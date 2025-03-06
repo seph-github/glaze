@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:glaze/firebase.dart';
+import 'package:glaze/home_page.dart';
+import 'package:glaze/login_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +20,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const LoginPage(),
     );
   }
 }
