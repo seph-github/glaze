@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "427955485240",
+    "project_id": "glaze-development",
+    "storage_bucket": "glaze-development.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:427955485240:android:04ec61e7e8fa391120c4cd",
+        "android_client_info": {
+          "package_name": "com.glaze.glaze_app.development"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqpiZQ92lDbHD3xKxxMscApIM0LaQSWJc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
