@@ -1,8 +1,9 @@
 // firebase.dart
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
-import 'package:glaze/firebase_options_production.dart' as production;
-import 'package:glaze/firebase_options_development.dart' as development;
+import 'package:glaze/firebase/firebase_options_production.dart' as production;
+import 'package:glaze/firebase/firebase_options_development.dart'
+    as development;
 
 Future<void> initializeFirebaseApp() async {
   // Determine which Firebase options to use based on the flavor
