@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:glaze/feature/home/home_page.dart';
-import 'package:glaze/feature/auth/login_page.dart';
+import 'package:glaze/feature/auth/views/login_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -11,12 +11,11 @@ part 'router.g.dart';
 @Riverpod(keepAlive: true)
 GoRouter router(Ref ref) {
   return GoRouter(
-    initialLocation: '/',
-    routes: $appRoutes, // Uses generated Typed Routes
+    initialLocation: '/login',
+    routes: $appRoutes,
   );
 }
 
-/// ✅ Typed Route Definitions
 @TypedGoRoute<HomeRoute>(path: '/')
 class HomeRoute extends GoRouteData {
   const HomeRoute();

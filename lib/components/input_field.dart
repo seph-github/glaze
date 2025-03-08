@@ -36,7 +36,7 @@ class InputField extends HookWidget {
   final String? initialValue;
   final TextInputType keyboardType;
   final TextInputAction _inputAction;
-  final String Function(String?)? validator;
+  final String? Function(String?)? validator;
   final void Function(String)? onChanged;
 
   @override
@@ -58,6 +58,12 @@ class InputField extends HookWidget {
           cursorColor: ColorPallete.whiteSmoke,
           decoration: InputDecoration(
             hintText: hintText,
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16.0),
+              borderSide: const BorderSide(
+                color: ColorPallete.whiteSmoke,
+              ),
+            ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16.0),
               borderSide: const BorderSide(
@@ -69,6 +75,13 @@ class InputField extends HookWidget {
               borderSide: const BorderSide(
                 width: 1 / 4,
                 color: ColorPallete.persianFable,
+              ),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16.0),
+              borderSide: const BorderSide(
+                width: 1,
+                color: ColorPallete.parlourRed,
               ),
             ),
             suffixIcon: obscureText

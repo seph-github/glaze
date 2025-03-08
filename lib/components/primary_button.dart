@@ -6,20 +6,39 @@ class PrimaryButton extends HookWidget {
   const PrimaryButton({
     super.key,
     required this.label,
+    this.onPressed,
   });
 
   final String label;
+  final Future<void> Function()? onPressed;
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = useState(false);
+
+    Future<void> handlePressed() async {
+      if (onPressed != null) {
+        isLoading.value = true;
+        try {
+          await onPressed!();
+        } finally {
+          isLoading.value = false;
+        }
+      }
+    }
+
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: isLoading.value ? null : handlePressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: ColorPallete.strawberryGlaze,
         ),
-        child: Text(label),
+        child: isLoading.value
+            ? const CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              )
+            : Text(label),
       ),
     );
   }
