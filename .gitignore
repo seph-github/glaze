@@ -47,3 +47,6 @@ app.*.map.json
 # Generated files
 **.freezed.dart
 **.g.dart
+
+# Private files
+/dart-defines/
