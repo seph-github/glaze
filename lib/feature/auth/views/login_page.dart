@@ -4,8 +4,6 @@ import 'package:glaze/components/input_field.dart';
 import 'package:glaze/components/primary_button.dart';
 import 'package:glaze/styles/color_pallete.dart';
 
-import '../repository/auth_repository.dart';
-
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key, String? redirect});
 
@@ -27,7 +25,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final authRepository = ref.watch(authRepositoryProvider);
+    // final authRepository = ref.watch(authRepositoryProvider);
 
     return Scaffold(
       backgroundColor: ColorPallete.blackPearl,
@@ -79,12 +77,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   print('is valid form ${formKey.currentState?.validate()}');
                   if (formKey.currentState?.validate() ?? false) {
                     try {
-                      final result = await authRepository.login(
-                        email: emailController.text,
-                        password: passwordController.text,
-                      );
+                      // final result = await authRepository.login(
+                      //   email: emailController.text,
+                      //   password: passwordController.text,
+                      // );
 
-                      print(result);
+                      // print(result);
                       // Navigate to home page or show success message
                     } catch (e) {
                       // Handle login error
