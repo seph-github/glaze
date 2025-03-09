@@ -11,7 +11,6 @@ Future<void> main() async {
   runZonedGuarded(
     () async {
       await initializer();
-
       runApp(
         const ProviderScope(
           child: App(),
