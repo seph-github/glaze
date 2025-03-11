@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:glaze/feature/home/home_page.dart';
-import 'package:glaze/feature/auth/views/login_page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:glaze/feature/auth/views/auth_view.dart';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'router.g.dart';
@@ -32,7 +32,7 @@ class LoginRoute extends GoRouteData {
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return LoginPage(redirect: redirectUri);
+    return AuthView(redirect: redirectUri);
   }
 }
 
@@ -53,12 +53,12 @@ class UploadRoute extends GoRouteData {
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return _authGuard(
-      // const UploadPage(),
-      const Placeholder(),
-      context,
-      state,
-    );
+    // return _authGuard(
+    // const UploadPage(),
+    return const Placeholder();
+    //   context,
+    //   state,
+    // );
   }
 }
 
@@ -68,24 +68,23 @@ class GlazeRoute extends GoRouteData {
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return _authGuard(
-      // const GlazePage(),
-      const Placeholder(),
-      context,
-      state,
-    );
+    // return _authGuard(
+    // const GlazePage(),
+    return const Placeholder();
+    //   context,
+    //   state,
+    // );
   }
 }
 
 /// ✅ Authentication Guard Function
-Widget _authGuard(Widget page, BuildContext context, GoRouterState state) {
-  final user = FirebaseAuth.instance.currentUser;
-  if (user == null) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final redirectUri = Uri.encodeComponent(state.uri.toString());
-      context.go('/login?redirect=$redirectUri');
-    });
-    return const SizedBox.shrink(); // Prevents briefly showing the page
-  }
-  return page;
-}
+// Widget _authGuard(Widget page, BuildContext context, GoRouterState state) {
+//   if (user == null) {
+//     WidgetsBinding.instance.addPostFrameCallback((_) {
+//       final redirectUri = Uri.encodeComponent(state.uri.toString());
+//       context.go('/login?redirect=$redirectUri');
+//     });
+//     return const SizedBox.shrink(); // Prevents briefly showing the page
+//   }
+//   return page;
+// }

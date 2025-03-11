@@ -14,7 +14,8 @@ class InputField extends HookWidget {
   })  : obscureText = false,
         controller = controller ?? TextEditingController(text: initialValue),
         keyboardType = TextInputType.emailAddress,
-        _inputAction = TextInputAction.next;
+        _inputAction = TextInputAction.next,
+        maxLines = 1;
 
   InputField.password({
     super.key,
@@ -27,7 +28,22 @@ class InputField extends HookWidget {
   })  : obscureText = true,
         controller = controller ?? TextEditingController(text: initialValue),
         keyboardType = TextInputType.text,
-        _inputAction = TextInputAction.go;
+        _inputAction = TextInputAction.go,
+        maxLines = 1;
+
+  InputField.text({
+    super.key,
+    required this.label,
+    this.hintText,
+    this.initialValue,
+    this.validator,
+    this.onChanged,
+    this.keyboardType = TextInputType.text,
+    TextEditingController? controller,
+  })  : controller = controller ?? TextEditingController(text: initialValue),
+        _inputAction = TextInputAction.next,
+        obscureText = false,
+        maxLines = 1;
 
   final String label;
   final String? hintText;
@@ -38,6 +54,7 @@ class InputField extends HookWidget {
   final TextInputAction _inputAction;
   final String? Function(String?)? validator;
   final void Function(String)? onChanged;
+  final int? maxLines;
 
   @override
   Widget build(BuildContext context) {
@@ -93,9 +110,11 @@ class InputField extends HookWidget {
                   )
                 : null,
           ),
+          controller: controller,
           obscureText: isObscured.value,
           keyboardType: keyboardType,
           textInputAction: _inputAction,
+          maxLines: maxLines,
           validator: (value) {
             return validator?.call(value);
           },

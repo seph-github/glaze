@@ -47,3 +47,7 @@ app.*.map.json
 # Generated files
 **.freezed.dart
 **.g.dart
+
+# Private files
+/dart-defines/
+**/ios/Flutter/Dart-Defines.xcconfig
