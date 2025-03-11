@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:glaze/feature/auth/provider/auth_service_provider.dart';
 import 'package:glaze/feature/auth/views/login_view.dart';
 import 'package:glaze/feature/auth/views/sign_up_view.dart';
 import 'package:glaze/styles/color_pallete.dart';
@@ -80,24 +81,29 @@ class _AuthViewState extends ConsumerState<AuthView> {
               ),
               PrimaryButton(
                 onPressed: () async {
-                  // if (formKey.currentState?.validate() ?? false) {
-                  //   try {
-                  //     ref.watch(loginNotifierProvider.notifier).login(
-                  //           email: emailController.text,
-                  //           password: passwordController.text,
-                  //         );
-                  //   } catch (e) {
-                  //     if (e is Exception) {
-                  //       if (context.mounted) {
-                  //         ScaffoldMessenger.of(context).showSnackBar(
-                  //           SnackBar(
-                  //             content: Text('Login failed: $e'),
-                  //           ),
-                  //         );
-                  //       }
-                  //     }
-                  //   }
-                  // }
+                  print('Validation ${formKey.currentState?.validate()}');
+                  if (formKey.currentState?.validate() ?? false) {
+                    print('username: ${usernameController.text}');
+                    print('email: ${emailController.text}');
+                    print('password: ${passwordController.text}');
+                    try {
+                      ref.watch(signupNotifierProvider.notifier).signup(
+                            username: usernameController.text,
+                            email: emailController.text,
+                            password: passwordController.text,
+                          );
+                    } catch (e) {
+                      if (e is Exception) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Login failed: $e'),
+                            ),
+                          );
+                        }
+                      }
+                    }
+                  }
                 },
                 // isLoading: ref.watch(loginNotifierProvider).isLoading,
                 label: initialPage == 0 ? 'Login' : 'Sign Up',

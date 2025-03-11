@@ -1,10 +1,12 @@
-import 'package:glaze/models/user/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../../entities/user_entity.dart';
 
 class AuthService {
   AuthService({required this.supabaseClient});
 
   final SupabaseClient supabaseClient;
+
   Future<AuthResponse> signInWithEmailPassword(
       {required String email, required String password}) async {
     try {
@@ -13,7 +15,6 @@ class AuthService {
         password: password,
       );
 
-      print('Result $result');
       return result;
     } catch (e) {
       rethrow;
@@ -25,20 +26,21 @@ class AuthService {
       required String password,
       required String username}) async {
     try {
-      await supabaseClient.auth.signUp(
+      final userResult = await supabaseClient.auth.signUp(
         email: email,
         password: password,
       );
 
       final usersDb = supabaseClient.from('users');
 
-      // final user = UserModel(
-      //   email: email,
-      //   username: username,
+      final user = UserEntity(
+        id: userResult.user!.id,
+        email: email,
+        username: username,
+        createdAt: DateTime.now(),
+      );
 
-      // );
-
-      await usersDb.insert({UserModel});
+      await usersDb.insert(user.toMap());
     } catch (e) {
       rethrow;
     }

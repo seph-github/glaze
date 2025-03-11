@@ -20,6 +20,20 @@ class UserEntity {
     this.badges,
     this.createdAt,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'username': username,
+      'email': email,
+      'profile_image_url': profileImageUrl,
+      'bio': bio,
+      'total_glazes': totalGlazes,
+      'total_uploads': totalUploads,
+      'badges': badges,
+      'created_at': createdAt?.toIso8601String(),
+    };
+  }
 }
 
 class UserEntityEmpty extends UserEntity {

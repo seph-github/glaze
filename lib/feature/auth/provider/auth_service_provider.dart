@@ -36,9 +36,13 @@ class SignupNotifier extends _$SignupNotifier {
       required String password,
       required String username}) async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(
-      () => ref.read(authServiceProvider).signUpWithEmailPassword(
-          email: email, password: password, username: username),
-    );
+    try {
+      state = await AsyncValue.guard(
+        () => ref.read(authServiceProvider).signUpWithEmailPassword(
+            email: email, password: password, username: username),
+      );
+    } catch (e, _) {
+      rethrow;
+    }
   }
 }
