@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glaze/feature/home/view/video_player_view.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:glaze/helper/auth_check_helper.dart';
 import 'package:glaze/providers/file_picker/file_picker_provider.dart';
 import 'package:glaze/providers/video_provider/video_provider.dart';
+import 'package:glaze/routing/auth_guard/auth_guard.dart';
+import 'package:glaze/routing/router.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../components/dialogs/dialogs.dart';
 
@@ -109,11 +113,21 @@ class _BottomIcons extends StatelessWidget {
                 builder: (context, ref, child) {
                   return IconButton(
                     icon: const Icon(Icons.add_a_photo_rounded),
-                    // onPressed: () async => await ref
-                    //     .read(filePickerNotifierProvider.notifier)
-                    //     .pickFile(),
-                    onPressed: () async =>
-                        await Dialogs.showBottomDialog(context),
+                    onPressed: () async {
+                      final router = GoRouter.of(context);
+                      final hasUser =
+                          await AuthCheckHelper.isLoggedIn(ref: ref);
+
+                      if (hasUser) {
+                        return await ref
+                            .read(filePickerNotifierProvider.notifier)
+                            .pickFile();
+                      } else {
+                        router.push(const LoginRoute().location);
+                      }
+                    },
+                    // onPressed: () async =>
+                    //     await Dialogs.showBottomDialog(context),
                   );
                 },
               ),

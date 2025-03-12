@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:glaze/feature/auth/providers/auth_service_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:glaze/feature/home/home_page.dart';
 import 'package:glaze/feature/auth/views/auth_view.dart';
