@@ -12,7 +12,7 @@
       "program": "lib/main.dart",
       "args": [
         "--dart-define-from-file=dart-defines/development.json",
-        "-v"]
+      ]
     },
     {
       "name": "Production Debug",

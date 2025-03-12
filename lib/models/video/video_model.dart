@@ -1,3 +1,5 @@
+// ignore_for_file: invalid_annotation_target
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'video_model.freezed.dart';
@@ -7,14 +9,14 @@ part 'video_model.g.dart';
 class VideoModel with _$VideoModel {
   const factory VideoModel({
     required String id,
-    required String userId,
-    required String videoUrl,
-    required String thumbnailUrl,
+    @JsonKey(name: 'user_id') required String userId,
+    @JsonKey(name: 'video_url') required String videoUrl,
+    @JsonKey(name: 'thumbnail_url') required String thumbnailUrl,
     String? caption,
     String? category,
-    int? glazesCount,
+    @JsonKey(name: 'glaze_count') int? glazesCount,
     String? status,
-    DateTime? createdAt,
+    @JsonKey(name: 'created_at') DateTime? createdAt,
   }) = _VideoModel;
 
   factory VideoModel.fromJson(Map<String, dynamic> json) =>

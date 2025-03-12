@@ -1,6 +1,18 @@
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+part 'supabase_services.g.dart';
+
+@riverpod
+SupabaseService supabaseService(ref) {
+  return SupabaseService.instance;
+}
+
 class SupabaseService {
+  SupabaseService._();
+
+  static SupabaseService instance = SupabaseService._();
+
   final supabase = Supabase.instance.client;
 
   Future<List<Map<String, dynamic>>> select({

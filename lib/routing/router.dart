@@ -6,12 +6,14 @@ import 'package:glaze/feature/auth/views/auth_view.dart';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import 'auth_guard/auth_guard.dart';
+
 part 'router.g.dart';
 
 @Riverpod(keepAlive: true)
 GoRouter router(Ref ref) {
   return GoRouter(
-    initialLocation: '/login',
+    initialLocation: '/',
     routes: $appRoutes,
   );
 }
@@ -46,19 +48,17 @@ class RegisterRoute extends GoRouteData {
       const Placeholder();
 }
 
-/// ✅ Protected Routes (Require Authentication)
 @TypedGoRoute<UploadRoute>(path: '/upload')
 class UploadRoute extends GoRouteData {
   const UploadRoute();
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    // return _authGuard(
-    // const UploadPage(),
-    return const Placeholder();
-    //   context,
-    //   state,
-    // );
+    return Consumer(
+      builder: (context, ref, child) {
+        return authGuard(context, state, () => const Placeholder(), ref);
+      },
+    );
   }
 }
 
@@ -68,23 +68,10 @@ class GlazeRoute extends GoRouteData {
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    // return _authGuard(
-    // const GlazePage(),
-    return const Placeholder();
-    //   context,
-    //   state,
-    // );
+    return Consumer(
+      builder: (context, ref, child) {
+        return authGuard(context, state, () => const Placeholder(), ref);
+      },
+    );
   }
 }
-
-/// ✅ Authentication Guard Function
-// Widget _authGuard(Widget page, BuildContext context, GoRouterState state) {
-//   if (user == null) {
-//     WidgetsBinding.instance.addPostFrameCallback((_) {
-//       final redirectUri = Uri.encodeComponent(state.uri.toString());
-//       context.go('/login?redirect=$redirectUri');
-//     });
-//     return const SizedBox.shrink(); // Prevents briefly showing the page
-//   }
-//   return page;
-// }

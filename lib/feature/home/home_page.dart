@@ -1,16 +1,63 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glaze/feature/home/view/video_player_view.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:glaze/providers/video_provider/video_provider.dart';
 
-const List<String> urls = [
-  'https://videos.pexels.com/video-files/17169505/17169505-hd_1080_1920_30fps.mp4',
-  'https://videos.pexels.com/video-files/17687289/17687289-uhd_1440_2560_30fps.mp4',
-  'https://videos.pexels.com/video-files/27868392/12251113_1080_1922_30fps.mp4',
-  'https://videos.pexels.com/video-files/15000517/15000517-uhd_1296_2304_30fps.mp4'
-];
-
-class HomePage extends StatelessWidget {
+class HomePage extends ConsumerWidget {
   const HomePage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Consumer(
+      builder: (context, ref, child) {
+        final state = ref.watch(videoNotifierProvider);
+        return state.when(
+          data: (data) {
+            return _VideoListView(data: data);
+          },
+          error: (error, stackTrace) => _ErrorView(
+            error: error.toString(),
+          ),
+          loading: () => const _LoadingView(),
+        );
+      },
+    );
+  }
+}
+
+class _LoadingView extends StatelessWidget {
+  const _LoadingView();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+  }
+}
+
+class _ErrorView extends StatelessWidget {
+  final String error;
+
+  const _ErrorView({required this.error});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Text(error),
+      ),
+    );
+  }
+}
+
+class _VideoListView extends StatelessWidget {
+  final List<dynamic> data;
+
+  const _VideoListView({required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -19,10 +66,10 @@ class HomePage extends StatelessWidget {
         alignment: Alignment.bottomCenter,
         children: [
           CarouselSlider.builder(
-            itemCount: urls.length,
+            itemCount: data.length,
             itemBuilder: (context, index, realIndex) {
               return VideoPlayerView(
-                url: urls[index],
+                url: data[index].videoUrl,
               );
             },
             options: CarouselOptions(
@@ -30,30 +77,44 @@ class HomePage extends StatelessWidget {
               height: MediaQuery.of(context).size.height,
               viewportFraction: 1.0,
               pageSnapping: true,
+              aspectRatio: 9 / 16,
+              enableInfiniteScroll: false,
             ),
           ),
-          Positioned(
-            bottom: MediaQuery.of(context).size.height / 4,
-            left: 0,
-            right: 0,
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  children: [
-                    Icon(Icons.account_circle),
-                    Icon(Icons.account_circle),
-                  ],
-                ),
-                Column(
-                  children: [
-                    Icon(Icons.account_circle),
-                    Icon(Icons.account_circle),
-                    Icon(Icons.account_circle),
-                  ],
-                ),
-              ],
-            ),
+          const _BottomIcons(),
+        ],
+      ),
+    );
+  }
+}
+
+class _BottomIcons extends StatelessWidget {
+  const _BottomIcons();
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      bottom: MediaQuery.of(context).size.height / 4,
+      left: 0,
+      right: 0,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.add_a_photo_rounded),
+                onPressed: () {},
+              ),
+              const Icon(Icons.account_circle),
+            ],
+          ),
+          const Column(
+            children: [
+              Icon(Icons.account_circle),
+              Icon(Icons.account_circle),
+              Icon(Icons.account_circle),
+            ],
           ),
         ],
       ),

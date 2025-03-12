@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:glaze/feature/auth/provider/auth_service_provider.dart';
+import 'package:glaze/feature/auth/providers/auth_service_provider.dart';
 import 'package:glaze/feature/auth/views/login_view.dart';
 import 'package:glaze/feature/auth/views/sign_up_view.dart';
 import 'package:glaze/styles/color_pallete.dart';

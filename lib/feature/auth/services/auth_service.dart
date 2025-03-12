@@ -53,4 +53,22 @@ class AuthService {
       rethrow;
     }
   }
+
+  Future<User?> getCurrentUser() async {
+    try {
+      final session = supabaseClient.auth.currentSession;
+
+      print('Session: $session');
+
+      if (session == null) return null;
+
+      return supabaseClient.auth.currentUser;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Stream<AuthState> onAuthStateChange() {
+    return supabaseClient.auth.onAuthStateChange;
+  }
 }
