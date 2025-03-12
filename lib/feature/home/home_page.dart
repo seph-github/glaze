@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glaze/feature/home/view/video_player_view.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:glaze/providers/file_picker/file_picker_provider.dart';
 import 'package:glaze/providers/video_provider/video_provider.dart';
+
+import '../../components/dialogs/dialogs.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -102,9 +105,17 @@ class _BottomIcons extends StatelessWidget {
         children: [
           Column(
             children: [
-              IconButton(
-                icon: const Icon(Icons.add_a_photo_rounded),
-                onPressed: () {},
+              Consumer(
+                builder: (context, ref, child) {
+                  return IconButton(
+                    icon: const Icon(Icons.add_a_photo_rounded),
+                    // onPressed: () async => await ref
+                    //     .read(filePickerNotifierProvider.notifier)
+                    //     .pickFile(),
+                    onPressed: () async =>
+                        await Dialogs.showBottomDialog(context),
+                  );
+                },
               ),
               const Icon(Icons.account_circle),
             ],
