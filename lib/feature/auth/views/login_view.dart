@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../components/input_field.dart';
+import '../../../components/inputs/input_field.dart';
 
 class LoginView extends StatelessWidget {
   const LoginView({

@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:glaze/components/input_field.dart';
+import 'package:glaze/components/inputs/input_field.dart';
 
 class SignUpView extends StatelessWidget {
   const SignUpView({

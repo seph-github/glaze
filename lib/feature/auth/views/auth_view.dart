@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:glaze/feature/auth/providers/auth_service_provider.dart';
+import 'package:glaze/repository/auth_service/auth_service_provider.dart';
 import 'package:glaze/feature/auth/views/login_view.dart';
 import 'package:glaze/feature/auth/views/sign_up_view.dart';
-import 'package:glaze/styles/color_pallete.dart';
+import 'package:glaze/core/styles/color_pallete.dart';
 
-import '../../../components/primary_button.dart';
+import '../../../components/buttons/primary_button.dart';
 
 class AuthView extends ConsumerStatefulWidget {
   const AuthView({super.key, String? redirect});
@@ -81,17 +81,19 @@ class _AuthViewState extends ConsumerState<AuthView> {
               ),
               PrimaryButton(
                 onPressed: () async {
-                  print('Validation ${formKey.currentState?.validate()}');
                   if (formKey.currentState?.validate() ?? false) {
-                    print('username: ${usernameController.text}');
-                    print('email: ${emailController.text}');
-                    print('password: ${passwordController.text}');
                     try {
-                      ref.watch(signupNotifierProvider.notifier).signup(
-                            username: usernameController.text,
+                      if (initialPage == 0) {
+                        ref.read(loginNotifierProvider.notifier).login(
                             email: emailController.text,
-                            password: passwordController.text,
-                          );
+                            password: passwordController.text);
+                      } else {
+                        ref.read(signupNotifierProvider.notifier).signup(
+                              username: usernameController.text,
+                              email: emailController.text,
+                              password: passwordController.text,
+                            );
+                      }
                     } catch (e) {
                       if (e is Exception) {
                         if (context.mounted) {
@@ -105,7 +107,9 @@ class _AuthViewState extends ConsumerState<AuthView> {
                     }
                   }
                 },
-                // isLoading: ref.watch(loginNotifierProvider).isLoading,
+                isLoading: initialPage == 0
+                    ? ref.watch(loginNotifierProvider).isLoading
+                    : ref.watch(signupNotifierProvider).isLoading,
                 label: initialPage == 0 ? 'Login' : 'Sign Up',
               ),
               GestureDetector(
