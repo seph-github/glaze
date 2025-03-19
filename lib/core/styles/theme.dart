@@ -13,7 +13,7 @@ ThemeData theme = ThemeData(
     surface: ColorPallete.black,
     onSurface: ColorPallete.whiteSmoke,
   ),
-  iconTheme: const IconThemeData(size: 40, color: ColorPallete.whiteSmoke),
+  iconTheme: const IconThemeData(size: 40, color: Colors.limeAccent),
   textTheme: const TextTheme(
     bodyLarge: TextStyle(color: ColorPallete.whiteSmoke),
     bodyMedium: TextStyle(color: ColorPallete.whiteSmoke),
@@ -30,9 +30,5 @@ ThemeData theme = ThemeData(
     headlineLarge: TextStyle(color: ColorPallete.whiteSmoke),
     headlineMedium: TextStyle(color: ColorPallete.whiteSmoke),
     headlineSmall: TextStyle(color: ColorPallete.whiteSmoke),
-  ),
-  appBarTheme: const AppBarTheme(
-    iconTheme: IconThemeData(
-        size: 18, color: Colors.amber), // Set back button icon size to default
   ),
 );

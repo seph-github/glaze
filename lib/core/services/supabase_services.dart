@@ -49,6 +49,15 @@ class SupabaseService {
     return response.first;
   }
 
+  Future<List<Map<String, dynamic>>> filterByColumn({
+    required String table,
+    required String column,
+    required String value,
+  }) async {
+    final response = await supabase.from(table).select().eq(column, value);
+    return response;
+  }
+
   Future<List<Map<String, dynamic>>> filterById({
     required String table,
     required String id,
@@ -62,6 +71,16 @@ class SupabaseService {
     required Map<String, dynamic> data,
   }) async {
     await supabase.from(table).insert(data);
+  }
+
+  Future<void> toggleRpc({
+    required String fn,
+    Map<String, dynamic>? params,
+  }) async {
+    await supabase.rpc(
+      fn,
+      params: params,
+    );
   }
 
   Future<void> update({

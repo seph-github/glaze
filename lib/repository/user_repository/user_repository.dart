@@ -3,6 +3,7 @@ import 'package:glaze/repository/auth_service/auth_service_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../data/models/glaze/glaze_model.dart';
 import '../../data/models/user/user_model.dart';
 import '../../data/models/video/video_model.dart';
 
@@ -38,6 +39,12 @@ class UserRepository {
       );
 
       if (response.isNotEmpty) {
+        final glazedResponse = await supabaseService.select(
+          table: 'glazes',
+          filterColumn: 'user_id',
+          filterValue: user.id,
+        );
+
         final videoResponse = await supabaseService.select(
           table: 'videos',
           filterColumn: 'user_id',
@@ -45,7 +52,9 @@ class UserRepository {
         );
 
         return UserModel.fromJson(response).copyWith(
-            videos: videoResponse.map((e) => VideoModel.fromJson(e)).toList());
+          glazes: glazedResponse.map((e) => GlazeModel.fromJson(e)).toList(),
+          videos: videoResponse.map((e) => VideoModel.fromJson(e)).toList(),
+        );
       }
     } catch (e) {
       print(e);

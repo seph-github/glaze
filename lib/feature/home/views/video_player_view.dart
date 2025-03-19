@@ -84,6 +84,7 @@ class VideoPlayerView extends HookWidget {
       return () {
         videoPlayerController.value?.dispose();
         hideControlsTimer.value?.cancel();
+        isError.dispose(); // Dispose the isError notifier
       };
     }, [url]);
 
@@ -116,7 +117,7 @@ class VideoPlayerView extends HookWidget {
           alignment: Alignment.center,
           children: [
             AspectRatio(
-              aspectRatio: videoPlayerController.value!.value.aspectRatio,
+              aspectRatio: 9 / 19.5,
               child: VideoPlayer(videoPlayerController.value!),
             ),
             if (showControls.value)

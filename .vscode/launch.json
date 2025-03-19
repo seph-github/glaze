@@ -12,7 +12,8 @@
       "program": "lib/main.dart",
       "args": [
         "--dart-define-from-file=dart-defines/development.json",
-      ]
+      ],
+      "noDebug": true
     },
     {
       "name": "Production Debug",
@@ -23,7 +24,9 @@
       "args": [
         "--flavor",
         "production",
-        "-v"]
+        "-v"
+      ],
+      "noDebug": true
     },
     {
       "name": "glaze (release mode)",
@@ -34,7 +37,9 @@
       "args": [
         "--flavor",
         "production",
-        "-v"]
+        "-v"
+      ],
+      "noDebug": true
     }
   ]
 }

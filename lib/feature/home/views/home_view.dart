@@ -65,34 +65,28 @@ class _VideoListView extends ConsumerWidget {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       primary: true,
-      body: Stack(
-        alignment: Alignment.bottomCenter,
-        children: [
-          RefreshIndicator(
-            onRefresh: () => ref.refresh(videoRepositoryProvider).fetchVideos(),
-            color: Colors.amber,
-            triggerMode: RefreshIndicatorTriggerMode.onEdge,
-            child: PageView.builder(
-              itemCount: data.length,
-              scrollDirection: Axis.vertical,
-              itemBuilder: (context, index) {
-                return VideoPlayerView(
+      body: RefreshIndicator(
+        onRefresh: () => ref.refresh(videoRepositoryProvider).fetchVideos(),
+        color: Colors.amber,
+        triggerMode: RefreshIndicatorTriggerMode.onEdge,
+        child: PageView.builder(
+          itemCount: data.length,
+          scrollDirection: Axis.vertical,
+          itemBuilder: (context, index) {
+            return Stack(
+              alignment: Alignment.bottomCenter,
+              children: [
+                VideoPlayerView(
                   url: data[index].videoUrl,
                   thumbnailUrl: data[index].thumbnailUrl,
-                );
-              },
-              // options: CarouselOptions(
-              //   scrollDirection: Axis.vertical,
-              //   height: MediaQuery.of(context).size.height,
-              //   viewportFraction: 1.0,
-              //   pageSnapping: true,
-              //   aspectRatio: 9 / 16,
-              //   enableInfiniteScroll: false,
-              // ),
-            ),
-          ),
-          const BottomIcons(),
-        ],
+                ),
+                BottomIcons(
+                  video: data[index],
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

@@ -85,7 +85,7 @@ class ProfileView extends ConsumerWidget {
               ),
               const SizedBox(height: 20),
               Container(
-                height: 200.0,
+                // height: 200.0,
                 width: double.infinity,
                 decoration: const BoxDecoration(
                   borderRadius: BorderRadius.all(
@@ -99,31 +99,52 @@ class ProfileView extends ConsumerWidget {
                   ),
                 ),
                 padding: const EdgeInsets.all(16.0),
-                child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'Glaze',
                       style: TextStyle(fontSize: 20),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        GlazeButton(
-                          label: '🍩',
-                        ),
-                        GlazeButton(
-                          label: '✨',
-                        ),
-                        GlazeButton(
-                          label: '🌀',
-                        ),
-                        GlazeButton(
-                          label: '💎',
-                        ),
-                      ],
+                    const SizedBox(height: 20),
+                    Wrap(
+                      direction: Axis.horizontal,
+                      spacing: 12.0,
+                      runSpacing: 12.0,
+                      alignment: WrapAlignment.start,
+                      children: value.maybeWhen(
+                        orElse: () => [],
+                        data: (glaze) {
+                          final glazes = glaze!.glazes;
+                          return glazes
+                                  ?.map(
+                                    (glaze) => const GlazeButton(
+                                      label: '🍩',
+                                    ),
+                                  )
+                                  .toList() ??
+                              [];
+                        },
+                      ),
                     ),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //   children: [
+                    //     GlazeButton(
+                    //       label: '🍩',
+                    //     ),
+                    //     GlazeButton(
+                    //       label: '✨',
+                    //     ),
+                    //     GlazeButton(
+                    //       label: '🌀',
+                    //     ),
+                    //     GlazeButton(
+                    //       label: '💎',
+                    //     ),
+                    //   ],
+                    // ),
                   ],
                 ),
               ),

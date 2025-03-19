@@ -1,4 +1,7 @@
+// ignore_for_file: invalid_annotation_target
+
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:glaze/data/models/glaze/glaze_model.dart';
 import 'package:glaze/data/models/video/video_model.dart';
 
 part 'user_model.freezed.dart';
@@ -10,13 +13,12 @@ class UserModel with _$UserModel {
     required String id,
     required String username,
     required String email,
-    String? profileImageUrl,
+    @JsonKey(name: 'profile_image_url') String? profileImageUrl,
     String? bio,
-    int? totalGlazes,
-    int? totalUploads,
+    List<GlazeModel>? glazes,
     List<VideoModel>? videos,
     String? badges,
-    DateTime? createdAt,
+    @JsonKey(name: 'created_at') DateTime? createdAt,
   }) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>
