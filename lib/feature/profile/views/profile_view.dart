@@ -63,6 +63,7 @@ class ProfileView extends ConsumerWidget {
               const SizedBox(height: 20),
               InputField.text(
                 label: 'User Name',
+                hintText: 'Username',
                 readOnly: true,
                 initialValue: value.maybeWhen(
                     orElse: () => '', data: (data) => data?.username),
@@ -85,7 +86,6 @@ class ProfileView extends ConsumerWidget {
               ),
               const SizedBox(height: 20),
               Container(
-                // height: 200.0,
                 width: double.infinity,
                 decoration: const BoxDecoration(
                   borderRadius: BorderRadius.all(

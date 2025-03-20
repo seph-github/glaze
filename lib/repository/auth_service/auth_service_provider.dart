@@ -1,17 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:glaze/core/services/supabase_services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-import '../../data/entities/user_entity.dart';
-import '../supabase_client_provider/supabase_client_provider.dart';
 
 part 'auth_service_provider.g.dart';
 
 @riverpod
 AuthService authService(ref) {
-  final supabaseClient = ref.watch(supabaseClientProvider);
-  return AuthService(supabaseClient: supabaseClient);
+  final supabaseClient = ref.watch(supabaseServiceProvider);
+  return AuthService(supabaseService: supabaseClient);
 }
 
 @riverpod
@@ -20,8 +18,8 @@ class LoginNotifier extends _$LoginNotifier {
   FutureOr build() => null;
 
   Future<void> login({required String email, required String password}) async {
-    state = const AsyncLoading();
     try {
+      state = const AsyncLoading();
       state = await AsyncValue.guard(
         () => ref
             .read(authServiceProvider)
@@ -44,13 +42,13 @@ class SignupNotifier extends _$SignupNotifier {
       {required String email,
       required String password,
       required String username}) async {
-    state = const AsyncLoading();
     try {
+      state = const AsyncLoading();
       state = await AsyncValue.guard(
         () => ref.read(authServiceProvider).signUpWithEmailPassword(
             email: email, password: password, username: username),
       );
-    } catch (e, _) {
+    } catch (e) {
       Fluttertoast.showToast(
         msg: e.toString(),
       );
@@ -59,14 +57,14 @@ class SignupNotifier extends _$SignupNotifier {
 }
 
 class AuthService {
-  AuthService({required this.supabaseClient});
+  AuthService({required this.supabaseService});
 
-  final SupabaseClient supabaseClient;
+  final SupabaseService supabaseService;
 
   Future<AuthResponse> signInWithEmailPassword(
       {required String email, required String password}) async {
     try {
-      final result = await supabaseClient.auth.signInWithPassword(
+      final result = await supabaseService.supabase.auth.signInWithPassword(
         email: email,
         password: password,
       );
@@ -77,34 +75,35 @@ class AuthService {
     }
   }
 
-  Future<void> signUpWithEmailPassword(
-      {required String email,
-      required String password,
-      required String username}) async {
+  Future<void> signUpWithEmailPassword({
+    required String email,
+    required String password,
+    required String username,
+  }) async {
     try {
-      final userResult = await supabaseClient.auth.signUp(
+      final AuthResponse authResponse =
+          await supabaseService.supabase.auth.signUp(
         email: email,
         password: password,
       );
 
-      final usersDb = supabaseClient.from('users');
+      print('User ${authResponse.user}');
 
-      final user = UserEntity(
-        id: userResult.user!.id,
-        email: email,
-        username: username,
-        createdAt: DateTime.now(),
+      await supabaseService.update(
+        id: authResponse.user!.id,
+        table: 'profiles',
+        data: {
+          'username': username,
+        },
       );
-
-      await usersDb.insert(user.toMap());
     } catch (e) {
-      rethrow;
+      throw Exception('SignUpRepository.signUp: $e');
     }
   }
 
   Future<void> signOut() async {
     try {
-      await supabaseClient.auth.signOut();
+      await supabaseService.supabase.auth.signOut();
     } catch (e) {
       rethrow;
     }
@@ -112,18 +111,18 @@ class AuthService {
 
   Future<User?> getCurrentUser() async {
     try {
-      final session = supabaseClient.auth.currentSession;
+      final session = supabaseService.supabase.auth.currentSession;
 
       if (session == null) return null;
 
-      return supabaseClient.auth.currentUser;
+      return supabaseService.supabase.auth.currentUser;
     } catch (e) {
       rethrow;
     }
   }
 
   Stream<AuthState> onAuthStateChange() {
-    return supabaseClient.auth.onAuthStateChange;
+    return supabaseService.supabase.auth.onAuthStateChange;
   }
 }
 

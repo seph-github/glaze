@@ -16,7 +16,8 @@ class BottomIcons extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Future<void> showMustLoginWarning(GoRouter router) async {
+    Future<void> showMustLoginWarning(BuildContext context) async {
+      final router = GoRouter.of(context);
       await Dialogs.createContentDialog(
         context,
         title: 'Error',
@@ -42,12 +43,11 @@ class BottomIcons extends ConsumerWidget {
               IconButton(
                 icon: const Icon(Icons.add_a_photo_rounded),
                 onPressed: () async {
-                  final router = GoRouter.of(context);
                   final user =
                       await ref.watch(authServiceProvider).getCurrentUser();
 
                   if (user == null && context.mounted) {
-                    return await showMustLoginWarning(router);
+                    return await showMustLoginWarning(context);
                   }
 
                   if (context.mounted) {
@@ -78,12 +78,11 @@ class BottomIcons extends ConsumerWidget {
                       const Icon(Icons.thumb_up_alt_outlined),
                 ),
                 onPressed: () async {
-                  final router = GoRouter.of(context);
                   final user =
                       await ref.watch(authServiceProvider).getCurrentUser();
 
                   if (user == null && context.mounted) {
-                    return await showMustLoginWarning(router);
+                    return await showMustLoginWarning(context);
                   }
                   await ref
                       .read(glazeRepositoryProvider)
@@ -96,15 +95,16 @@ class BottomIcons extends ConsumerWidget {
               const Icon(Icons.share),
               IconButton(
                 onPressed: () async {
-                  final router = GoRouter.of(context);
                   final user =
                       await ref.watch(authServiceProvider).getCurrentUser();
 
                   if (user == null && context.mounted) {
-                    return await showMustLoginWarning(router);
+                    return await showMustLoginWarning(context);
                   }
 
-                  router.push(const ProfileRoute().location);
+                  if (context.mounted) {
+                    context.push(const ProfileRoute().location);
+                  }
                 },
                 icon: const Icon(Icons.account_circle),
               ),

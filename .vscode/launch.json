@@ -13,7 +13,6 @@
       "args": [
         "--dart-define-from-file=dart-defines/development.json",
       ],
-      "noDebug": true
     },
     {
       "name": "Production Debug",

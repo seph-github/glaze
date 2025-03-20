@@ -5,15 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:app_links/app_links.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class VideoPlayerView extends HookWidget {
-  const VideoPlayerView(
-      {super.key, required this.url, required this.thumbnailUrl});
+import '../../../data/models/video/video_model.dart';
 
-  final String url;
-  final String thumbnailUrl;
+class VideoPlayerView extends ConsumerWidget {
+  const VideoPlayerView({super.key, required this.videoModel});
+
+  final VideoModel videoModel;
 
   Future<File> _ensureMp4Extension(File file) async {
     if (!file.path.toLowerCase().endsWith('.mp4')) {
@@ -60,50 +59,43 @@ class VideoPlayerView extends HookWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final videoPlayerController = useState<VideoPlayerController?>(null);
-    final isError = useState(false);
-    final showControls = useState(false);
-    final hideControlsTimer = useState<Timer?>(null);
-    final isThumbnailError = useState(false);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final videoPlayerController = ref.watch(videoPlayerControllerProvider);
+    final isError = ref.watch(isErrorProvider);
+    final showControls = ref.watch(showControlsProvider);
+    final hideControlsTimer = ref.watch(hideControlsTimerProvider);
+    final isThumbnailError = ref.watch(isThumbnailErrorProvider);
 
-    useEffect(() {
-      _preloadVideo(url, videoPlayerController, isError);
-
-      // Example usage of AppLinks
-      final appLinks = AppLinks();
-      appLinks.getInitialLink().then((initialLink) {
-        if (initialLink != null) {
-          // Handle the initial link
-          print('Initial link: $initialLink');
+    ref.listen(
+      videoPlayerControllerProvider,
+      (previous, next) {
+        if (previous != next) {
+          _preloadVideo(
+            videoModel.videoUrl,
+            ValueNotifier(videoPlayerController),
+            ValueNotifier(isError),
+          );
         }
-      }).catchError((error) {
-        print('Error getting initial link: $error');
-      });
-
-      return () {
-        videoPlayerController.value?.dispose();
-        hideControlsTimer.value?.cancel();
-        isError.dispose(); // Dispose the isError notifier
-      };
-    }, [url]);
+      },
+    );
 
     void toggleControls() {
-      showControls.value = !showControls.value;
+      ref.read(showControlsProvider.notifier).state = !showControls;
 
-      if (showControls.value) {
-        hideControlsTimer.value?.cancel();
-        hideControlsTimer.value = Timer(const Duration(seconds: 1), () {
-          showControls.value = false;
+      if (showControls) {
+        hideControlsTimer?.cancel();
+        ref.read(hideControlsTimerProvider.notifier).state =
+            Timer(const Duration(seconds: 1), () {
+          ref.read(showControlsProvider.notifier).state = false;
         });
       }
     }
 
     void togglePlayPause() {
-      if (videoPlayerController.value!.value.isPlaying) {
-        videoPlayerController.value!.pause();
+      if (videoPlayerController!.value.isPlaying) {
+        videoPlayerController.pause();
       } else {
-        videoPlayerController.value!.play();
+        videoPlayerController.play();
       }
     }
 
@@ -118,9 +110,11 @@ class VideoPlayerView extends HookWidget {
           children: [
             AspectRatio(
               aspectRatio: 9 / 19.5,
-              child: VideoPlayer(videoPlayerController.value!),
+              child: VideoPlayer(
+                videoPlayerController!,
+              ),
             ),
-            if (showControls.value)
+            if (showControls)
               Container(
                 width: 50,
                 height: 50,
@@ -129,7 +123,7 @@ class VideoPlayerView extends HookWidget {
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  videoPlayerController.value!.value.isPlaying
+                  videoPlayerController.value.isPlaying
                       ? Icons.pause
                       : Icons.play_arrow,
                   color: Colors.white,
@@ -142,33 +136,57 @@ class VideoPlayerView extends HookWidget {
     }
 
     Widget buildThumbnail() {
-      return isThumbnailError.value
+      return isThumbnailError
           ? const CircularProgressIndicator()
           : Image.network(
-              thumbnailUrl,
-              // errorBuilder: (context, error, stackTrace) {
-              //   if (error is NetworkImageLoadException &&
-              //       error.statusCode == 404) {
-              //     WidgetsBinding.instance.addPostFrameCallback(
-              //       (_) {
-              //         isThumbnailError.value = true;
-              //       },
-              //     );
-              //   }
-              //   return const CircularProgressIndicator();
-              // },
+              videoModel.thumbnailUrl,
+              errorBuilder: (context, error, stackTrace) {
+                if (error is NetworkImageLoadException &&
+                    error.statusCode == 404) {
+                  WidgetsBinding.instance.addPostFrameCallback(
+                    (_) {
+                      // isThumbnailError.value = true;
+                    },
+                  );
+                }
+                return const CircularProgressIndicator();
+              },
             );
     }
 
     return Scaffold(
       body: Center(
-        child: isError.value
+        child: isError
             ? const Text('Error loading video')
-            : videoPlayerController.value != null &&
-                    videoPlayerController.value!.value.isInitialized
+            : videoPlayerController != null &&
+                    videoPlayerController.value.isInitialized
                 ? buildVideoPlayer()
                 : buildThumbnail(),
       ),
     );
+  }
+}
+
+final videoPlayerControllerProvider = StateNotifierProvider<
+    VideoPlayerControllerNotifier, VideoPlayerController?>((ref) {
+  return VideoPlayerControllerNotifier();
+});
+
+final isErrorProvider = StateProvider<bool>((ref) => false);
+final showControlsProvider = StateProvider<bool>((ref) => false);
+final hideControlsTimerProvider = StateProvider<Timer?>((ref) => null);
+final isThumbnailErrorProvider = StateProvider<bool>((ref) => false);
+
+class VideoPlayerControllerNotifier
+    extends StateNotifier<VideoPlayerController?> {
+  VideoPlayerControllerNotifier() : super(null);
+
+  void setController(VideoPlayerController controller) {
+    state = controller;
+  }
+
+  void disposeController() {
+    state?.dispose();
+    state = null;
   }
 }

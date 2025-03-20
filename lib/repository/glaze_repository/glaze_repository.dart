@@ -17,8 +17,9 @@ class GlazeNotifier extends _$GlazeNotifier {
   @override
   FutureOr<List<GlazeModel>> build() async {
     final user = await ref.watch(authServiceProvider).getCurrentUser();
+    if (user == null) return [];
     return ref.watch(glazeRepositoryProvider).fetchUserGlaze(
-          userId: user!.id,
+          userId: user.id,
         );
   }
 }
@@ -32,12 +33,11 @@ class GlazeRepository {
   Future<void> onGlaze(
       {required String videoId, required String userId}) async {
     try {
-      print('called');
       await _supabaseService.toggleRpc(
         fn: 'toggle_glaze',
         params: {
-          'p_video_id': videoId,
           'p_user_id': userId,
+          'p_video_id': videoId,
         },
       );
     } catch (e) {

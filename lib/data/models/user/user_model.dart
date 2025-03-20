@@ -11,7 +11,7 @@ part 'user_model.g.dart';
 class UserModel with _$UserModel {
   const factory UserModel({
     required String id,
-    required String username,
+    String? username,
     required String email,
     @JsonKey(name: 'profile_image_url') String? profileImageUrl,
     String? bio,

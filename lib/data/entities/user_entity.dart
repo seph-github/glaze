@@ -34,6 +34,30 @@ class UserEntity {
       'created_at': createdAt?.toIso8601String(),
     };
   }
+
+  UserEntity copyWith({
+    String? id,
+    String? username,
+    String? email,
+    String? profileImageUrl,
+    String? bio,
+    int? totalGlazes,
+    int? totalUploads,
+    String? badges,
+    DateTime? createdAt,
+  }) {
+    return UserEntity(
+      id: id ?? this.id,
+      username: username ?? this.username,
+      email: email ?? this.email,
+      profileImageUrl: profileImageUrl ?? this.profileImageUrl,
+      bio: bio ?? this.bio,
+      totalGlazes: totalGlazes ?? this.totalGlazes,
+      totalUploads: totalUploads ?? this.totalUploads,
+      badges: badges ?? this.badges,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
 }
 
 class UserEntityEmpty extends UserEntity {

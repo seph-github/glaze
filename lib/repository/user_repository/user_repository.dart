@@ -15,7 +15,7 @@ UserRepository userRepository(ref) {
   return UserRepository(supabaseService: supabaseService);
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class UserNotifier extends _$UserNotifier {
   @override
   Future<UserModel?> build() async {
@@ -34,7 +34,7 @@ class UserRepository {
   Future<UserModel?> fetchUser({required User? user}) async {
     try {
       final response = await supabaseService.findById(
-        table: 'users',
+        table: 'profiles',
         id: user!.id,
       );
 
