@@ -1,7 +1,9 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glaze/data/models/video/video_model.dart';
-import 'package:glaze/repository/auth_service/auth_service_provider.dart';
+import 'package:glaze/repository/auth_repository/auth_repository_provider.dart';
 import 'package:glaze/repository/glaze_repository/glaze_repository.dart';
 import 'package:go_router/go_router.dart';
 
@@ -59,6 +61,101 @@ class BottomIcons extends ConsumerWidget {
                 },
               ),
               const Icon(Icons.file_open),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(25.0),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                  child: Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(25),
+                      border: Border.all(
+                        color: Colors.white,
+                        width: 0.5,
+                      ),
+                      gradient: const RadialGradient(
+                        colors: [
+                          Colors.white,
+                          Colors.black,
+                        ],
+                        tileMode: TileMode.decal,
+                        focalRadius: 40.0,
+                        focal: Alignment.topRight,
+                        stops: [
+                          0.2,
+                          0.4,
+                        ],
+                      ),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 10.0,
+                          spreadRadius: 0.0,
+                          offset: Offset(0.0, 0.0),
+                        ),
+                      ],
+                    ),
+                    child: const Center(
+                      child: Text(
+                        "",
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                width: 150,
+                height: 150,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    // Dark shadow to the bottom
+                    BoxShadow(
+                      color: Colors.white12,
+                      blurRadius: 20,
+                      offset: Offset(8, 8),
+                      blurStyle: BlurStyle.inner,
+                    ),
+                    // Light shadow to simulate light reflection
+                    // BoxShadow(
+                    //   color: Colors.white24,
+                    //   blurRadius: 1,
+                    //   offset: Offset(1, 1),
+                    // ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(150 / 2),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          colors: [
+                            Colors.white.withValues(alpha: 0.5),
+                            Colors.black.withValues(alpha: 0.1),
+                          ],
+                          radius: 0.35,
+                          focal: Alignment.topCenter,
+                          center: Alignment.topRight,
+                          focalRadius: 0.3,
+                        ),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.3),
+                          width: 1.5,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              )
             ],
           ),
           Column(
@@ -93,6 +190,7 @@ class BottomIcons extends ConsumerWidget {
                 },
               ),
               const Icon(Icons.share),
+              // TODO:
               IconButton(
                 onPressed: () async {
                   final user =
@@ -108,6 +206,33 @@ class BottomIcons extends ConsumerWidget {
                 },
                 icon: const Icon(Icons.account_circle),
               ),
+              // ClipRRect(
+              //   clipBehavior: Clip.none,
+              //   child: Container(
+              //     width: 50.0,
+              //     height: 50.0,
+              //     decoration: BoxDecoration(
+              //         shape: BoxShape.circle,
+              //         color: Colors.white30.withValues(alpha: 0.3),
+              //         border: Border.all(
+              //           color: Colors.white30,
+              //         ),
+              //         boxShadow: [
+              //           BoxShadow(
+              //             color: Colors.black38.withValues(alpha: 0.3),
+              //             spreadRadius: 1,
+              //             blurRadius: 1,
+              //             offset: const Offset(-0.5, -0.5),
+              //           ),
+              //         ],
+              //         gradient: LinearGradient(
+              //           colors: [
+              //             Colors.white,
+              //             Colors.white12,
+              //           ],
+              //         )),
+              //   ),
+              // ),
             ],
           ),
         ],

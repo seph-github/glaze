@@ -3,17 +3,19 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 
 import '../../core/styles/color_pallete.dart';
 
-class DropDownMenu extends HookWidget {
-  const DropDownMenu({
+class CustomDropDownMenu extends HookWidget {
+  const CustomDropDownMenu({
     super.key,
     required this.menus,
     this.hintText,
     required this.onSelected,
-  });
+    double? borderRadius,
+  }) : borderRadius = borderRadius ?? 32.0;
 
   final List<String> menus;
   final String? hintText;
   final ValueChanged<String?> onSelected;
+  final double borderRadius;
 
   @override
   Widget build(BuildContext context) {
@@ -25,26 +27,26 @@ class DropDownMenu extends HookWidget {
       focusNode: focusNode,
       decoration: InputDecoration(
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16.0),
+          borderRadius: BorderRadius.circular(borderRadius),
           borderSide: const BorderSide(
             color: ColorPallete.whiteSmoke,
           ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16.0),
+          borderRadius: BorderRadius.circular(borderRadius),
           borderSide: const BorderSide(
             color: ColorPallete.whiteSmoke,
           ),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16.0),
+          borderRadius: BorderRadius.circular(borderRadius),
           borderSide: const BorderSide(
             width: 1 / 4,
             color: ColorPallete.persianFable,
           ),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16.0),
+          borderRadius: BorderRadius.circular(borderRadius),
           borderSide: const BorderSide(
             width: 1,
             color: ColorPallete.parlourRed,

@@ -5,8 +5,10 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:glaze/core/routing/nested_navigation_scaffold.dart';
+import 'package:glaze/feature/shops/shop_view.dart';
 import 'package:glaze/feature/profile/views/profile_view.dart';
-import 'package:glaze/repository/auth_service/auth_service_provider.dart';
+import 'package:glaze/repository/auth_repository/auth_repository_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:glaze/feature/auth/views/auth_view.dart';
 
@@ -14,27 +16,109 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../feature/home/views/home_view.dart';
-import 'auth_guard/auth_guard.dart';
+import '../../feature/moments/moments_view.dart';
+import '../../feature/onboarding/providers/onboarding_provider.dart';
+import '../../feature/onboarding/views/onboarding_view.dart';
 
 part 'router.g.dart';
+
+final homeNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'home');
+final momentsNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'moments');
+final premiumNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'shop');
+final profileNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'profile');
 
 @Riverpod(keepAlive: true)
 GoRouter router(Ref ref) {
   final router = GoRouter(
-    initialLocation: '/',
-    routes: $appRoutes,
+    // initialLocation: '/',
+    routes: [
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, child) {
+          return NestedNavigationScaffold(
+            navigationShell: child,
+          );
+        },
+        branches: [
+          StatefulShellBranch(
+            navigatorKey: homeNavigatorKey,
+            routes: [
+              GoRoute(
+                path: '/',
+                pageBuilder: (context, state) {
+                  return const NoTransitionPage(
+                    child: HomeView(),
+                  );
+                },
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: momentsNavigatorKey,
+            routes: [
+              GoRoute(
+                path: '/moments',
+                pageBuilder: (context, state) {
+                  return const NoTransitionPage(
+                    child: MomentsView(),
+                  );
+                },
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: premiumNavigatorKey,
+            routes: [
+              GoRoute(
+                path: '/shop',
+                pageBuilder: (context, state) {
+                  return const NoTransitionPage(
+                    child: ShopView(),
+                  );
+                },
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: profileNavigatorKey,
+            routes: [
+              GoRoute(
+                path: '/profile',
+                pageBuilder: (context, state) => const NoTransitionPage(
+                  child: ProfileView(),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/auth',
+        builder: (context, state) => const AuthView(),
+      ),
+      ...$appRoutes,
+    ],
     redirect: (context, state) async {
       final User? user = await ref.read(authServiceProvider).getCurrentUser();
       final String path = state.matchedLocation;
-      if (path != const AuthRoute().location && user == null) {
-        return const HomeRoute().location;
+      final bool hasCompletedOnboarding =
+          ref.read(onboardingProvider).completeOnBoarding;
+      // if (path != const AuthRoute().location && user == null) {
+      //   return const HomeRoute().location;
+      // }
+      log('router redirect: $path, $user, on boarding completed $hasCompletedOnboarding');
+
+      if (path == '/' && !hasCompletedOnboarding) {
+        return const OnboardingRoute().location;
       }
+
+      if (path == '/profile' && user == null) {
+        return const AuthRoute().location;
+      }
+
       return null;
     },
-    refreshListenable: _GoRouterRefreshStream(
-      ref.watch(authServiceProvider).onAuthStateChange(),
-    ),
   );
+
   ref.listen(
     authStateChangesProvider,
     (previous, next) {
@@ -45,6 +129,7 @@ GoRouter router(Ref ref) {
         switch (auth.event) {
           case AuthChangeEvent.initialSession:
             log('initialSession');
+            router.go(const HomeRoute().location);
             break;
           case AuthChangeEvent.passwordRecovery:
             log('passwordRecovery');
@@ -77,21 +162,13 @@ GoRouter router(Ref ref) {
   return router;
 }
 
-class _GoRouterRefreshStream extends ChangeNotifier {
-  _GoRouterRefreshStream(Stream<dynamic> stream) {
-    notifyListeners();
-    _subscription = stream.asBroadcastStream().listen(
-          (_) => notifyListeners(),
-        );
-  }
-
-  late final StreamSubscription<dynamic> _subscription;
+@TypedGoRoute<OnboardingRoute>(path: '/onboarding')
+class OnboardingRoute extends GoRouteData {
+  const OnboardingRoute();
 
   @override
-  void dispose() {
-    _subscription.cancel();
-    super.dispose();
-  }
+  Widget build(BuildContext context, GoRouterState state) =>
+      const OnboardingView();
 }
 
 @TypedGoRoute<HomeRoute>(path: '/')
@@ -102,11 +179,11 @@ class HomeRoute extends GoRouteData {
   Widget build(BuildContext context, GoRouterState state) => const HomeView();
 }
 
-@TypedGoRoute<AuthRoute>(path: '/login')
+@TypedGoRoute<AuthRoute>(path: '/auth')
 class AuthRoute extends GoRouteData {
-  const AuthRoute({this.redirectUri});
+  const AuthRoute();
 
-  final String? redirectUri;
+  // final String? redirectUri;
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
@@ -121,7 +198,7 @@ class AuthRoute extends GoRouteData {
             context.go('/');
           });
         }
-        return AuthView(redirect: redirectUri);
+        return const AuthView();
       },
     );
   }
@@ -137,33 +214,33 @@ class RegisterRoute extends GoRouteData {
       const Placeholder();
 }
 
-@TypedGoRoute<UploadRoute>(path: '/upload')
-class UploadRoute extends GoRouteData {
-  const UploadRoute();
+// @TypedGoRoute<UploadRoute>(path: '/upload')
+// class UploadRoute extends GoRouteData {
+//   const UploadRoute();
 
-  @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return Consumer(
-      builder: (context, ref, child) {
-        return authGuard(context, state, () => const Placeholder(), ref);
-      },
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context, GoRouterState state) {
+//     return Consumer(
+//       builder: (context, ref, child) {
+//         return authGuard(context, state, () => const Placeholder(), ref);
+//       },
+//     );
+//   }
+// }
 
-@TypedGoRoute<GlazeRoute>(path: '/glaze')
-class GlazeRoute extends GoRouteData {
-  const GlazeRoute();
+// @TypedGoRoute<GlazeRoute>(path: '/glaze')
+// class GlazeRoute extends GoRouteData {
+//   const GlazeRoute();
 
-  @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return Consumer(
-      builder: (context, ref, child) {
-        return authGuard(context, state, () => const Placeholder(), ref);
-      },
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context, GoRouterState state) {
+//     return Consumer(
+//       builder: (context, ref, child) {
+//         return authGuard(context, state, () => const Placeholder(), ref);
+//       },
+//     );
+//   }
+// }
 
 @TypedGoRoute<ProfileRoute>(path: '/profile')
 class ProfileRoute extends GoRouteData {
@@ -172,15 +249,5 @@ class ProfileRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const ProfileView();
-    // return Consumer(
-    //   builder: (context, ref, child) {
-    //     return authGuard(
-    //       context,
-    //       state,
-    //       () => const ProfileView(),
-    //       ref,
-    //     );
-    //   },
-    // );
   }
 }

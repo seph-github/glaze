@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:glaze/feature/home/views/new_video_player_view.dart';
+import 'package:glaze/feature/home/views/video_player_view.dart';
 
-import '../../../data/models/video/video_model.dart';
 import '../../../repository/user_repository/user_repository.dart';
 import '../../../repository/video_repository/video_repository.dart';
-import '../widgets/button_icons.dart';
 
 class HomeView extends ConsumerWidget {
   const HomeView({super.key});
@@ -30,20 +28,10 @@ class HomeView extends ConsumerWidget {
                   scrollDirection: Axis.vertical,
                   itemBuilder: (context, index) {
                     return Stack(
-                      alignment: Alignment.bottomCenter,
+                      alignment: Alignment.center,
                       children: [
-                        NewVideoPlayerView(
+                        VideoPlayerView(
                           controller: data.controllers?[index],
-                        ),
-                        BottomIcons(
-                          video: data.model?[index] ??
-                              VideoModel(
-                                id: '',
-                                videoUrl: '',
-                                userId: '',
-                                thumbnailUrl: '',
-                                createdAt: DateTime.now(),
-                              ),
                         ),
                       ],
                     );

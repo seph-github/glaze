@@ -11,7 +11,7 @@ import 'package:video_compress/video_compress.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../core/services/supabase_services.dart';
-import '../auth_service/auth_service_provider.dart';
+import '../auth_repository/auth_repository_provider.dart';
 
 part 'video_repository.g.dart';
 

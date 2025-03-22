@@ -10,25 +10,28 @@ class PrimaryButton extends StatelessWidget {
     this.isLoading,
     this.backgroundColor,
     this.foregroundColor,
-  });
+    double? borderRadius,
+  }) : borderRadius = borderRadius ?? 32.0;
 
   final String label;
   final void Function()? onPressed;
   final bool? isLoading;
   final Color? backgroundColor;
   final Color? foregroundColor;
+  final double borderRadius;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
+      height: 50,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor ?? ColorPallete.strawberryGlaze,
           foregroundColor: foregroundColor ?? Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.0),
+            borderRadius: BorderRadius.circular(borderRadius),
             side: const BorderSide(
               color: ColorPallete.strawberryGlaze,
             ),

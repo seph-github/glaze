@@ -4,12 +4,12 @@ import 'package:glaze/core/services/supabase_services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-part 'auth_service_provider.g.dart';
+part 'auth_repository_provider.g.dart';
 
 @riverpod
-AuthService authService(ref) {
+AuthRepository authService(ref) {
   final supabaseClient = ref.watch(supabaseServiceProvider);
-  return AuthService(supabaseService: supabaseClient);
+  return AuthRepository(supabaseService: supabaseClient);
 }
 
 @riverpod
@@ -56,8 +56,8 @@ class SignupNotifier extends _$SignupNotifier {
   }
 }
 
-class AuthService {
-  AuthService({required this.supabaseService});
+class AuthRepository {
+  AuthRepository({required this.supabaseService});
 
   final SupabaseService supabaseService;
 

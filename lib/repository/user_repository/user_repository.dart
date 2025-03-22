@@ -1,5 +1,6 @@
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:glaze/core/services/supabase_services.dart';
-import 'package:glaze/repository/auth_service/auth_service_provider.dart';
+import 'package:glaze/repository/auth_repository/auth_repository_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -57,8 +58,7 @@ class UserRepository {
         );
       }
     } catch (e) {
-      print(e);
-      rethrow;
+      Fluttertoast.showToast(msg: e.toString());
     }
     return null;
   }

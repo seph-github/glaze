@@ -10,6 +10,8 @@ class InputField extends HookWidget {
     this.initialValue,
     this.validator,
     this.onChanged,
+    this.borderRadius,
+    this.helper,
     TextEditingController? controller,
     this.readOnly = false,
   })  : obscureText = false,
@@ -27,6 +29,8 @@ class InputField extends HookWidget {
     this.validator,
     this.onChanged,
     this.readOnly = false,
+    this.borderRadius,
+    this.helper,
   })  : obscureText = true,
         controller = controller ?? TextEditingController(text: initialValue),
         keyboardType = TextInputType.text,
@@ -42,11 +46,31 @@ class InputField extends HookWidget {
     this.onChanged,
     this.keyboardType = TextInputType.text,
     this.readOnly = false,
+    this.borderRadius,
+    this.helper,
     TextEditingController? controller,
   })  : controller = controller ?? TextEditingController(text: initialValue),
         _inputAction = TextInputAction.next,
         obscureText = false,
         maxLines = 1;
+
+  InputField.paragraph({
+    super.key,
+    this.label,
+    this.hintText,
+    this.initialValue,
+    this.validator,
+    this.onChanged,
+    this.keyboardType = TextInputType.text,
+    this.readOnly = false,
+    this.borderRadius,
+    this.helper,
+    int? maxLines,
+    TextEditingController? controller,
+  })  : controller = controller ?? TextEditingController(text: initialValue),
+        _inputAction = TextInputAction.next,
+        obscureText = false,
+        maxLines = maxLines ?? 5;
 
   final String? label;
   final String? hintText;
@@ -59,6 +83,8 @@ class InputField extends HookWidget {
   final void Function(String)? onChanged;
   final int? maxLines;
   final bool readOnly;
+  final double? borderRadius;
+  final Widget? helper;
 
   @override
   Widget build(BuildContext context) {
@@ -84,27 +110,28 @@ class InputField extends HookWidget {
             hintStyle: const TextStyle(
               color: Colors.white54,
             ),
+            semanticCounterText: 'counter',
             focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16.0),
+              borderRadius: BorderRadius.circular(borderRadius ?? 32.0),
               borderSide: const BorderSide(
                 color: ColorPallete.whiteSmoke,
               ),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16.0),
+              borderRadius: BorderRadius.circular(borderRadius ?? 32.0),
               borderSide: const BorderSide(
                 color: ColorPallete.whiteSmoke,
               ),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16.0),
+              borderRadius: BorderRadius.circular(borderRadius ?? 32.0),
               borderSide: const BorderSide(
                 width: 1 / 4,
                 color: ColorPallete.persianFable,
               ),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16.0),
+              borderRadius: BorderRadius.circular(borderRadius ?? 32.0),
               borderSide: const BorderSide(
                 width: 1,
                 color: ColorPallete.parlourRed,
@@ -118,6 +145,7 @@ class InputField extends HookWidget {
                         : const Icon(Icons.visibility_off),
                   )
                 : null,
+            helper: helper,
           ),
           controller: controller,
           obscureText: isObscured.value,
