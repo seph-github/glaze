@@ -28,13 +28,10 @@ class PrimaryButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor ?? ColorPallete.strawberryGlaze,
+          backgroundColor: backgroundColor ?? ColorPallete.magenta,
           foregroundColor: foregroundColor ?? Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadius),
-            side: const BorderSide(
-              color: ColorPallete.strawberryGlaze,
-            ),
           ),
         ),
         child: isLoading ?? false

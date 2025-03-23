@@ -65,12 +65,12 @@ class MomentsView extends ConsumerWidget {
                     ),
                     CustomDropDownMenu(
                       hintText: 'Publish As',
-                      menus: [],
+                      menus: const [],
                       onSelected: (value) {},
                     ),
                     CustomDropDownMenu(
                       hintText: 'Select Category',
-                      menus: [],
+                      menus: const [],
                       onSelected: (value) {},
                     ),
                     const FocusButton(

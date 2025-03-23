@@ -87,7 +87,7 @@ class AuthRepository {
         password: password,
       );
 
-      print('User ${authResponse.user}');
+      // print('User ${authResponse.user}');
 
       await supabaseService.update(
         id: authResponse.user!.id,

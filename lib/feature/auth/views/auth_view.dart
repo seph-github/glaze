@@ -9,6 +9,9 @@ import 'package:go_router/go_router.dart';
 import '../../../components/buttons/primary_button.dart';
 import '../../../components/inputs/input_field.dart';
 import '../../../core/routing/router.dart';
+import '../widgets/auth_header.dart';
+import '../widgets/auth_provider_toggle_widget.dart';
+import '../widgets/auth_sso_widget.dart';
 
 class AuthView extends HookWidget {
   const AuthView({super.key});
@@ -16,7 +19,6 @@ class AuthView extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final formKey = GlobalKey<FormState>();
-    final size = useMemoized(() => MediaQuery.of(context).size);
     final providerController = useTextEditingController();
     final passwordController = useTextEditingController();
     final usernameController = useTextEditingController();
@@ -27,32 +29,11 @@ class AuthView extends HookWidget {
 
     final initialPage = useState<int>(0);
 
-    final List<Color> colors = [
-      Colors.white10,
-      Colors.white12,
-      Colors.white24,
-      Colors.white30,
-      Colors.white38,
-      Colors.white54,
-      Colors.white60,
-      Colors.white70,
-    ];
-
-    final List<double> stops = [
-      0.3,
-      0.4,
-      0.45,
-      0.5,
-      0.6,
-      0.7,
-      0.75,
-      0.9,
-    ];
-
     return Consumer(
       builder: (context, ref, _) {
         return Scaffold(
           backgroundColor: ColorPallete.blackPearl,
+          resizeToAvoidBottomInset: false,
           body: SafeArea(
             child: Form(
               key: formKey,
@@ -62,72 +43,14 @@ class AuthView extends HookWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     const Spacer(),
-                    Text(
-                      isLogin.value ? 'Welcome Back' : 'Get Started',
-                      style:
-                          Theme.of(context).textTheme.headlineLarge!.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                    ),
-                    Text(
-                      isLogin.value
-                          ? 'Quick & secure access to your account\nwith email or phone number'
-                          : 'Create your account easily, secure your profile\n&start sharing your moments hassle-free!',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                            color: Colors.grey,
-                            fontWeight: FontWeight.w400,
-                          ),
+                    AuthHeader(isLogin: isLogin),
+                    const Gap(10),
+                    AuthProviderToggleWidget(
+                      toggleItems: toggleItems,
+                      itemsValue: itemsValue,
+                      selectedIndex: selectedIndex,
                     ),
                     const Gap(20),
-                    Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(62.0),
-                        color: ColorPallete.slateViolet,
-                      ),
-                      child: ToggleButtons(
-                        tapTargetSize: MaterialTapTargetSize.padded,
-                        constraints: const BoxConstraints(
-                          maxWidth: double.infinity,
-                          minHeight: 60.0,
-                        ),
-                        isSelected: itemsValue.value,
-                        borderColor: Colors.transparent,
-                        fillColor: Colors.transparent,
-                        selectedColor: Colors.white,
-                        selectedBorderColor: Colors.transparent,
-                        onPressed: (index) {
-                          if (index == 0) {
-                            itemsValue.value = [true, false];
-                          } else {
-                            itemsValue.value = [false, true];
-                          }
-                          selectedIndex.value = index;
-                        },
-                        children: toggleItems.value
-                            .map(
-                              (item) => Container(
-                                alignment: Alignment.center,
-                                width: (size.width / 2.229),
-                                margin: const EdgeInsets.all(2.0),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 24.0, vertical: 8.0),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(32.0),
-                                  color: itemsValue.value[
-                                          toggleItems.value.indexOf(item)]
-                                      ? ColorPallete.blackPearl
-                                      : Colors.transparent,
-                                ),
-                                child: Text(item),
-                              ),
-                            )
-                            .toList(),
-                      ),
-                    ),
-                    const Gap(30),
                     if (!isLogin.value)
                       InputField.text(
                         hintText: 'Choose a username',
@@ -215,44 +138,7 @@ class AuthView extends HookWidget {
                       label: isLogin.value ? 'Login' : 'Sign Up',
                     ),
                     const Gap(20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Container(
-                          width: size.width * 0.25,
-                          height: 2.5,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: colors,
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                              stops: stops,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          'OR CONTINUE WITH',
-                          style:
-                              Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 12.0,
-                                  ),
-                        ),
-                        Container(
-                          width: size.width * 0.25,
-                          height: 2.5,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: colors.reversed.toList(),
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                              stops: stops,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    AuthSSOWidget(),
                     const Gap(20),
                     PrimaryButton(
                       onPressed: () {
@@ -260,7 +146,7 @@ class AuthView extends HookWidget {
                         router.pushReplacement(const HomeRoute().location);
                       },
                       label: 'Continue Anonymously',
-                      backgroundColor: ColorPallete.slateViolet,
+                      backgroundColor: Colors.white12,
                     ),
                     const Spacer(),
                     GestureDetector(

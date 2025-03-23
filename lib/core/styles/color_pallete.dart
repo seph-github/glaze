@@ -12,4 +12,9 @@ class ColorPallete {
   static const Color slateViolet = Color(0xFF989192);
   static const Color strawberryGlaze = Color(0xFFDAB7BE);
   static const Color persianFable = Color(0xFFD4EBDD);
+  static const Color magenta = Color(0xFFE485C7);
+  static const Color lilac = Color(0xFFC28EDD);
+  static const Color mediumPurple = Color(0xFF967ADB);
+  static const Color mediumBlue = Color(0xFF4C6DB8);
+  static const Color lavender = Color(0xFFA686E0);
 }
