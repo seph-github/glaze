@@ -3,7 +3,14 @@ import 'package:flutter/material.dart';
 class ProfileInteractionCard extends StatelessWidget {
   const ProfileInteractionCard({
     super.key,
+    this.followers,
+    this.following,
+    this.glazes,
   });
+
+  final int? followers;
+  final int? following;
+  final int? glazes;
 
   @override
   Widget build(BuildContext context) {
@@ -14,10 +21,10 @@ class ProfileInteractionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16.0),
         border: Border.all(color: Colors.grey, width: 0.25),
       ),
-      child: const Row(
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Column(
+          const Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
@@ -36,14 +43,14 @@ class ProfileInteractionCard extends StatelessWidget {
               ),
             ],
           ),
-          VerticalDivider(
+          const VerticalDivider(
             width: 0.5,
             thickness: 0.5,
             color: Colors.grey,
             endIndent: 20,
             indent: 20,
           ),
-          Column(
+          const Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
@@ -62,7 +69,7 @@ class ProfileInteractionCard extends StatelessWidget {
               ),
             ],
           ),
-          VerticalDivider(
+          const VerticalDivider(
             width: 0.5,
             thickness: 0.5,
             color: Colors.grey,
@@ -73,13 +80,13 @@ class ProfileInteractionCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                '800',
-                style: TextStyle(
+                glazes.toString(),
+                style: const TextStyle(
                   fontSize: 16.0,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Text(
+              const Text(
                 'Total Glazes',
                 style: TextStyle(
                   fontSize: 12.0,

@@ -26,36 +26,30 @@ class VideoPlayerView extends HookWidget {
       );
     }
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(42.0),
-      child: AspectRatio(
-        aspectRatio: 9 / 17.25,
-        child: GestureDetector(
-          onTap: () {
-            controller.value.isPlaying ? controller.pause() : controller.play();
-            showIcon.value = true;
-            startHideTimer();
-          },
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              VideoPlayer(
-                controller,
-              ),
-              if (showIcon.value)
-                Container(
-                  padding: const EdgeInsets.all(24.0),
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.black26,
-                  ),
-                  child: controller.value.isPlaying
-                      ? const Icon(Icons.pause)
-                      : const Icon(Icons.play_arrow),
-                ),
-            ],
+    return GestureDetector(
+      onTap: () {
+        controller.value.isPlaying ? controller.pause() : controller.play();
+        showIcon.value = true;
+        startHideTimer();
+      },
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          VideoPlayer(
+            controller,
           ),
-        ),
+          if (showIcon.value)
+            Container(
+              padding: const EdgeInsets.all(24.0),
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.black26,
+              ),
+              child: controller.value.isPlaying
+                  ? const Icon(Icons.pause)
+                  : const Icon(Icons.play_arrow),
+            ),
+        ],
       ),
     );
   }

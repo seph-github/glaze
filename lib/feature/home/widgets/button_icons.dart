@@ -3,8 +3,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glaze/data/models/video/video_model.dart';
-import 'package:glaze/repository/auth_repository/auth_repository_provider.dart';
-import 'package:glaze/repository/glaze_repository/glaze_repository.dart';
+import 'package:glaze/data/repository/auth_repository/auth_repository_provider.dart';
+import 'package:glaze/data/repository/glaze_repository/glaze_repository.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../components/dialogs/dialogs.dart';
@@ -165,7 +165,7 @@ class BottomIcons extends ConsumerWidget {
                 icon: glazeNotifier.when(
                   data: (data) {
                     final isGlazed =
-                        data.any((element) => element.videoId == video.id);
+                        data.any((element) => element.videoId == video.videoId);
                     return isGlazed
                         ? const Icon(Icons.thumb_up)
                         : const Icon(Icons.thumb_up_alt_outlined);
@@ -183,7 +183,7 @@ class BottomIcons extends ConsumerWidget {
                   }
                   await ref
                       .read(glazeRepositoryProvider)
-                      .onGlaze(userId: user!.id, videoId: video.id)
+                      .onGlaze(userId: user!.id, videoId: video.videoId)
                       .whenComplete(
                         () => ref.refresh(glazeNotifierProvider),
                       );
@@ -200,9 +200,9 @@ class BottomIcons extends ConsumerWidget {
                     return await showMustLoginWarning(context);
                   }
 
-                  if (context.mounted) {
-                    context.push(const ProfileRoute().location);
-                  }
+                  // if (context.mounted) {
+                  //   context.push(ProfileRoute().location);
+                  // }
                 },
                 icon: const Icon(Icons.account_circle),
               ),

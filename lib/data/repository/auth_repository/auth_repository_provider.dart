@@ -13,6 +13,12 @@ AuthRepository authService(ref) {
 }
 
 @riverpod
+class LoggedInUserNotifier extends _$LoggedInUserNotifier {
+  @override
+  FutureOr<User?> build() => ref.watch(authServiceProvider).getCurrentUser();
+}
+
+@riverpod
 class LoginNotifier extends _$LoginNotifier {
   @override
   FutureOr build() => null;
@@ -52,6 +58,23 @@ class SignupNotifier extends _$SignupNotifier {
       Fluttertoast.showToast(
         msg: e.toString(),
       );
+    }
+  }
+}
+
+@riverpod
+class LogoutNotifier extends _$LogoutNotifier {
+  @override
+  FutureOr build() async => null;
+
+  Future<void> logout() async {
+    try {
+      state = const AsyncLoading();
+      state = await AsyncValue.guard(
+        () async => await ref.read(authServiceProvider).signOut(),
+      );
+    } catch (e) {
+      throw Exception('LogoutNotifier.logout: $e');
     }
   }
 }

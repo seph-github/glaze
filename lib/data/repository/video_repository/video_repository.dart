@@ -10,7 +10,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:video_compress/video_compress.dart';
 import 'package:video_player/video_player.dart';
 
-import '../../core/services/supabase_services.dart';
+import '../../../core/services/supabase_services.dart';
 import '../auth_repository/auth_repository_provider.dart';
 
 part 'video_repository.g.dart';
@@ -69,6 +69,7 @@ class CacheVideoNotifier extends _$CacheVideoNotifier {
 
       await controllers[index].initialize();
       controllers[index].setLooping(true);
+      controllers[index].value.aspectRatio;
       controllers[index].play();
     }
     // return {'videos': data, 'controllers': controllers};
@@ -121,7 +122,9 @@ class VideoRepository {
   final SupabaseService supabaseService;
   Future<List<VideoModel>> fetchVideos() async {
     try {
-      final videos = await supabaseService.select(table: 'videos');
+      // final videos = await supabaseService.select(table: 'videos');
+      final videos = await supabaseService.withReturnValuesRpc(
+          fn: 'select_videos_with_owners');
 
       final value = videos
           .map<VideoModel>(
@@ -132,7 +135,7 @@ class VideoRepository {
       value.sort(
         (a, b) => b.createdAt!.compareTo(a.createdAt!),
       );
-
+      // log('videos $value');
       return value;
     } catch (e) {
       rethrow;

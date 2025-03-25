@@ -11,6 +11,8 @@ class PrimaryButton extends StatelessWidget {
     this.backgroundColor,
     this.foregroundColor,
     double? borderRadius,
+    this.height,
+    this.width,
   }) : borderRadius = borderRadius ?? 32.0;
 
   final String label;
@@ -19,12 +21,14 @@ class PrimaryButton extends StatelessWidget {
   final Color? backgroundColor;
   final Color? foregroundColor;
   final double borderRadius;
+  final double? height;
+  final double? width;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: double.infinity,
-      height: 50,
+      width: width ?? double.infinity,
+      height: height ?? 50,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(

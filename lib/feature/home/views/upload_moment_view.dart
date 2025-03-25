@@ -7,8 +7,8 @@ import '../../../components/buttons/focus_button.dart';
 import '../../../components/buttons/primary_button.dart';
 import '../../../components/drop_downs/custom_drop_down_menu.dart';
 import '../../../components/inputs/input_field.dart';
-import '../../../repository/file_picker/file_picker_provider.dart';
-import '../../../repository/video_repository/video_repository.dart';
+import '../../../data/repository/file_picker/file_picker_provider.dart';
+import '../../../data/repository/video_repository/video_repository.dart';
 
 class UploadMoment extends HookWidget {
   UploadMoment({

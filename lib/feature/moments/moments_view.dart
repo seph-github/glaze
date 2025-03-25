@@ -7,8 +7,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../components/buttons/primary_button.dart';
 import '../../components/drop_downs/custom_drop_down_menu.dart';
-import '../../repository/file_picker/file_picker_provider.dart';
-import '../../repository/video_repository/video_repository.dart';
+import '../../data/repository/file_picker/file_picker_provider.dart';
+import '../../data/repository/video_repository/video_repository.dart';
 
 class MomentsView extends ConsumerWidget {
   const MomentsView({super.key});

@@ -73,7 +73,7 @@ class SupabaseService {
     await supabase.from(table).insert(data);
   }
 
-  Future<void> toggleRpc({
+  Future<void> voidFunctionRpc({
     required String fn,
     Map<String, dynamic>? params,
   }) async {
@@ -81,6 +81,18 @@ class SupabaseService {
       fn,
       params: params,
     );
+  }
+
+  Future<List<Map<String, dynamic>>> withReturnValuesRpc(
+      {required String fn, Map<String, dynamic>? params}) async {
+    try {
+      return await supabase.rpc(
+        fn,
+        params: params,
+      );
+    } catch (e) {
+      throw Exception('SupabaseService.withReturnValuesRpc: $e');
+    }
   }
 
   Future<void> update({

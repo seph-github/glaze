@@ -61,6 +61,13 @@
 	<true/>
 	<key>UIFileSharingEnabled</key>
 	<true/>
-
+	<key>FLTEnableImpeller</key>
+	<true/>
+	<key>FLTUseFlutterMetalLayer</key>
+	<true/>
+	<key>FLTEnableWideGamut</key>
+	<true/>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 </dict>
 </plist>

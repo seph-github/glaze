@@ -15,6 +15,17 @@
       ],
     },
     {
+      "name": "Development Profile",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile",
+      "program": "lib/main.dart",
+      "args": [
+        "--no-enable-impeller",
+        "--dart-define-from-file=dart-defines/development.json",
+      ],
+    },
+    {
       "name": "Production Debug",
       "request": "launch",
       "type": "dart",

@@ -22,29 +22,6 @@ class NestedNavigationScaffold extends HookWidget {
     return Scaffold(
       body: _navigationShell,
       bottomNavigationBar: NavigationBar(
-        // bottomNavigationBar: BottomNavigationBar(
-        //   currentIndex: _navigationShell.currentIndex,
-        //   onTap: _goBranch,
-        //   selectedItemColor: Colors.amber,
-        //   unselectedItemColor: Colors.grey,
-        //   items: [
-        //     BottomNavigationBarItem(
-        //       icon: const Icon(Icons.home),
-        //       label: 'Home',
-        //     ),
-        //     BottomNavigationBarItem(
-        //       icon: const Icon(Icons.home),
-        //       label: 'Moments',
-        //     ),
-        //     BottomNavigationBarItem(
-        //       icon: const Icon(Icons.home),
-        //       label: 'Premium',
-        //     ),
-        //     BottomNavigationBarItem(
-        //       icon: const Icon(Icons.home),
-        //       label: 'Profile',
-        //     ),
-        //   ],
         selectedIndex: _navigationShell.currentIndex,
         indicatorColor: Colors.transparent,
         indicatorShape: null,

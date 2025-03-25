@@ -8,7 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glaze/core/routing/nested_navigation_scaffold.dart';
 import 'package:glaze/feature/shops/shop_view.dart';
 import 'package:glaze/feature/profile/views/profile_view.dart';
-import 'package:glaze/repository/auth_repository/auth_repository_provider.dart';
+import 'package:glaze/data/repository/auth_repository/auth_repository_provider.dart';
+import 'package:glaze/data/repository/user_repository/user_repository.dart';
 import 'package:go_router/go_router.dart';
 import 'package:glaze/feature/auth/views/auth_view.dart';
 
@@ -17,8 +18,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../feature/home/views/home_view.dart';
 import '../../feature/moments/moments_view.dart';
-import '../../feature/onboarding/providers/onboarding_provider.dart';
-import '../../feature/onboarding/views/onboarding_view.dart';
+import '../../feature/profile/views/view_user_profile.dart';
+import '../../feature/splash/providers/splash_provider.dart';
+import '../../feature/splash/views/splash_view.dart';
+import '../../feature/settings/views/general_settings_view.dart';
 
 part 'router.g.dart';
 
@@ -30,7 +33,7 @@ final profileNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'profile');
 @Riverpod(keepAlive: true)
 GoRouter router(Ref ref) {
   final router = GoRouter(
-    // initialLocation: '/',
+    debugLogDiagnostics: true,
     routes: [
       StatefulShellRoute.indexedStack(
         builder: (context, state, child) {
@@ -83,32 +86,37 @@ GoRouter router(Ref ref) {
             routes: [
               GoRoute(
                 path: '/profile',
-                pageBuilder: (context, state) => const NoTransitionPage(
-                  child: ProfileView(),
-                ),
+                pageBuilder: (context, state) {
+                  return const NoTransitionPage(
+                    child: ProfileView(),
+                  );
+                },
               ),
             ],
           ),
         ],
       ),
-      GoRoute(
-        path: '/auth',
-        builder: (context, state) => const AuthView(),
-      ),
       ...$appRoutes,
+      // GoRoute(
+      //   path: '/view-user-profile/:id',
+      //   pageBuilder: (context, state) {
+      //     final id = state.pathParameters['id']!;
+      //     return NoTransitionPage(
+      //       child: ViewUserProfile(id: id),
+      //     );
+      //   },
+      // ),
     ],
     redirect: (context, state) async {
       final User? user = await ref.read(authServiceProvider).getCurrentUser();
       final String path = state.matchedLocation;
       final bool hasCompletedOnboarding =
           ref.read(onboardingProvider).completeOnBoarding;
-      // if (path != const AuthRoute().location && user == null) {
-      //   return const HomeRoute().location;
-      // }
-      log('router redirect: $path, $user, on boarding completed $hasCompletedOnboarding');
+
+      // log('router redirect: $path, $user, on boarding completed $hasCompletedOnboarding');
 
       if (path == '/' && !hasCompletedOnboarding) {
-        return const OnboardingRoute().location;
+        return const SplashRoute().location;
       }
 
       if (path == '/profile' && user == null) {
@@ -121,7 +129,7 @@ GoRouter router(Ref ref) {
 
   ref.listen(
     authStateChangesProvider,
-    (previous, next) {
+    (previous, next) async {
       if (next is AsyncError) {
         router.go(const AuthRoute().location);
       }
@@ -136,10 +144,12 @@ GoRouter router(Ref ref) {
             break;
           case AuthChangeEvent.signedIn:
             log('signedIn');
+            ref.watch(userNotifierProvider);
             router.go(const HomeRoute().location);
             break;
           case AuthChangeEvent.signedOut:
             log('signedOut');
+            ref.invalidate(userNotifierProvider);
             router.go(const AuthRoute().location);
             break;
           case AuthChangeEvent.tokenRefreshed:
@@ -162,13 +172,21 @@ GoRouter router(Ref ref) {
   return router;
 }
 
-@TypedGoRoute<OnboardingRoute>(path: '/onboarding')
-class OnboardingRoute extends GoRouteData {
-  const OnboardingRoute();
+@TypedGoRoute<GeneralSettingsRoute>(path: '/general-settings')
+class GeneralSettingsRoute extends GoRouteData {
+  const GeneralSettingsRoute();
 
   @override
   Widget build(BuildContext context, GoRouterState state) =>
-      const OnboardingView();
+      const GeneralSettingsView();
+}
+
+@TypedGoRoute<SplashRoute>(path: '/onboarding')
+class SplashRoute extends GoRouteData {
+  const SplashRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const SplashView();
 }
 
 @TypedGoRoute<HomeRoute>(path: '/')
@@ -204,44 +222,6 @@ class AuthRoute extends GoRouteData {
   }
 }
 
-@TypedGoRoute<RegisterRoute>(path: '/register')
-class RegisterRoute extends GoRouteData {
-  const RegisterRoute();
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      // const RegisterPage();
-      const Placeholder();
-}
-
-// @TypedGoRoute<UploadRoute>(path: '/upload')
-// class UploadRoute extends GoRouteData {
-//   const UploadRoute();
-
-//   @override
-//   Widget build(BuildContext context, GoRouterState state) {
-//     return Consumer(
-//       builder: (context, ref, child) {
-//         return authGuard(context, state, () => const Placeholder(), ref);
-//       },
-//     );
-//   }
-// }
-
-// @TypedGoRoute<GlazeRoute>(path: '/glaze')
-// class GlazeRoute extends GoRouteData {
-//   const GlazeRoute();
-
-//   @override
-//   Widget build(BuildContext context, GoRouterState state) {
-//     return Consumer(
-//       builder: (context, ref, child) {
-//         return authGuard(context, state, () => const Placeholder(), ref);
-//       },
-//     );
-//   }
-// }
-
 @TypedGoRoute<ProfileRoute>(path: '/profile')
 class ProfileRoute extends GoRouteData {
   const ProfileRoute();
@@ -249,5 +229,20 @@ class ProfileRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const ProfileView();
+  }
+}
+
+@TypedGoRoute<ViewUserProfileRoute>(path: '/view-user-profile/:id')
+class ViewUserProfileRoute extends GoRouteData {
+  const ViewUserProfileRoute({required this.id});
+  final String id;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    // final id = state.pathParameters['id']!;
+
+    // log('id: $id');
+
+    return ViewUserProfile(id: id);
   }
 }

@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../data/local/shared_prefs.dart';
 
-part 'onboarding_provider.g.dart';
+part 'splash_provider.g.dart';
 
 @riverpod
 OnboardingProvider onboarding(ref) {

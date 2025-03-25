@@ -2,7 +2,8 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:glaze/data/models/glaze/glaze_model.dart';
-import 'package:glaze/data/models/video/video_model.dart';
+
+import '../video/videos.dart';
 
 part 'user_model.freezed.dart';
 part 'user_model.g.dart';
@@ -15,10 +16,13 @@ class UserModel with _$UserModel {
     required String email,
     @JsonKey(name: 'profile_image_url') String? profileImageUrl,
     String? bio,
-    List<GlazeModel>? glazes,
-    List<VideoModel>? videos,
+    String? provider,
     String? badges,
+    @JsonKey(name: 'total_glazes') int? totalGlazes,
+    @JsonKey(name: 'total_uploads') int? totalUploads,
     @JsonKey(name: 'created_at') DateTime? createdAt,
+    List<GlazeModel>? glazes,
+    List<Videos>? videos,
   }) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>

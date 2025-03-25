@@ -8,13 +8,14 @@ part 'video_model.g.dart';
 @freezed
 class VideoModel with _$VideoModel {
   const factory VideoModel({
-    required String id,
     @JsonKey(name: 'user_id') required String userId,
+    @JsonKey(name: 'username') required String username,
+    @JsonKey(name: 'video_id') required String videoId,
     @JsonKey(name: 'video_url') required String videoUrl,
     @JsonKey(name: 'thumbnail_url') required String thumbnailUrl,
     String? caption,
     String? category,
-    @JsonKey(name: 'glaze_count') int? glazesCount,
+    @JsonKey(name: 'glazes_count') int? glazesCount,
     String? status,
     @JsonKey(name: 'created_at') DateTime? createdAt,
   }) = _VideoModel;

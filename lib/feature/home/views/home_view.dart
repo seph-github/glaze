@@ -1,51 +1,161 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gap/gap.dart';
+import 'package:glaze/components/morphism_widget.dart';
+import 'package:glaze/core/routing/router.dart';
 import 'package:glaze/feature/home/views/video_player_view.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../../repository/user_repository/user_repository.dart';
-import '../../../repository/video_repository/video_repository.dart';
+import '../../../data/repository/video_repository/video_repository.dart';
 
 class HomeView extends ConsumerWidget {
   const HomeView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(userNotifierProvider);
-    return Consumer(
-      builder: (context, ref, child) {
-        final state = ref.watch(cacheVideoNotifierProvider);
+    final size = MediaQuery.sizeOf(context);
+    final double height = size.height;
+    final double width = size.width;
 
-        return state.when(
-          data: (data) {
-            return Scaffold(
-              body: RefreshIndicator(
-                onRefresh: () =>
-                    ref.refresh(videoRepositoryProvider).fetchVideos(),
-                color: Colors.amber,
-                triggerMode: RefreshIndicatorTriggerMode.onEdge,
-                child: PageView.builder(
-                  itemCount: data.controllers?.length,
-                  scrollDirection: Axis.vertical,
-                  itemBuilder: (context, index) {
-                    return Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        VideoPlayerView(
-                          controller: data.controllers?[index],
-                        ),
-                      ],
-                    );
-                  },
+    return ClipRRect(
+      borderRadius: const BorderRadius.only(
+        bottomLeft: Radius.circular(24.0),
+        bottomRight: Radius.circular(24.0),
+      ),
+      child: Consumer(
+        builder: (context, ref, child) {
+          final state = ref.watch(cacheVideoNotifierProvider);
+
+          return state.when(
+            data: (data) {
+              return Scaffold(
+                body: RefreshIndicator(
+                  onRefresh: () =>
+                      ref.refresh(videoRepositoryProvider).fetchVideos(),
+                  color: Colors.white12,
+                  triggerMode: RefreshIndicatorTriggerMode.onEdge,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 500),
+                    child: PageView.builder(
+                      itemCount: data.controllers?.length,
+                      scrollDirection: Axis.vertical,
+                      itemBuilder: (context, index) {
+                        return Stack(
+                          alignment: Alignment.bottomCenter,
+                          children: [
+                            VideoPlayerView(
+                              controller: data.controllers?[index],
+                            ),
+                            ClipRRect(
+                              child: Container(
+                                width: width,
+                                height: height * 0.22,
+                                padding: const EdgeInsets.all(16.0),
+                                decoration: BoxDecoration(
+                                  boxShadow: [
+                                    BoxShadow(
+                                      offset: const Offset(-1, -1),
+                                      color:
+                                          Colors.black.withValues(alpha: 0.1),
+                                      spreadRadius: 100,
+                                      blurRadius: 100,
+                                      blurStyle: BlurStyle.normal,
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        MorphismWidget.rounded(
+                                          width: width / 2,
+                                          height: 40,
+                                          child: const Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: <Widget>[
+                                              Icon(
+                                                Icons.thumb_up_alt_outlined,
+                                                size: 24,
+                                              ),
+                                              Gap(10),
+                                              Text('Best Content'),
+                                            ],
+                                          ),
+                                        ),
+                                        Text(
+                                          data.model?[index].caption ?? '',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .displaySmall
+                                              ?.copyWith(
+                                                  fontWeight: FontWeight.bold),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            final router = GoRouter.of(context);
+                                            final userId =
+                                                data.model?[index].userId;
+
+                                            router.push(ViewUserProfileRoute(
+                                                    id: userId ?? '')
+                                                .location);
+                                          },
+                                          child: Text(
+                                            'By @${data.model?[index].username}',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium
+                                                ?.copyWith(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                          ),
+                                        ),
+                                        Text(
+                                          '# Trending',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium
+                                              ?.copyWith(
+                                                  fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
+                                    const Column(
+                                      children: <Widget>[
+                                        MorphismWidget.circle(
+                                          size: 50,
+                                        ),
+                                        Gap(10),
+                                        MorphismWidget.circle(
+                                          size: 50,
+                                          child: Icon(Icons.share, size: 24),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
                 ),
-              ),
-            );
-          },
-          error: (error, stackTrace) => _ErrorView(
-            error: error.toString(),
-          ),
-          loading: () => const _LoadingView(),
-        );
-      },
+              );
+            },
+            error: (error, stackTrace) => _ErrorView(
+              error: error.toString(),
+            ),
+            loading: () => const _LoadingView(),
+          );
+        },
+      ),
     );
   }
 }

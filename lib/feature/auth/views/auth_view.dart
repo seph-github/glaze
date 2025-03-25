@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
-import 'package:glaze/repository/auth_repository/auth_repository_provider.dart';
+import 'package:glaze/data/repository/auth_repository/auth_repository_provider.dart';
 import 'package:glaze/core/styles/color_pallete.dart';
 import 'package:go_router/go_router.dart';
 
@@ -149,13 +149,28 @@ class AuthView extends HookWidget {
                       backgroundColor: Colors.white12,
                     ),
                     const Spacer(),
-                    GestureDetector(
-                      onTap: () {
-                        isLogin.value = !isLogin.value;
-                      },
-                      child: isLogin.value
-                          ? const Text('Don\'t have an account? Sign up')
-                          : const Text('Already have an account? Login'),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          isLogin.value
+                              ? 'Don\'t have an account?'
+                              : 'Already have an account?',
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelLarge
+                              ?.copyWith(color: Colors.grey),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            isLogin.value = !isLogin.value;
+                          },
+                          child: Text(
+                            isLogin.value ? ' Sign up' : ' Login',
+                            style: Theme.of(context).textTheme.labelLarge,
+                          ),
+                        ),
+                      ],
                     ),
                     const Spacer(),
                   ],

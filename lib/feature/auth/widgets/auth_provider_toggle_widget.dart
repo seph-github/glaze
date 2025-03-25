@@ -19,16 +19,16 @@ class AuthProviderToggleWidget extends StatelessWidget {
     return Container(
       width: double.infinity,
       height: 60.0,
-      padding: const EdgeInsets.all(4.0),
+      padding: const EdgeInsets.all(2.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(62.0),
-        color: Colors.white12,
+        color: Colors.white10,
       ),
       child: Row(
         children: toggleItems.value
             .map(
               (item) => Expanded(
-                child: InkWell(
+                child: GestureDetector(
                   onTap: () {
                     if (item == 'Email') {
                       itemsValue.value = [true, false];
@@ -54,7 +54,7 @@ class AuthProviderToggleWidget extends StatelessWidget {
                           color: selectedIndex.value ==
                                   toggleItems.value.indexOf(item)
                               ? Colors.white
-                              : Colors.white24,
+                              : Colors.white60,
                         ),
                       ),
                     ),
