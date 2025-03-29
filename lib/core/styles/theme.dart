@@ -4,9 +4,9 @@ import 'package:glaze/core/styles/color_pallete.dart';
 ThemeData theme = ThemeData(
   colorScheme: const ColorScheme(
     brightness: Brightness.dark,
-    primary: ColorPallete.magenta,
+    primary: ColorPallete.primaryColor,
     onPrimary: ColorPallete.slateViolet,
-    secondary: ColorPallete.parlourRed,
+    secondary: ColorPallete.secondaryColor,
     onSecondary: ColorPallete.strawberryGlaze,
     error: ColorPallete.parlourRed,
     onError: ColorPallete.parlourRed,

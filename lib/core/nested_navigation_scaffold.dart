@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 class NestedNavigationScaffold extends HookWidget {
@@ -30,12 +31,17 @@ class NestedNavigationScaffold extends HookWidget {
               overlayColor:
                   const WidgetStatePropertyAll<Color>(Colors.transparent),
               destinations: [
-                const NavigationDestination(
-                  icon: Icon(Icons.home),
+                NavigationDestination(
+                  icon: SvgPicture.asset('assets/images/svg/home_outlined.svg'),
+                  selectedIcon:
+                      SvgPicture.asset('assets/images/svg/home_fill_icon.svg'),
                   label: 'Home',
                 ),
-                const NavigationDestination(
-                  icon: Icon(Icons.person),
+                NavigationDestination(
+                  icon: SvgPicture.asset(
+                      'assets/images/svg/moments_inactive_icon.svg'),
+                  selectedIcon: SvgPicture.asset(
+                      'assets/images/svg/moments_fill_icon.svg'),
                   label: 'Moments',
                 ),
                 NavigationDestination(
@@ -43,26 +49,21 @@ class NestedNavigationScaffold extends HookWidget {
                     width: 50.0,
                     height: 50.0,
                     margin: const EdgeInsets.only(top: 30),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Colors.white,
-                        width: 2.0,
-                      ),
-                    ),
-                    child: const Icon(
-                      Icons.add,
-                      color: Colors.white,
-                    ),
+                    child: SvgPicture.asset('assets/images/svg/add_icon.svg'),
                   ),
                   label: '',
                 ),
-                const NavigationDestination(
-                  icon: Icon(Icons.person),
+                NavigationDestination(
+                  icon: SvgPicture.asset(
+                      'assets/images/svg/shop_inactive_icon.svg'),
+                  selectedIcon:
+                      SvgPicture.asset('assets/images/svg/shop_fill_icon.svg'),
                   label: 'Shops',
                 ),
-                const NavigationDestination(
-                  icon: Icon(Icons.person),
+                NavigationDestination(
+                  icon: SvgPicture.asset('assets/images/svg/profile_icon.svg'),
+                  selectedIcon: SvgPicture.asset(
+                      'assets/images/svg/profile_fill_icon.svg'),
                   label: 'Profile',
                 )
               ],

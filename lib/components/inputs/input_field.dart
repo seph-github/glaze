@@ -6,6 +6,7 @@ class InputField extends HookWidget {
   InputField.email({
     super.key,
     this.label,
+    this.inputIcon,
     this.hintText,
     this.initialValue,
     this.validator,
@@ -23,6 +24,7 @@ class InputField extends HookWidget {
   InputField.password({
     super.key,
     this.label,
+    this.inputIcon,
     this.hintText,
     TextEditingController? controller,
     this.initialValue,
@@ -40,6 +42,7 @@ class InputField extends HookWidget {
   InputField.text({
     super.key,
     this.label,
+    this.inputIcon,
     this.hintText,
     this.initialValue,
     this.validator,
@@ -57,6 +60,7 @@ class InputField extends HookWidget {
   InputField.paragraph({
     super.key,
     this.label,
+    this.inputIcon,
     this.hintText,
     this.initialValue,
     this.validator,
@@ -85,6 +89,7 @@ class InputField extends HookWidget {
   final bool readOnly;
   final double? borderRadius;
   final Widget? helper;
+  final Widget? inputIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -109,6 +114,10 @@ class InputField extends HookWidget {
             hintText: hintText,
             hintStyle: const TextStyle(
               color: Colors.white54,
+            ),
+            prefixIcon: Transform.scale(
+              scale: 0.5,
+              child: inputIcon,
             ),
             semanticCounterText: 'counter',
             focusedErrorBorder: OutlineInputBorder(

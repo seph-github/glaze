@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
+import 'package:glaze/core/styles/color_pallete.dart';
 import 'package:glaze/data/repository/auth_repository/auth_repository_provider.dart';
 import 'package:go_router/go_router.dart';
 
@@ -25,6 +27,8 @@ class AuthView extends HookWidget {
     final itemsValue = useState<List<bool>>([true, false]);
     final selectedIndex = useState<int>(0);
     final isLogin = useState<bool>(true);
+    final agreedToTermsAndCon = useState<bool>(false);
+    final recruitingTalent = useState<bool>(false);
 
     return Consumer(
       builder: (context, ref, _) {
@@ -49,6 +53,8 @@ class AuthView extends HookWidget {
                     const Gap(20),
                     if (!isLogin.value)
                       InputField.text(
+                        inputIcon: SvgPicture.asset(
+                            'assets/images/svg/profile_icon.svg'),
                         hintText: 'Choose a username',
                         controller: usernameController,
                         validator: (value) {
@@ -60,6 +66,11 @@ class AuthView extends HookWidget {
                       ),
                     if (!isLogin.value) const Gap(20),
                     InputField.email(
+                      inputIcon: toggleItems.value[selectedIndex.value] ==
+                              'Email'
+                          ? SvgPicture.asset('assets/images/svg/email_icon.svg')
+                          : SvgPicture.asset(
+                              'assets/images/svg/phone_icon.svg'),
                       hintText:
                           toggleItems.value[selectedIndex.value] == 'Email'
                               ? 'Enter your email'
@@ -78,6 +89,8 @@ class AuthView extends HookWidget {
                     ),
                     const Gap(16),
                     InputField.password(
+                      inputIcon: SvgPicture.asset(
+                          'assets/images/svg/password_icon.svg'),
                       hintText: 'Enter your password',
                       controller: passwordController,
                       validator: (value) {
@@ -97,6 +110,22 @@ class AuthView extends HookWidget {
                         child: const Align(
                           alignment: Alignment.centerRight,
                           child: Text('Forgot Password?'),
+                        ),
+                      ),
+                    if (!isLogin.value)
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Row(
+                          children: [
+                            Checkbox(
+                              value: agreedToTermsAndCon.value,
+                              onChanged: (value) {
+                                agreedToTermsAndCon.value = value ?? false;
+                              },
+                              checkColor: ColorPallete.backgroundColor,
+                            ),
+                            const Text('I agree to the terms and conditions'),
+                          ],
                         ),
                       ),
                     const Gap(30),
@@ -144,6 +173,28 @@ class AuthView extends HookWidget {
                       label: 'Continue Anonymously',
                       backgroundColor: Colors.white12,
                     ),
+                    const Gap(20),
+                    if (!isLogin.value)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Are You Recruiting Talent?',
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelLarge
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w900,
+                                ),
+                          ),
+                          Switch.adaptive(
+                            value: recruitingTalent.value,
+                            onChanged: (value) {
+                              recruitingTalent.value = value;
+                            },
+                          ),
+                        ],
+                      ),
                     const Spacer(),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
