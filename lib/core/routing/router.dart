@@ -5,7 +5,9 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:glaze/core/routing/nested_navigation_scaffold.dart';
+import 'package:glaze/core/nested_navigation_scaffold.dart';
+import 'package:glaze/feature/moments/upload_moments_view.dart';
+import 'package:glaze/feature/onboarding/provider/onboarding_provider.dart';
 import 'package:glaze/feature/shops/shop_view.dart';
 import 'package:glaze/feature/profile/views/profile_view.dart';
 import 'package:glaze/data/repository/auth_repository/auth_repository_provider.dart';
@@ -16,8 +18,10 @@ import 'package:glaze/feature/auth/views/auth_view.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../feature/challenges/views/challenges_view.dart';
 import '../../feature/home/views/home_view.dart';
 import '../../feature/moments/moments_view.dart';
+import '../../feature/onboarding/views/onboarding_view.dart';
 import '../../feature/profile/views/view_user_profile.dart';
 import '../../feature/splash/providers/splash_provider.dart';
 import '../../feature/splash/views/splash_view.dart';
@@ -27,6 +31,7 @@ part 'router.g.dart';
 
 final homeNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'home');
 final momentsNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'moments');
+final uploadMomentKey = GlobalKey<NavigatorState>(debugLabel: 'upload-moments');
 final premiumNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'shop');
 final profileNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'profile');
 
@@ -34,6 +39,7 @@ final profileNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'profile');
 GoRouter router(Ref ref) {
   final router = GoRouter(
     debugLogDiagnostics: true,
+    initialLocation: '/onboarding',
     routes: [
       StatefulShellRoute.indexedStack(
         builder: (context, state, child) {
@@ -69,6 +75,19 @@ GoRouter router(Ref ref) {
             ],
           ),
           StatefulShellBranch(
+            navigatorKey: uploadMomentKey,
+            routes: [
+              GoRoute(
+                path: '/upload-moments',
+                pageBuilder: (context, state) {
+                  return const NoTransitionPage(
+                    child: UploadMomentsView(),
+                  );
+                },
+              ),
+            ],
+          ),
+          StatefulShellBranch(
             navigatorKey: premiumNavigatorKey,
             routes: [
               GoRoute(
@@ -97,26 +116,26 @@ GoRouter router(Ref ref) {
         ],
       ),
       ...$appRoutes,
-      // GoRoute(
-      //   path: '/view-user-profile/:id',
-      //   pageBuilder: (context, state) {
-      //     final id = state.pathParameters['id']!;
-      //     return NoTransitionPage(
-      //       child: ViewUserProfile(id: id),
-      //     );
-      //   },
-      // ),
     ],
     redirect: (context, state) async {
       final User? user = await ref.read(authServiceProvider).getCurrentUser();
       final String path = state.matchedLocation;
+      final bool hasSplashCompleted = ref.read(splashProvider).completeSplash;
       final bool hasCompletedOnboarding =
           ref.read(onboardingProvider).completeOnBoarding;
 
-      // log('router redirect: $path, $user, on boarding completed $hasCompletedOnboarding');
+      log('router redirect: $path, $user, on boarding completed $hasCompletedOnboarding');
 
-      if (path == '/' && !hasCompletedOnboarding) {
+      if (path == '/' && !hasSplashCompleted) {
         return const SplashRoute().location;
+      }
+
+      if (path == '/onboarding' && !hasCompletedOnboarding) {
+        return const OnboardingRoute().location;
+      }
+
+      if (path == '/' && user != null) {
+        return const OnboardingRoute().location;
       }
 
       if (path == '/profile' && user == null) {
@@ -172,16 +191,7 @@ GoRouter router(Ref ref) {
   return router;
 }
 
-@TypedGoRoute<GeneralSettingsRoute>(path: '/general-settings')
-class GeneralSettingsRoute extends GoRouteData {
-  const GeneralSettingsRoute();
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      const GeneralSettingsView();
-}
-
-@TypedGoRoute<SplashRoute>(path: '/onboarding')
+@TypedGoRoute<SplashRoute>(path: '/splash')
 class SplashRoute extends GoRouteData {
   const SplashRoute();
 
@@ -239,10 +249,33 @@ class ViewUserProfileRoute extends GoRouteData {
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    // final id = state.pathParameters['id']!;
-
-    // log('id: $id');
-
     return ViewUserProfile(id: id);
   }
+}
+
+@TypedGoRoute<GeneralSettingsRoute>(path: '/general-settings')
+class GeneralSettingsRoute extends GoRouteData {
+  const GeneralSettingsRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const GeneralSettingsView();
+}
+
+@TypedGoRoute<ChallengesRoute>(path: '/challenges')
+class ChallengesRoute extends GoRouteData {
+  const ChallengesRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const ChallengesView();
+}
+
+@TypedGoRoute<OnboardingRoute>(path: '/onboarding')
+class OnboardingRoute extends GoRouteData {
+  const OnboardingRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const OnboardingView();
 }

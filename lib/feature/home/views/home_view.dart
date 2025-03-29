@@ -13,6 +13,7 @@ class HomeView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final router = GoRouter.of(context);
     final size = MediaQuery.sizeOf(context);
     final double height = size.height;
     final double width = size.width;
@@ -72,6 +73,10 @@ class HomeView extends ConsumerWidget {
                                           CrossAxisAlignment.start,
                                       children: <Widget>[
                                         MorphismWidget.rounded(
+                                          onTap: () {
+                                            router.push(const ChallengesRoute()
+                                                .location);
+                                          },
                                           width: width / 2,
                                           height: 40,
                                           child: const Row(
@@ -97,7 +102,6 @@ class HomeView extends ConsumerWidget {
                                         ),
                                         GestureDetector(
                                           onTap: () {
-                                            final router = GoRouter.of(context);
                                             final userId =
                                                 data.model?[index].userId;
 
@@ -125,13 +129,18 @@ class HomeView extends ConsumerWidget {
                                         ),
                                       ],
                                     ),
-                                    const Column(
+                                    Column(
                                       children: <Widget>[
                                         MorphismWidget.circle(
+                                          onTap: () {},
                                           size: 50,
+                                          child: const Icon(
+                                            Icons.favorite,
+                                            size: 24,
+                                          ),
                                         ),
-                                        Gap(10),
-                                        MorphismWidget.circle(
+                                        const Gap(10),
+                                        const MorphismWidget.circle(
                                           size: 50,
                                           child: Icon(Icons.share, size: 24),
                                         ),

@@ -9,6 +9,8 @@ class MorphismWidget extends StatelessWidget {
     this.radius = 1,
     this.shape = BoxShape.circle,
     this.child,
+    this.onTap,
+    this.onDoubleTap,
   })  : width = size ?? 60,
         height = size ?? 60;
 
@@ -18,6 +20,8 @@ class MorphismWidget extends StatelessWidget {
     double? height,
     this.radius = 32.0,
     this.child,
+    this.onTap,
+    this.onDoubleTap,
     this.shape = BoxShape.rectangle,
   })  : width = width ?? double.infinity,
         height = height ?? 50;
@@ -27,6 +31,8 @@ class MorphismWidget extends StatelessWidget {
   final BoxShape? shape;
   final double radius;
   final Widget? child;
+  final VoidCallback? onTap;
+  final VoidCallback? onDoubleTap;
 
   @override
   Widget build(BuildContext context) {
@@ -104,31 +110,43 @@ class MorphismWidget extends StatelessWidget {
     );
 
     if (shape == BoxShape.circle) {
-      return Transform(
-        alignment: Alignment.center,
-        transform: Matrix4.rotationX(3.14159),
-        child: ClipOval(
-          child: widget,
+      return GestureDetector(
+        onTap: onTap,
+        onDoubleTap: onDoubleTap,
+        child: Transform(
+          alignment: Alignment.center,
+          transform: Matrix4.rotationX(3.14159),
+          child: ClipOval(
+            child: widget,
+          ),
         ),
       );
     }
 
     if (shape == BoxShape.rectangle) {
-      return Transform(
-        alignment: Alignment.center,
-        transform: Matrix4.rotationX(3.14159),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(radius),
-          child: widget,
+      return GestureDetector(
+        onTap: onTap,
+        onDoubleTap: onDoubleTap,
+        child: Transform(
+          alignment: Alignment.center,
+          transform: Matrix4.rotationX(3.14159),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(radius),
+            child: widget,
+          ),
         ),
       );
     }
 
-    return Transform(
-      alignment: Alignment.center,
-      transform: Matrix4.rotationX(3.14159),
-      child: ClipRect(
-        child: widget,
+    return GestureDetector(
+      onTap: onTap,
+      onDoubleTap: onDoubleTap,
+      child: Transform(
+        alignment: Alignment.center,
+        transform: Matrix4.rotationX(3.14159),
+        child: ClipRect(
+          child: widget,
+        ),
       ),
     );
   }

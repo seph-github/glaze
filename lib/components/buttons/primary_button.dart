@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
+import 'package:lottie/lottie.dart';
 
 import '../../core/styles/color_pallete.dart';
 
@@ -13,6 +15,7 @@ class PrimaryButton extends StatelessWidget {
     double? borderRadius,
     this.height,
     this.width,
+    this.icon,
   }) : borderRadius = borderRadius ?? 32.0;
 
   final String label;
@@ -23,6 +26,7 @@ class PrimaryButton extends StatelessWidget {
   final double borderRadius;
   final double? height;
   final double? width;
+  final Widget? icon;
 
   @override
   Widget build(BuildContext context) {
@@ -32,17 +36,31 @@ class PrimaryButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor ?? ColorPallete.magenta,
+          elevation: 0,
+          backgroundColor: backgroundColor ?? ColorPallete.primaryColor,
           foregroundColor: foregroundColor ?? Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadius),
           ),
         ),
         child: isLoading ?? false
-            ? const CircularProgressIndicator.adaptive(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            ? Lottie.asset(
+                'assets/lotties/donut_sprinkled.json',
+                height: 32.0,
+                width: 32.0,
               )
-            : Text(label),
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (icon != null)
+                    const Icon(
+                      Icons.abc_sharp,
+                      size: 24.0,
+                    ),
+                  const Gap(10),
+                  Text(label),
+                ],
+              ),
       ),
     );
   }

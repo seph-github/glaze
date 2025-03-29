@@ -42,7 +42,7 @@ class AuthProviderToggleWidget extends StatelessWidget {
                       borderRadius: BorderRadius.circular(62.0),
                       color:
                           selectedIndex.value == toggleItems.value.indexOf(item)
-                              ? ColorPallete.black
+                              ? ColorPallete.backgroundColor
                               : Colors.transparent,
                     ),
                     child: Center(
@@ -54,7 +54,7 @@ class AuthProviderToggleWidget extends StatelessWidget {
                           color: selectedIndex.value ==
                                   toggleItems.value.indexOf(item)
                               ? Colors.white
-                              : Colors.white60,
+                              : ColorPallete.hintTextColor,
                         ),
                       ),
                     ),

@@ -71,6 +71,16 @@ class ProfileView extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: ProfileInteractionCard(
+                  following: value.maybeWhen(
+                    orElse: () => 0,
+                    data: (data) {
+                      return data?.totalFollowing ?? 0;
+                    },
+                  ),
+                  followers: value.maybeWhen(
+                    orElse: () => 0,
+                    data: (data) => data?.totalFollowers ?? 0,
+                  ),
                   glazes: value.maybeWhen(
                     orElse: () => 0,
                     data: (data) => data?.totalGlazes ?? 0,
@@ -78,37 +88,37 @@ class ProfileView extends ConsumerWidget {
                 ),
               ),
               const Gap(20),
-              Consumer(
-                builder: (context, ref, _) {
-                  final userValue = ref.watch(loggedInUserNotifierProvider);
+              // Consumer(
+              //   builder: (context, ref, _) {
+              //     final userValue = ref.watch(loggedInUserNotifierProvider);
 
-                  return value.maybeWhen(
-                    orElse: () {
-                      return const SizedBox.shrink();
-                    },
-                    data: (data) {
-                      if (data?.id ==
-                          userValue.maybeWhen(
-                              orElse: () => '', data: (data) => data?.id)) {
-                        return const SizedBox.shrink();
-                      }
+              //     return value.maybeWhen(
+              //       orElse: () {
+              //         return const SizedBox.shrink();
+              //       },
+              //       data: (data) {
+              //         if (data?.id ==
+              //             userValue.maybeWhen(
+              //                 orElse: () => '', data: (data) => data?.id)) {
+              //           return const SizedBox.shrink();
+              //         }
 
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Column(
-                          children: [
-                            PrimaryButton(
-                              label: 'Follow',
-                              onPressed: () {},
-                            ),
-                            const SizedBox(height: 20),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
+              //         return Padding(
+              //           padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              //           child: Column(
+              //             children: [
+              //               PrimaryButton(
+              //                 label: 'Follow',
+              //                 onPressed: () {},
+              //               ),
+              //               const SizedBox(height: 20),
+              //             ],
+              //           ),
+              //         );
+              //       },
+              //     );
+              //   },
+              // ),
               const ProfileAchievementsCard(),
               const SizedBox(height: 20),
               ProfileMomentsCard(

@@ -20,6 +20,8 @@ class UserModel with _$UserModel {
     String? badges,
     @JsonKey(name: 'total_glazes') int? totalGlazes,
     @JsonKey(name: 'total_uploads') int? totalUploads,
+    @JsonKey(name: 'total_followers') int? totalFollowers,
+    @JsonKey(name: 'total_following') int? totalFollowing,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     List<GlazeModel>? glazes,
     List<Videos>? videos,

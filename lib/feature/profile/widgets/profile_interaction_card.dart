@@ -24,17 +24,17 @@ class ProfileInteractionCard extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          const Column(
+          Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                '1.2K',
-                style: TextStyle(
+                followers.toString(),
+                style: const TextStyle(
                   fontSize: 16.0,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Text(
+              const Text(
                 'Following',
                 style: TextStyle(
                   fontSize: 12.0,
@@ -50,17 +50,17 @@ class ProfileInteractionCard extends StatelessWidget {
             endIndent: 20,
             indent: 20,
           ),
-          const Column(
+          Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                '2.5K',
-                style: TextStyle(
+                following.toString(),
+                style: const TextStyle(
                   fontSize: 16.0,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Text(
+              const Text(
                 'Followers',
                 style: TextStyle(
                   fontSize: 12.0,

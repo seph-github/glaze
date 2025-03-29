@@ -3,7 +3,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/data/repository/auth_repository/auth_repository_provider.dart';
-import 'package:glaze/core/styles/color_pallete.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../components/buttons/primary_button.dart';
@@ -27,12 +26,9 @@ class AuthView extends HookWidget {
     final selectedIndex = useState<int>(0);
     final isLogin = useState<bool>(true);
 
-    final initialPage = useState<int>(0);
-
     return Consumer(
       builder: (context, ref, _) {
         return Scaffold(
-          backgroundColor: ColorPallete.blackPearl,
           resizeToAvoidBottomInset: false,
           body: SafeArea(
             child: Form(
@@ -108,7 +104,7 @@ class AuthView extends HookWidget {
                       onPressed: () async {
                         if (formKey.currentState?.validate() ?? false) {
                           try {
-                            if (initialPage.value == 0) {
+                            if (isLogin.value) {
                               ref.read(loginNotifierProvider.notifier).login(
                                   email: providerController.text,
                                   password: passwordController.text);

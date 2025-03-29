@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:glaze/core/services/supabase_services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -30,6 +32,7 @@ class UserNotifier extends _$UserNotifier {
           final userModel = await ref.watch(userRepositoryProvider).fetchUser(
                 id: user?.id,
               );
+          log('userModel: $userModel');
           return userModel;
         },
       );
@@ -57,6 +60,7 @@ class GetUserProfileNotifier extends _$GetUserProfileNotifier {
               await ref.watch(userRepositoryProvider).fetchUsersProfile(
                     id: id,
                   );
+
           return userModel;
         },
       );
@@ -79,7 +83,9 @@ class UserRepository {
       if (id == null) return null;
 
       final response = await supabaseService.withReturnValuesRpc(
-          fn: 'find_user_by_id', params: {'params_user_id': id});
+        fn: 'find_user_by_id',
+        params: {'params_user_id': id},
+      );
 
       return UserModel.fromJson(response.first);
     } catch (e) {

@@ -51,3 +51,4 @@ app.*.map.json
 # Private files
 /dart-defines/
 **/ios/Flutter/Dart-Defines.xcconfig
+/supabase

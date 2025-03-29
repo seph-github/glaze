@@ -6,25 +6,24 @@ import '../../../data/local/shared_prefs.dart';
 part 'splash_provider.g.dart';
 
 @riverpod
-OnboardingProvider onboarding(ref) {
-  return OnboardingProvider(
+SplashProvider splash(ref) {
+  return SplashProvider(
     preferences: ref.read(sharedPrefsProvider),
   );
 }
 
-class OnboardingProvider {
-  const OnboardingProvider({
+class SplashProvider {
+  const SplashProvider({
     required SharedPreferences preferences,
   }) : _preferences = preferences;
 
   final SharedPreferences _preferences;
 
-  static String onBoardingCompletedKey = 'onBoardingCompleted';
+  static String splashCompletedKey = 'splashCompleted';
 
-  Future<void> setOnBoardingComplete(bool value) async {
-    await _preferences.setBool(onBoardingCompletedKey, value);
+  Future<void> setSplashComplete(bool value) async {
+    await _preferences.setBool(splashCompletedKey, value);
   }
 
-  bool get completeOnBoarding =>
-      _preferences.getBool(onBoardingCompletedKey) ?? false;
+  bool get completeSplash => _preferences.getBool(splashCompletedKey) ?? false;
 }

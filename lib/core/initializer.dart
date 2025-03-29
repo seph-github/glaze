@@ -8,7 +8,20 @@ Future<void> initializer() async {
   const url = String.fromEnvironment('url', defaultValue: '');
   const apiKey = String.fromEnvironment('apiKey', defaultValue: '');
 
-  await Supabase.initialize(url: url, anonKey: apiKey);
+  await Supabase.initialize(
+    url: url,
+    anonKey: apiKey,
+    authOptions: const FlutterAuthClientOptions(
+      authFlowType: AuthFlowType.pkce,
+    ),
+    debug: true,
+    realtimeClientOptions: const RealtimeClientOptions(
+      logLevel: RealtimeLogLevel.info,
+    ),
+    storageOptions: const StorageClientOptions(
+      retryAttempts: 10,
+    ),
+  );
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
