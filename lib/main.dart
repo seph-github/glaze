@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -25,8 +26,10 @@ Future<void> main() async {
       );
     },
     (error, stack) {
-      Fluttertoast.showToast(msg: "$error");
-      log("An unhandled exception occurred", error: error, stackTrace: stack);
+      if (kDebugMode) {
+        log("An unhandled exception occurred", error: error, stackTrace: stack);
+        Fluttertoast.showToast(msg: "$error");
+      }
     },
   );
 }

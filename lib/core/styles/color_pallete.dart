@@ -22,7 +22,7 @@ class ColorPallete {
   static const Color primaryColor = Color(0xFFD251BF);
   static const Color secondaryColor = Color(0xFF272727);
   static const Color hintTextColor = Color(0xFF939393);
-  static const Color backgroundColor = Color(0XFF0F0F0f);
+  static const Color backgroundColor = Color(0XFF0F0F0F);
   static const Color lightBackgroundColor = Color(0xFF161616);
   static const Color borderColor = Color(0xFF9E9E9E);
 }

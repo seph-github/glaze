@@ -1,12 +1,17 @@
 import 'dart:math' hide log;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+
 import 'package:glaze/core/services/supabase_services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 part 'auth_repository_provider.g.dart';
+
+@riverpod
+Stream<AuthState> authStateChanges(Ref ref) {
+  return ref.watch(authServiceProvider).onAuthStateChange();
+}
 
 @riverpod
 AuthRepository authService(ref) {
@@ -25,7 +30,12 @@ class LoginNotifier extends _$LoginNotifier {
   @override
   FutureOr build() => null;
 
-  Future<void> login({required String email, required String password}) async {
+  Future<void> login({
+    required String email,
+    required String password,
+  }) async {
+    if (state.isLoading) return;
+
     try {
       state = const AsyncLoading();
       state = await AsyncValue.guard(
@@ -34,9 +44,7 @@ class LoginNotifier extends _$LoginNotifier {
             .signInWithEmailPassword(email: email, password: password),
       );
     } catch (e) {
-      Fluttertoast.showToast(
-        msg: e.toString(),
-      );
+      state = AsyncValue.error(e.toString(), StackTrace.current);
     }
   }
 }
@@ -46,10 +54,13 @@ class SignupNotifier extends _$SignupNotifier {
   @override
   FutureOr build() => null;
 
-  Future<void> signup(
-      {required String email,
-      required String password,
-      required String username}) async {
+  Future<void> signup({
+    required String email,
+    required String password,
+    required String username,
+  }) async {
+    if (state.isLoading) return;
+
     try {
       state = const AsyncLoading();
       state = await AsyncValue.guard(
@@ -57,9 +68,7 @@ class SignupNotifier extends _$SignupNotifier {
             email: email, password: password, username: username),
       );
     } catch (e) {
-      Fluttertoast.showToast(
-        msg: e.toString(),
-      );
+      state = AsyncValue.error(e.toString(), StackTrace.current);
     }
   }
 }
@@ -70,15 +79,15 @@ class AnonymousSigninNotifier extends _$AnonymousSigninNotifier {
   FutureOr build() => null;
 
   Future<void> anonymousSignin() async {
+    if (state.isLoading) return;
+
     try {
       state = const AsyncLoading();
       state = await AsyncValue.guard(
         () => ref.read(authServiceProvider).anonymousSignin(),
       );
     } catch (e) {
-      Fluttertoast.showToast(
-        msg: e.toString(),
-      );
+      state = AsyncValue.error(e.toString(), StackTrace.current);
     }
   }
 }
@@ -89,13 +98,15 @@ class LogoutNotifier extends _$LogoutNotifier {
   FutureOr build() async => null;
 
   Future<void> logout() async {
+    if (state.isLoading) return;
+
     try {
       state = const AsyncLoading();
       state = await AsyncValue.guard(
         () async => await ref.read(authServiceProvider).signOut(),
       );
     } catch (e) {
-      throw Exception('LogoutNotifier.logout: $e');
+      state = AsyncValue.error(e.toString(), StackTrace.current);
     }
   }
 }
@@ -105,17 +116,17 @@ class AuthRepository {
 
   final SupabaseService supabaseService;
 
-  Future<AuthResponse> signInWithEmailPassword(
-      {required String email, required String password}) async {
+  Future<void> signInWithEmailPassword({
+    required String email,
+    required String password,
+  }) async {
     try {
-      final result = await supabaseService.supabase.auth.signInWithPassword(
+      await supabaseService.supabase.auth.signInWithPassword(
         email: email,
         password: password,
       );
-
-      return result;
     } catch (e) {
-      rethrow;
+      throw Exception('SignInRepository.signIn: $e');
     }
   }
 
@@ -130,8 +141,6 @@ class AuthRepository {
         email: email,
         password: password,
       );
-
-      // print('User ${authResponse.user}');
 
       await supabaseService.update(
         id: authResponse.user!.id,
@@ -160,7 +169,7 @@ class AuthRepository {
         },
       );
     } catch (e) {
-      rethrow;
+      throw Exception('AnonymousSigninRepository.anonymousSignin: $e');
     }
   }
 
@@ -180,7 +189,7 @@ class AuthRepository {
 
       return supabaseService.supabase.auth.currentUser;
     } catch (e) {
-      rethrow;
+      throw Exception('AuthRepository.getCurrentUser: $e');
     }
   }
 
@@ -190,12 +199,6 @@ class AuthRepository {
 
   int createRandomNumber() {
     final random = Random();
-    return random.nextInt(90000000) +
-        10000000; // Generates a random 8-digit number
+    return random.nextInt(90000000) + 10000000;
   }
-}
-
-@riverpod
-Stream<AuthState> authStateChanges(Ref ref) {
-  return ref.watch(authServiceProvider).onAuthStateChange();
 }
