@@ -6,7 +6,6 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glaze/core/nested_navigation_scaffold.dart';
-import 'package:glaze/feature/moments/upload_moments_view.dart';
 import 'package:glaze/feature/onboarding/provider/onboarding_provider.dart';
 import 'package:glaze/feature/shops/shop_view.dart';
 import 'package:glaze/feature/profile/views/profile_view.dart';
@@ -20,7 +19,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../feature/challenges/views/challenges_view.dart';
 import '../../feature/home/views/home_view.dart';
-import '../../feature/moments/moments_view.dart';
+import '../../feature/moments/views/moments_view.dart';
 import '../../feature/onboarding/views/onboarding_view.dart';
 import '../../feature/profile/views/view_user_profile.dart';
 import '../../feature/splash/providers/splash_provider.dart';
@@ -80,7 +79,7 @@ GoRouter router(Ref ref) {
                 path: '/upload-moments',
                 pageBuilder: (context, state) {
                   return const NoTransitionPage(
-                    child: UploadMomentsView(),
+                    child: Placeholder(),
                   );
                 },
               ),

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:glaze/core/services/supabase_services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -29,10 +27,12 @@ class UserNotifier extends _$UserNotifier {
       state = await AsyncValue.guard(
         () async {
           final user = await ref.watch(authServiceProvider).getCurrentUser();
-          final userModel = await ref.watch(userRepositoryProvider).fetchUser(
-                id: user?.id,
-              );
-          log('userModel: $userModel');
+
+          final UserModel? userModel =
+              await ref.watch(userRepositoryProvider).fetchUser(
+                    id: user?.id,
+                  );
+
           return userModel;
         },
       );
@@ -78,7 +78,7 @@ class UserRepository {
 
   final SupabaseService supabaseService;
 
-  Future<UserModel?> fetchUser({required String? id}) async {
+  FutureOr<UserModel?> fetchUser({required String? id}) async {
     try {
       if (id == null) return null;
 

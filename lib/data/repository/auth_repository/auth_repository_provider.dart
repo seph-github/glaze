@@ -1,3 +1,5 @@
+import 'dart:math' hide log;
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:glaze/core/services/supabase_services.dart';
@@ -53,6 +55,25 @@ class SignupNotifier extends _$SignupNotifier {
       state = await AsyncValue.guard(
         () => ref.read(authServiceProvider).signUpWithEmailPassword(
             email: email, password: password, username: username),
+      );
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: e.toString(),
+      );
+    }
+  }
+}
+
+@riverpod
+class AnonymousSigninNotifier extends _$AnonymousSigninNotifier {
+  @override
+  FutureOr build() => null;
+
+  Future<void> anonymousSignin() async {
+    try {
+      state = const AsyncLoading();
+      state = await AsyncValue.guard(
+        () => ref.read(authServiceProvider).anonymousSignin(),
       );
     } catch (e) {
       Fluttertoast.showToast(
@@ -124,6 +145,25 @@ class AuthRepository {
     }
   }
 
+  Future<void> anonymousSignin() async {
+    try {
+      final AuthResponse authResponse =
+          await supabaseService.supabase.auth.signInAnonymously();
+
+      final int tempUserId = createRandomNumber();
+
+      await supabaseService.update(
+        id: authResponse.user!.id,
+        table: 'profiles',
+        data: {
+          'username_id': tempUserId,
+        },
+      );
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<void> signOut() async {
     try {
       await supabaseService.supabase.auth.signOut();
@@ -146,6 +186,12 @@ class AuthRepository {
 
   Stream<AuthState> onAuthStateChange() {
     return supabaseService.supabase.auth.onAuthStateChange;
+  }
+
+  int createRandomNumber() {
+    final random = Random();
+    return random.nextInt(90000000) +
+        10000000; // Generates a random 8-digit number
   }
 }
 

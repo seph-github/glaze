@@ -30,7 +30,17 @@ class NestedNavigationScaffold extends HookWidget {
 
     path.value = router.state.matchedLocation;
     return Scaffold(
-      body: _navigationShell,
+      body: ClipRRect(
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(
+            24.0,
+          ),
+          bottomRight: Radius.circular(
+            24.0,
+          ),
+        ),
+        child: _navigationShell,
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _navigationShell.currentIndex,
         indicatorColor: Colors.transparent,

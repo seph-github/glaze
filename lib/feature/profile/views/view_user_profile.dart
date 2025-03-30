@@ -63,7 +63,7 @@ class ViewUserProfile extends ConsumerWidget {
                     ),
                     const Gap(8),
                     Text(
-                      data?.username ?? '',
+                      '@${data?.username ?? data?.usernameId.toString()}',
                       style: const TextStyle(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,

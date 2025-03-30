@@ -19,153 +19,146 @@ class HomeView extends ConsumerWidget {
     final double height = size.height;
     final double width = size.width;
 
-    return ClipRRect(
-      borderRadius: const BorderRadius.only(
-        bottomLeft: Radius.circular(24.0),
-        bottomRight: Radius.circular(24.0),
-      ),
-      child: Consumer(
-        builder: (context, ref, child) {
-          final state = ref.watch(cacheVideoNotifierProvider);
+    return Consumer(
+      builder: (context, ref, child) {
+        final state = ref.watch(cacheVideoNotifierProvider);
 
-          return state.when(
-            data: (data) {
-              return Scaffold(
-                body: RefreshIndicator(
-                  onRefresh: () =>
-                      ref.refresh(videoRepositoryProvider).fetchVideos(),
-                  color: Colors.white12,
-                  triggerMode: RefreshIndicatorTriggerMode.onEdge,
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 500),
-                    child: PageView.builder(
-                      itemCount: data.controllers?.length,
-                      scrollDirection: Axis.vertical,
-                      itemBuilder: (context, index) {
-                        return Stack(
-                          alignment: Alignment.bottomCenter,
-                          children: [
-                            VideoPlayerView(
-                              controller: data.controllers?[index],
-                            ),
-                            Positioned(
-                              bottom: -100,
-                              left: 0,
-                              right: 0,
-                              child: Container(
-                                width: width,
-                                height: height * 0.3,
-                                padding: const EdgeInsets.all(16.0),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.rectangle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color:
-                                          Colors.black.withValues(alpha: 0.6),
-                                      offset: const Offset(0, 0),
-                                      blurRadius: 100,
-                                      spreadRadius: 50,
-                                    ),
-                                  ],
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        MorphismWidget.rounded(
-                                          onTap: () {
-                                            router.push(const ChallengesRoute()
-                                                .location);
-                                          },
-                                          width: width / 2,
-                                          height: 40,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: <Widget>[
-                                              SvgPicture.asset(
-                                                  'assets/images/svg/Trophy Icon.svg'),
-                                              const Gap(10),
-                                              const Text('Best Content'),
-                                            ],
-                                          ),
+        return state.when(
+          data: (data) {
+            return Scaffold(
+              body: RefreshIndicator(
+                onRefresh: () =>
+                    ref.refresh(videoRepositoryProvider).fetchVideos(),
+                color: Colors.white12,
+                triggerMode: RefreshIndicatorTriggerMode.onEdge,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 500),
+                  child: PageView.builder(
+                    itemCount: data.controllers?.length,
+                    scrollDirection: Axis.vertical,
+                    itemBuilder: (context, index) {
+                      return Stack(
+                        alignment: Alignment.bottomCenter,
+                        children: [
+                          VideoPlayerView(
+                            controller: data.controllers?[index],
+                          ),
+                          Positioned(
+                            bottom: -100,
+                            left: 0,
+                            right: 0,
+                            child: Container(
+                              width: width,
+                              height: height * 0.3,
+                              padding: const EdgeInsets.all(16.0),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.rectangle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.6),
+                                    offset: const Offset(0, 0),
+                                    blurRadius: 100,
+                                    spreadRadius: 50,
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      MorphismWidget.rounded(
+                                        onTap: () {
+                                          router.push(
+                                              const ChallengesRoute().location);
+                                        },
+                                        width: width / 2,
+                                        height: 40,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            SvgPicture.asset(
+                                                'assets/images/svg/Trophy Icon.svg'),
+                                            const Gap(10),
+                                            const Text('Best Content'),
+                                          ],
                                         ),
-                                        Text(
-                                          data.model?[index].caption ?? '',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .displaySmall
-                                              ?.copyWith(
-                                                  fontWeight: FontWeight.bold),
-                                        ),
-                                        GestureDetector(
-                                          onTap: () {
-                                            final userId =
-                                                data.model?[index].userId;
+                                      ),
+                                      const Gap(10),
+                                      Text(
+                                        data.model?[index].caption ?? '',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge
+                                            ?.copyWith(
+                                                fontWeight: FontWeight.bold),
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          final userId =
+                                              data.model?[index].userId;
 
-                                            router.push(ViewUserProfileRoute(
-                                                    id: userId ?? '')
-                                                .location);
-                                          },
-                                          child: Text(
-                                            'By @${data.model?[index].username}',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyMedium
-                                                ?.copyWith(
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                          ),
-                                        ),
-                                        Text(
-                                          '# Trending',
+                                          router.push(ViewUserProfileRoute(
+                                                  id: userId ?? '')
+                                              .location);
+                                        },
+                                        child: Text(
+                                          'By @${data.model?[index].username}',
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyMedium
                                               ?.copyWith(
                                                   fontWeight: FontWeight.bold),
                                         ),
-                                      ],
-                                    ),
-                                    Column(
-                                      children: <Widget>[
-                                        MorphismWidget.circle(
-                                          onTap: () {},
-                                          size: 45.0,
-                                          child: SvgPicture.asset(
-                                              'assets/images/svg/Glaze Donuts Icon.svg'),
-                                        ),
-                                        const Gap(10),
-                                        MorphismWidget.circle(
-                                          size: 45.0,
-                                          child: SvgPicture.asset(
-                                              'assets/images/svg/share_icon.svg'),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
+                                      ),
+                                      Text(
+                                        '# Trending',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium
+                                            ?.copyWith(
+                                                fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
+                                  Column(
+                                    children: <Widget>[
+                                      MorphismWidget.circle(
+                                        onTap: () {},
+                                        size: 45.0,
+                                        child: SvgPicture.asset(
+                                            'assets/images/svg/Glaze Donuts Icon.svg'),
+                                      ),
+                                      const Gap(10),
+                                      MorphismWidget.circle(
+                                        size: 45.0,
+                                        child: SvgPicture.asset(
+                                            'assets/images/svg/share_icon.svg'),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        );
-                      },
-                    ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ),
-              );
-            },
-            error: (error, stackTrace) => _ErrorView(
-              error: error.toString(),
-            ),
-            loading: () => const _LoadingView(),
-          );
-        },
-      ),
+              ),
+            );
+          },
+          error: (error, stackTrace) => _ErrorView(
+            error: error.toString(),
+          ),
+          loading: () => const _LoadingView(),
+        );
+      },
     );
   }
 }

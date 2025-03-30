@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:glaze/core/styles/color_pallete.dart';
 
 class UserProfileImageWidget extends StatelessWidget {
@@ -22,14 +23,18 @@ class UserProfileImageWidget extends StatelessWidget {
               color: ColorPallete.strawberryGlaze,
               width: 5,
             ),
-            image: DecorationImage(
-              image: NetworkImage(
-                imageUrl ??
-                    'https://uxwing.com/wp-content/themes/uxwing/download/peoples-avatars/no-profile-picture-icon.png',
-              ),
-              fit: BoxFit.cover,
-            ),
+            image: imageUrl == null
+                ? null
+                : DecorationImage(
+                    image: NetworkImage(
+                      imageUrl!,
+                    ),
+                    fit: BoxFit.fitHeight,
+                  ),
           ),
+          child: imageUrl == null
+              ? SvgPicture.asset('assets/images/svg/profile.svg')
+              : null,
         ),
         Positioned(
           bottom: 0,

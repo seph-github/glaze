@@ -13,7 +13,7 @@ class UserModel with _$UserModel {
   const factory UserModel({
     required String id,
     String? username,
-    required String email,
+    String? email,
     @JsonKey(name: 'profile_image_url') String? profileImageUrl,
     String? bio,
     String? provider,
@@ -25,6 +25,7 @@ class UserModel with _$UserModel {
     @JsonKey(name: 'created_at') DateTime? createdAt,
     List<GlazeModel>? glazes,
     List<Videos>? videos,
+    @JsonKey(name: 'username_id') int? usernameId,
   }) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>

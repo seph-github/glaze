@@ -3,11 +3,9 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../components/buttons/primary_button.dart';
 import '../../../components/inputs/input_field.dart';
-import '../../../core/routing/router.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../data/repository/auth_repository/auth_repository_provider.dart';
 import '../widgets/auth_header.dart';
@@ -29,6 +27,41 @@ class AuthView extends HookWidget {
     final isLogin = useState<bool>(true);
     final agreedToTermsAndCon = useState<bool>(false);
     final recruitingTalent = useState<bool>(false);
+
+    Future<void> onSubmit(WidgetRef ref) async {
+      if (formKey.currentState?.validate() ?? false) {
+        formKey.currentState?.save();
+        try {
+          if (isLogin.value) {
+            ref.read(loginNotifierProvider.notifier).login(
+                email: providerController.text,
+                password: passwordController.text);
+
+            ref.read(signupNotifierProvider.notifier).signup(
+                  username: usernameController.text,
+                  email: providerController.text,
+                  password: passwordController.text,
+                );
+          }
+        } catch (e) {
+          if (e is Exception) {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Login failed: $e'),
+                ),
+              );
+            }
+          }
+        }
+      }
+    }
+
+    Future<void> onAnonymousSignin(WidgetRef ref) async {
+      await ref
+          .read(anonymousSigninNotifierProvider.notifier)
+          .anonymousSignin();
+    }
 
     return Consumer(
       builder: (context, ref, _) {
@@ -130,33 +163,7 @@ class AuthView extends HookWidget {
                       ),
                     const Gap(30),
                     PrimaryButton(
-                      onPressed: () async {
-                        if (formKey.currentState?.validate() ?? false) {
-                          try {
-                            if (isLogin.value) {
-                              ref.read(loginNotifierProvider.notifier).login(
-                                  email: providerController.text,
-                                  password: passwordController.text);
-                            } else {
-                              ref.read(signupNotifierProvider.notifier).signup(
-                                    username: usernameController.text,
-                                    email: providerController.text,
-                                    password: passwordController.text,
-                                  );
-                            }
-                          } catch (e) {
-                            if (e is Exception) {
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Login failed: $e'),
-                                  ),
-                                );
-                              }
-                            }
-                          }
-                        }
-                      },
+                      onPressed: () => onSubmit(ref),
                       isLoading: isLogin.value
                           ? ref.watch(loginNotifierProvider).isLoading
                           : ref.watch(signupNotifierProvider).isLoading,
@@ -166,10 +173,9 @@ class AuthView extends HookWidget {
                     AuthSSOWidget(),
                     const Gap(20),
                     PrimaryButton(
-                      onPressed: () {
-                        final router = GoRouter.of(context);
-                        router.pushReplacement(const HomeRoute().location);
-                      },
+                      onPressed: () => onAnonymousSignin(ref),
+                      isLoading:
+                          ref.watch(anonymousSigninNotifierProvider).isLoading,
                       label: 'Continue Anonymously',
                       backgroundColor: Colors.white12,
                     ),

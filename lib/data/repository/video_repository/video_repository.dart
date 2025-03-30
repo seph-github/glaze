@@ -22,7 +22,7 @@ VideoRepository videoRepository(ref) {
 }
 
 @riverpod
-class VideoNotifier extends _$VideoNotifier {
+class VideosNotifier extends _$VideosNotifier {
   @override
   Future<List<VideoModel>> build() async {
     return ref.watch(videoRepositoryProvider).fetchVideos();

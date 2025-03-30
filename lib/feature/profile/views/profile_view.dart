@@ -43,7 +43,7 @@ class ProfileView extends ConsumerWidget {
                 value.maybeWhen(
                   orElse: () => '',
                   data: (data) {
-                    return data?.username ?? '';
+                    return '@${data?.username ?? data?.usernameId.toString()}';
                   },
                 ),
                 style: const TextStyle(
