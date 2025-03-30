@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../components/buttons/focus_button.dart';
 import '../../../components/buttons/primary_button.dart';
@@ -79,21 +78,19 @@ class UploadMoment extends HookWidget {
               PrimaryButton(
                 label: 'Upload Moment',
                 onPressed: () async {
-                  final file = ref.watch(filePickerNotifierProvider).value;
+                  // await ref
+                  //     .read(videoUploadNotifierProvider.notifier)
+                  //     .uploadVideo(file: file!, title: titleController.text);
 
-                  await ref
-                      .read(videoUploadNotifierProvider.notifier)
-                      .uploadVideo(file: file!, title: titleController.text);
+                  // titleController.clear();
+                  // optionController.clear();
 
-                  titleController.clear();
-                  optionController.clear();
+                  // ref.invalidate(filePickerNotifierProvider);
 
-                  ref.invalidate(filePickerNotifierProvider);
-
-                  await ref
-                      .refresh(videoRepositoryProvider)
-                      .fetchVideos()
-                      .then((_) => context.mounted ? context.pop() : null);
+                  // await ref
+                  //     .refresh(videoRepositoryProvider)
+                  //     .fetchVideos()
+                  //     .then((_) => context.mounted ? context.pop() : null);
                 },
                 isLoading: ref.watch(videoUploadNotifierProvider).isLoading,
               ),

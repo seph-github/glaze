@@ -1,18 +1,21 @@
 class VideoEntity {
   final String userId;
-
+  final String title;
   final String videoUrl;
   final String thumbnailUrl;
   final String? caption;
   final String? category;
+  final String? publishAs;
   final int? glazesCount;
   final String? status;
   final DateTime? createdAt;
 
   VideoEntity({
     required this.userId,
+    required this.title,
     required this.videoUrl,
     required this.thumbnailUrl,
+    this.publishAs,
     this.caption,
     this.category,
     this.glazesCount,
@@ -23,9 +26,11 @@ class VideoEntity {
   Map<String, dynamic> toMap() {
     return {
       'user_id': userId,
+      'title': title,
       'video_url': videoUrl,
       'thumbnail_url': thumbnailUrl,
       'caption': caption,
+      'publish_as': publishAs,
       'category': category,
       'glazes_count': glazesCount,
       'status': status,
@@ -40,6 +45,7 @@ class VideoEntityWithUser extends VideoEntity {
 
   VideoEntityWithUser({
     required super.userId,
+    required super.title,
     required super.videoUrl,
     required super.thumbnailUrl,
     super.caption,

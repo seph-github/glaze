@@ -98,16 +98,27 @@ class VideoUploadNotifier extends _$VideoUploadNotifier {
   @override
   Future<void> build() async {}
 
-  Future<void> uploadVideo({required File file, required String title}) async {
+  Future<void> uploadVideo({
+    required File file,
+    required String title,
+    required String caption,
+    required String category,
+    required String publishAs,
+  }) async {
     try {
       final user = await ref.watch(authServiceProvider).getCurrentUser();
 
       state = const AsyncLoading();
       state = await AsyncValue.guard(
         () async {
-          await ref
-              .watch(videoRepositoryProvider)
-              .uploadVideo(file: file, userId: user?.id ?? '', title: title);
+          await ref.watch(videoRepositoryProvider).uploadVideo(
+                file: file,
+                userId: user?.id ?? '',
+                caption: caption,
+                category: category,
+                title: title,
+                publishAs: publishAs,
+              );
         },
       );
     } catch (e) {
@@ -142,10 +153,14 @@ class VideoRepository {
     }
   }
 
-  Future<void> uploadVideo(
-      {required File file,
-      required String userId,
-      required String title}) async {
+  Future<void> uploadVideo({
+    required File file,
+    required String userId,
+    required String title,
+    required String caption,
+    required String category,
+    required String publishAs,
+  }) async {
     try {
       final url = await supabaseService.upload(
           file: file, userId: userId, bucketName: 'videos');
@@ -159,7 +174,9 @@ class VideoRepository {
       log('video_url: $url');
 
       final data = VideoEntity(
-        caption: title,
+        title: title,
+        caption: caption,
+        category: category,
         thumbnailUrl: thumbnailUrl,
         videoUrl: url,
         userId: userId,

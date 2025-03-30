@@ -39,7 +39,6 @@ final profileNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'profile');
 GoRouter router(Ref ref) {
   final router = GoRouter(
     debugLogDiagnostics: true,
-    initialLocation: '/onboarding',
     routes: [
       StatefulShellRoute.indexedStack(
         builder: (context, state, child) {
@@ -124,23 +123,24 @@ GoRouter router(Ref ref) {
       final bool hasCompletedOnboarding =
           ref.read(onboardingProvider).completeOnBoarding;
 
-      log('router redirect: $path, $user, on boarding completed $hasCompletedOnboarding');
+      log('router redirect: $path, user: ${user != null}, splash screen completed $hasSplashCompleted, on boarding completed $hasCompletedOnboarding');
 
-      if (path == '/' && !hasSplashCompleted) {
+      if (path == '/' && user == null && !hasSplashCompleted) {
         return const SplashRoute().location;
       }
 
-      if (path == '/onboarding' && !hasCompletedOnboarding) {
-        return const OnboardingRoute().location;
-      }
-
-      if (path == '/' && user != null) {
+      if (path == '/' && user == null && !hasCompletedOnboarding) {
         return const OnboardingRoute().location;
       }
 
       if (path == '/profile' && user == null) {
         return const AuthRoute().location;
       }
+
+      // Ensure no unnecessary redirects to the home route
+      // if (path == '/' && user != null) {
+      //   return null;
+      // }
 
       return null;
     },
@@ -156,7 +156,6 @@ GoRouter router(Ref ref) {
         switch (auth.event) {
           case AuthChangeEvent.initialSession:
             log('initialSession');
-            router.go(const HomeRoute().location);
             break;
           case AuthChangeEvent.passwordRecovery:
             log('passwordRecovery');
@@ -164,7 +163,6 @@ GoRouter router(Ref ref) {
           case AuthChangeEvent.signedIn:
             log('signedIn');
             ref.watch(userNotifierProvider);
-            router.go(const HomeRoute().location);
             break;
           case AuthChangeEvent.signedOut:
             log('signedOut');

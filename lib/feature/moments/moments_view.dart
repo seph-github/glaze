@@ -3,11 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glass_kit/glass_kit.dart';
 import 'package:glaze/components/buttons/focus_button.dart';
 import 'package:glaze/components/inputs/input_field.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../components/buttons/primary_button.dart';
 import '../../components/drop_downs/custom_drop_down_menu.dart';
-import '../../data/repository/file_picker/file_picker_provider.dart';
 import '../../data/repository/video_repository/video_repository.dart';
 
 class MomentsView extends ConsumerWidget {
@@ -87,24 +85,24 @@ class MomentsView extends ConsumerWidget {
                       label: 'Upload Moment',
                       borderRadius: 32.0,
                       onPressed: () async {
-                        final router = GoRouter.of(context);
-                        final file =
-                            ref.watch(filePickerNotifierProvider).value;
+                        // final router = GoRouter.of(context);
+                        // final file =
+                        //     ref.watch(filePickerNotifierProvider).value;
 
-                        await ref
-                            .read(videoUploadNotifierProvider.notifier)
-                            .uploadVideo(
-                                file: file!, title: titleController.text);
+                        // await ref
+                        //     .read(videoUploadNotifierProvider.notifier)
+                        //     .uploadVideo(
+                        //         file: file!, title: titleController.text);
 
-                        titleController.clear();
-                        captionController.clear();
+                        // titleController.clear();
+                        // captionController.clear();
 
-                        ref.invalidate(filePickerNotifierProvider);
+                        // ref.invalidate(filePickerNotifierProvider);
 
-                        await ref
-                            .refresh(videoRepositoryProvider)
-                            .fetchVideos()
-                            .then((_) => context.mounted ? router.pop() : null);
+                        // await ref
+                        //     .refresh(videoRepositoryProvider)
+                        //     .fetchVideos()
+                        //     .then((_) => context.mounted ? router.pop() : null);
                       },
                       isLoading:
                           ref.watch(videoUploadNotifierProvider).isLoading,

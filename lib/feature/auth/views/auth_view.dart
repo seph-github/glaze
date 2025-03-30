@@ -3,13 +3,13 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
-import 'package:glaze/core/styles/color_pallete.dart';
-import 'package:glaze/data/repository/auth_repository/auth_repository_provider.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../components/buttons/primary_button.dart';
 import '../../../components/inputs/input_field.dart';
 import '../../../core/routing/router.dart';
+import '../../../core/styles/color_pallete.dart';
+import '../../../data/repository/auth_repository/auth_repository_provider.dart';
 import '../widgets/auth_header.dart';
 import '../widgets/auth_provider_toggle_widget.dart';
 import '../widgets/auth_sso_widget.dart';

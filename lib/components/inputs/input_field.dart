@@ -113,12 +113,14 @@ class InputField extends HookWidget {
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: const TextStyle(
-              color: Colors.white54,
+              color: ColorPallete.hintTextColor,
             ),
-            prefixIcon: Transform.scale(
-              scale: 0.5,
-              child: inputIcon,
-            ),
+            prefixIcon: inputIcon != null
+                ? Transform.scale(
+                    scale: 0.5,
+                    child: inputIcon,
+                  )
+                : null,
             semanticCounterText: 'counter',
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(borderRadius ?? 32.0),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../../core/styles/color_pallete.dart';
 
@@ -10,12 +11,14 @@ class CustomDropDownMenu extends HookWidget {
     this.hintText,
     required this.onSelected,
     double? borderRadius,
+    this.validator,
   }) : borderRadius = borderRadius ?? 32.0;
 
   final List<String> menus;
   final String? hintText;
   final ValueChanged<String?> onSelected;
   final double borderRadius;
+  final String? Function(String?)? validator;
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +28,8 @@ class CustomDropDownMenu extends HookWidget {
     return TextFormField(
       readOnly: true,
       focusNode: focusNode,
+      validator: validator,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       decoration: InputDecoration(
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadius),
@@ -61,7 +66,7 @@ class CustomDropDownMenu extends HookWidget {
             ),
           ),
           isExpanded: true,
-          icon: const Icon(Icons.keyboard_arrow_down_rounded),
+          icon: SvgPicture.asset('assets/images/svg/Drop Down Icon.svg'),
           menuWidth: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 12.0),
           underline: Container(),

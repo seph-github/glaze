@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/components/morphism_widget.dart';
 import 'package:glaze/core/routing/router.dart';
@@ -47,20 +48,23 @@ class HomeView extends ConsumerWidget {
                             VideoPlayerView(
                               controller: data.controllers?[index],
                             ),
-                            ClipRRect(
+                            Positioned(
+                              bottom: -100,
+                              left: 0,
+                              right: 0,
                               child: Container(
                                 width: width,
-                                height: height * 0.22,
+                                height: height * 0.3,
                                 padding: const EdgeInsets.all(16.0),
                                 decoration: BoxDecoration(
+                                  shape: BoxShape.rectangle,
                                   boxShadow: [
                                     BoxShadow(
-                                      offset: const Offset(-1, -1),
                                       color:
-                                          Colors.black.withValues(alpha: 0.1),
-                                      spreadRadius: 100,
+                                          Colors.black.withValues(alpha: 0.6),
+                                      offset: const Offset(0, 0),
                                       blurRadius: 100,
-                                      blurStyle: BlurStyle.normal,
+                                      spreadRadius: 50,
                                     ),
                                   ],
                                 ),
@@ -79,16 +83,14 @@ class HomeView extends ConsumerWidget {
                                           },
                                           width: width / 2,
                                           height: 40,
-                                          child: const Row(
+                                          child: Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.center,
                                             children: <Widget>[
-                                              Icon(
-                                                Icons.thumb_up_alt_outlined,
-                                                size: 24,
-                                              ),
-                                              Gap(10),
-                                              Text('Best Content'),
+                                              SvgPicture.asset(
+                                                  'assets/images/svg/Trophy Icon.svg'),
+                                              const Gap(10),
+                                              const Text('Best Content'),
                                             ],
                                           ),
                                         ),
@@ -133,16 +135,15 @@ class HomeView extends ConsumerWidget {
                                       children: <Widget>[
                                         MorphismWidget.circle(
                                           onTap: () {},
-                                          size: 50,
-                                          child: const Icon(
-                                            Icons.favorite,
-                                            size: 24,
-                                          ),
+                                          size: 45.0,
+                                          child: SvgPicture.asset(
+                                              'assets/images/svg/Glaze Donuts Icon.svg'),
                                         ),
                                         const Gap(10),
-                                        const MorphismWidget.circle(
-                                          size: 50,
-                                          child: Icon(Icons.share, size: 24),
+                                        MorphismWidget.circle(
+                                          size: 45.0,
+                                          child: SvgPicture.asset(
+                                              'assets/images/svg/share_icon.svg'),
                                         ),
                                       ],
                                     ),

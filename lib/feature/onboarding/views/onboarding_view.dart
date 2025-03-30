@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
-import 'package:glaze/components/buttons/primary_button.dart';
-import 'package:glaze/core/styles/color_pallete.dart';
-import 'package:go_router/go_router.dart';
 
+import '../../../components/buttons/primary_button.dart';
 import '../../../core/routing/router.dart';
+import '../../../core/styles/color_pallete.dart';
 import '../provider/onboarding_provider.dart';
 
 class OnboardingView extends ConsumerWidget {
@@ -53,14 +52,12 @@ class OnboardingView extends ConsumerWidget {
             PrimaryButton(
               label: 'Continue',
               onPressed: () async {
-                final router = GoRouter.of(context);
                 if (index == state.length - 1) {
                   await ref
                       .read(onboardingProvider)
                       .setOnBoardingComplete(true)
                       .then(
-                        (_) =>
-                            router.pushReplacement(const HomeRoute().location),
+                        (_) => ref.refresh(routerProvider),
                       );
                 }
                 ref.read(onboardingDataNotifierProvider.notifier).next();
