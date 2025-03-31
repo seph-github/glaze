@@ -5,7 +5,6 @@ class VideoEntity {
   final String thumbnailUrl;
   final String? caption;
   final String? category;
-  final String? publishAs;
   final int? glazesCount;
   final String? status;
   final DateTime? createdAt;
@@ -15,7 +14,6 @@ class VideoEntity {
     required this.title,
     required this.videoUrl,
     required this.thumbnailUrl,
-    this.publishAs,
     this.caption,
     this.category,
     this.glazesCount,
@@ -30,7 +28,6 @@ class VideoEntity {
       'video_url': videoUrl,
       'thumbnail_url': thumbnailUrl,
       'caption': caption,
-      'publish_as': publishAs,
       'category': category,
       'glazes_count': glazesCount,
       'status': status,

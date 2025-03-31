@@ -11,17 +11,21 @@ class FocusButton extends HookWidget {
     this.hintText,
     this.helper,
     double? borderRadius,
-    this.isLoading,
+    this.controller,
+    this.isLoading = false,
     this.validator,
+    this.onChanged,
   }) : borderRadius = borderRadius ?? 32.0;
 
   final Widget? child;
+  final TextEditingController? controller;
   final void Function()? onTap;
   final Widget? helper;
   final double borderRadius;
   final String? hintText;
-  final bool? isLoading;
+  final bool isLoading;
   final String? Function(String?)? validator;
+  final void Function(String)? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +35,7 @@ class FocusButton extends HookWidget {
       readOnly: true,
       focusNode: focusNode,
       validator: validator,
+      controller: controller,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       decoration: InputDecoration(
         hintText: hintText,
@@ -65,7 +70,7 @@ class FocusButton extends HookWidget {
         ),
         prefixIcon: child == null
             ? null
-            : isLoading!
+            : !isLoading
                 ? Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12.0),
                     child: child)
@@ -80,6 +85,12 @@ class FocusButton extends HookWidget {
       onTap: () => onTap?.call(),
       onTapOutside: (event) {
         focusNode.unfocus();
+      },
+      onChanged: (value) {
+        controller?.text = value; // Ensure the controller is updated
+        if (value.isNotEmpty) {
+          focusNode.unfocus(); // Optionally unfocus to trigger revalidation
+        }
       },
     );
   }

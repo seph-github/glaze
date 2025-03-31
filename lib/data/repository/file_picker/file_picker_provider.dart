@@ -13,8 +13,8 @@ class FilePickerNotifier extends _$FilePickerNotifier {
   FutureOr<File?> build() => null;
 
   Future<File?> pickFile() async {
-    // if (state.isLoading) return null;
-    state = const AsyncLoading();
+    if (state.isLoading) return null;
+
     final status = await _requestPermissions();
 
     if (!status) {

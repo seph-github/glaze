@@ -179,7 +179,6 @@ GoRouter router(Ref ref) {
             break;
           case AuthChangeEvent.mfaChallengeVerified:
             log('mfaChallengeVerified');
-
             break;
         }
       }

@@ -100,7 +100,12 @@ class SupabaseService {
     required String id,
     required Map<String, dynamic> data,
   }) async {
-    await supabase.from(table).update(data).eq('id', id);
+    try {
+      await supabase.from(table).update(data).eq('id', id);
+    } catch (e) {
+      Fluttertoast.showToast(msg: e.toString(), toastLength: Toast.LENGTH_LONG);
+      throw Exception('SupabaseService.update: $e');
+    }
   }
 
   Future<void> delete({
@@ -110,10 +115,11 @@ class SupabaseService {
     await supabase.from(table).delete().eq('id', id);
   }
 
-  Future<String> upload(
-      {required File file,
-      required String userId,
-      required String bucketName}) async {
+  Future<String> upload({
+    required File file,
+    required String userId,
+    required String bucketName,
+  }) async {
     try {
       final String dirName = '$userId/${file.path.split('/').last}';
 
@@ -126,7 +132,7 @@ class SupabaseService {
       return filteredUrl;
     } catch (e) {
       Fluttertoast.showToast(msg: e.toString(), toastLength: Toast.LENGTH_LONG);
-      return '';
+      throw Exception('SupabaseService.upload: $e');
     }
   }
 

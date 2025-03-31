@@ -5,16 +5,21 @@ import 'package:flutter_svg/svg.dart';
 import '../../core/styles/color_pallete.dart';
 
 class CustomDropDownMenu extends HookWidget {
-  const CustomDropDownMenu({
+  CustomDropDownMenu({
     super.key,
     required this.menus,
+    TextEditingController? controller,
+    this.initialValue,
     this.hintText,
     required this.onSelected,
     double? borderRadius,
     this.validator,
-  }) : borderRadius = borderRadius ?? 32.0;
+  })  : controller = controller ?? TextEditingController(text: initialValue),
+        borderRadius = borderRadius ?? 32.0;
 
   final List<String> menus;
+  final TextEditingController? controller;
+  final String? initialValue;
   final String? hintText;
   final ValueChanged<String?> onSelected;
   final double borderRadius;
@@ -25,10 +30,34 @@ class CustomDropDownMenu extends HookWidget {
     final selectedValue = useState<String?>(null);
     final focusNode = useFocusNode();
 
+    useEffect(() {
+      void listener() {
+        if (controller?.text.isEmpty ?? true) {
+          selectedValue.value = null; // Reset the selected value
+        } else {
+          selectedValue.value = controller?.text; // Sync with controller text
+        }
+      }
+
+      // Add a listener to the controller to observe changes in its text
+      controller?.addListener(listener);
+
+      return () {
+        controller?.removeListener(listener); // Remove the listener on cleanup
+      };
+    }, [controller]); // Observe changes in the controller
+
     return TextFormField(
       readOnly: true,
+      controller: controller,
       focusNode: focusNode,
       validator: validator,
+      // validator: (value) {
+      //   if (value?.isEmpty ?? true) {
+      //     return null; // Disable validation when the controller is cleared
+      //   }
+      //   return validator?.call(value); // Call the provided validator otherwise
+      // },
       autovalidateMode: AutovalidateMode.onUserInteraction,
       decoration: InputDecoration(
         focusedErrorBorder: OutlineInputBorder(
@@ -75,6 +104,7 @@ class CustomDropDownMenu extends HookWidget {
           },
           onChanged: (String? newValue) {
             selectedValue.value = newValue;
+            controller?.text = newValue ?? '';
             onSelected(newValue);
           },
           items: menus.map<DropdownMenuItem<String>>(
@@ -87,6 +117,9 @@ class CustomDropDownMenu extends HookWidget {
           ).toList(),
         ),
       ),
+      // onFieldSubmitted: (value) {Node.unfocus(),
+      //   selectedValue.value = '';
+      // },
       onTapOutside: (event) => focusNode.unfocus(),
     );
   }

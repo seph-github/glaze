@@ -3,13 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:io';
 
 import '../../../components/buttons/focus_button.dart';
 import '../../../components/buttons/primary_button.dart';
+import '../../../components/dialogs/dialogs.dart';
 import '../../../components/drop_downs/custom_drop_down_menu.dart';
 import '../../../components/inputs/input_field.dart';
 import '../../../components/morphism_widget.dart';
 import '../../../core/styles/color_pallete.dart';
+import '../../../data/repository/category/category_repository.dart';
 import '../../../data/repository/file_picker/file_picker_provider.dart';
 import '../../../data/repository/video_repository/video_repository.dart';
 
@@ -27,22 +30,70 @@ class UploadMomentsCard extends StatelessWidget {
     final TextEditingController captionController = TextEditingController();
     final TextEditingController publishAsController = TextEditingController();
     final TextEditingController categoryController = TextEditingController();
+    final TextEditingController fileController = TextEditingController();
 
     void onPickFile(WidgetRef ref) async {
-      ref.read(filePickerNotifierProvider.notifier).pickFile();
+      await ref.read(filePickerNotifierProvider.notifier).pickFile();
+      final pickedFile = ref.watch(filePickerNotifierProvider).maybeWhen(
+            orElse: () => null,
+            data: (data) => data,
+          );
+      if (pickedFile != null) {
+        fileController.text = pickedFile.path.split('/').last;
+        final fileSize = pickedFile.lengthSync();
+        print('File size ${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB');
+
+        if (fileSize > 100 * 1024 * 1024) {
+          // Check if file size exceeds 100MB
+          fileController.text = ''; // Clear the controller if invalid
+
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('File size must not exceed 100MB'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
+        formKey.currentState?.validate(); // Trigger revalidation
+      }
     }
 
     void onSubmit(WidgetRef ref) async {
       if (formKey.currentState!.validate()) {
         formKey.currentState!.save();
 
-        ref.read(videoUploadNotifierProvider.notifier).uploadVideo(
+        ref
+            .read(videoUploadNotifierProvider.notifier)
+            .uploadVideo(
               file: ref.watch(filePickerNotifierProvider).value!,
               title: titleController.text,
               caption: captionController.text,
               category: categoryController.text,
-              publishAs: publishAsController.text,
-            );
+            )
+            .whenComplete(
+          () async {
+            titleController.clear();
+            captionController.clear();
+            categoryController.clear(); // Clear the category controller
+            fileController.clear();
+            ref.invalidate(filePickerNotifierProvider);
+
+            if (context.mounted) {
+              await Dialogs.createContentDialog(
+                context,
+                title: 'Success',
+                content: 'Video uploaded successfully',
+                onPressed: () {
+                  router.pop();
+                },
+              );
+            }
+
+            formKey.currentState?.reset();
+          },
+        );
       }
     }
 
@@ -143,8 +194,8 @@ class UploadMomentsCard extends StatelessWidget {
                         color: ColorPallete.hintTextColor,
                       ),
                 ),
-                validator: (p0) {
-                  if (p0!.isEmpty) {
+                validator: (value) {
+                  if (value!.isEmpty) {
                     return 'Please enter video title';
                   }
                   return null;
@@ -154,61 +205,106 @@ class UploadMomentsCard extends StatelessWidget {
                 controller: captionController,
                 maxLines: 5,
                 hintText: 'Write video caption',
-                validator: (p0) {
-                  if (p0!.isEmpty) {
+                validator: (value) {
+                  if (value!.isEmpty) {
                     return 'Please enter video caption';
                   }
                   return null;
                 },
               ),
               const Gap(16.0),
-              CustomDropDownMenu(
-                menus: const [],
-                onSelected: (value) {
-                  publishAsController.text = value as String;
-                },
-                hintText: 'Publish as',
-                validator: (p0) {
-                  if (p0!.isEmpty) {
-                    return 'Please select publish as';
-                  }
-                  return null;
+              Consumer(
+                builder: (context, ref, _) {
+                  final state = ref.watch(categoriesNotifierProvider);
+                  return CustomDropDownMenu(
+                    controller: categoryController,
+                    menus: state.maybeWhen(
+                      orElse: () => [],
+                      data: (data) {
+                        return data.map((e) => e.name).toList();
+                      },
+                    ),
+                    onSelected: (value) {
+                      categoryController.text = value ?? '';
+                      formKey.currentState
+                          ?.validate(); // Trigger validation after selection
+                    },
+                    hintText: 'Category',
+                    validator: (value) {
+                      if (categoryController.text.isEmpty) {
+                        // Validate the controller's text
+                        return 'Please select category';
+                      }
+                      return null;
+                    },
+                  );
                 },
               ),
               const Gap(16.0),
-              CustomDropDownMenu(
-                menus: const [],
-                onSelected: (value) {
-                  categoryController.text = value as String;
-                },
-                hintText: 'Category',
-                validator: (p0) {
-                  if (p0!.isEmpty) {
-                    return 'Please select category';
-                  }
-                  return null;
+              Consumer(
+                builder: (context, ref, _) {
+                  final state = ref.watch(filePickerNotifierProvider);
+
+                  return FocusButton(
+                    controller: fileController,
+                    hintText: 'Choose file',
+                    onTap: () => onPickFile(ref),
+                    helper: Text(
+                      '* max file size 100MB',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: ColorPallete.hintTextColor,
+                          ),
+                    ),
+                    onChanged: (value) {
+                      print('value: $value');
+                      final fileName = state.maybeWhen(
+                        orElse: () => value,
+                        data: (data) => data?.path.split('/').last ?? '',
+                      );
+
+                      fileController.text = fileName;
+                      if (fileName.isNotEmpty) {
+                        formKey.currentState?.validate();
+                      }
+                    },
+                    validator: (value) {
+                      final pickedFile =
+                          ref.watch(filePickerNotifierProvider).maybeWhen(
+                                orElse: () => null,
+                                data: (data) => data,
+                              );
+
+                      if (pickedFile == null) {
+                        return 'Please choose file';
+                      } else {}
+
+                      final fileSize = File(pickedFile.path).lengthSync();
+                      if (fileSize > 100 * 1024 * 1024) {
+                        // Check if file size exceeds 100MB
+                        return 'File size must not exceed 100MB';
+                      }
+
+                      return null;
+                    },
+                    child: state.maybeWhen(
+                      orElse: () => null,
+                      data: (data) {
+                        if (data == null) return null;
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              data.path.split('/').last,
+                              textAlign: TextAlign.center,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  );
                 },
               ),
-              const Gap(16.0),
-              Consumer(builder: (context, ref, _) {
-                return FocusButton(
-                  hintText: 'Choose File',
-                  isLoading: ref.watch(filePickerNotifierProvider).isLoading,
-                  onTap: () => onPickFile(ref),
-                  helper: Text(
-                    '* max file size 100MB',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: ColorPallete.hintTextColor,
-                        ),
-                  ),
-                  validator: (p0) {
-                    if (p0!.isEmpty) {
-                      return 'Please choose file';
-                    }
-                    return null;
-                  },
-                );
-              }),
               const Gap(16.0),
               Consumer(
                 builder: (context, ref, _) {

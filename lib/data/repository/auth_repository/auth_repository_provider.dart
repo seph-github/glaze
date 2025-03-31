@@ -6,6 +6,8 @@ import 'package:glaze/core/services/supabase_services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/result_handler/results.dart';
+
 part 'auth_repository_provider.g.dart';
 
 @riverpod
@@ -22,73 +24,70 @@ AuthRepository authService(ref) {
 @riverpod
 class LoggedInUserNotifier extends _$LoggedInUserNotifier {
   @override
-  FutureOr<User?> build() => ref.watch(authServiceProvider).getCurrentUser();
+  FutureOr<Result<User?, Exception>> build() async {
+    try {
+      final result = await ref.watch(authServiceProvider).getCurrentUser();
+      return Success(result);
+    } catch (e) {
+      return Failure(e as Exception);
+    }
+  }
 }
 
 @riverpod
 class LoginNotifier extends _$LoginNotifier {
   @override
-  FutureOr build() => null;
+  FutureOr<Result<AuthResponse, Exception>?> build() async => null;
 
-  Future<void> login({
+  Future<Result<AuthResponse, Exception>> login({
     required String email,
     required String password,
   }) async {
-    if (state.isLoading) return;
-
-    try {
-      state = const AsyncLoading();
-      state = await AsyncValue.guard(
-        () => ref
-            .read(authServiceProvider)
-            .signInWithEmailPassword(email: email, password: password),
-      );
-    } catch (e) {
-      state = AsyncValue.error(e.toString(), StackTrace.current);
-    }
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(
+      () async => await ref.read(authServiceProvider).signInWithEmailPassword(
+            email: email,
+            password: password,
+          ),
+    );
+    return Future.value(state.value);
   }
 }
 
 @riverpod
 class SignupNotifier extends _$SignupNotifier {
   @override
-  FutureOr build() => null;
+  FutureOr<Result<AuthResponse, Exception>?> build() async => null;
 
-  Future<void> signup({
+  Future<Result<AuthResponse, Exception>> signup({
     required String email,
     required String password,
     required String username,
   }) async {
-    if (state.isLoading) return;
-
-    try {
-      state = const AsyncLoading();
-      state = await AsyncValue.guard(
-        () => ref.read(authServiceProvider).signUpWithEmailPassword(
-            email: email, password: password, username: username),
-      );
-    } catch (e) {
-      state = AsyncValue.error(e.toString(), StackTrace.current);
-    }
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(
+      () async => await ref.read(authServiceProvider).signUpWithEmailPassword(
+            email: email,
+            password: password,
+            username: username,
+          ),
+    );
+    return Future.value(state.value);
   }
 }
 
 @riverpod
 class AnonymousSigninNotifier extends _$AnonymousSigninNotifier {
   @override
-  FutureOr build() => null;
+  FutureOr<Result<AuthResponse, Exception>?> build() => null;
 
-  Future<void> anonymousSignin() async {
-    if (state.isLoading) return;
+  Future<Result<AuthResponse, Exception>> anonymousSignin() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(
+      () async => await ref.read(authServiceProvider).anonymousSignin(),
+    );
 
-    try {
-      state = const AsyncLoading();
-      state = await AsyncValue.guard(
-        () => ref.read(authServiceProvider).anonymousSignin(),
-      );
-    } catch (e) {
-      state = AsyncValue.error(e.toString(), StackTrace.current);
-    }
+    return Future.value(state.value);
   }
 }
 
@@ -105,6 +104,8 @@ class LogoutNotifier extends _$LogoutNotifier {
       state = await AsyncValue.guard(
         () async => await ref.read(authServiceProvider).signOut(),
       );
+    } on AuthException catch (e) {
+      state = AsyncValue.error(e.message, StackTrace.current);
     } catch (e) {
       state = AsyncValue.error(e.toString(), StackTrace.current);
     }
@@ -116,21 +117,24 @@ class AuthRepository {
 
   final SupabaseService supabaseService;
 
-  Future<void> signInWithEmailPassword({
+  Future<Result<AuthResponse, Exception>> signInWithEmailPassword({
     required String email,
     required String password,
   }) async {
     try {
-      await supabaseService.supabase.auth.signInWithPassword(
+      final AuthResponse authResponse =
+          await supabaseService.supabase.auth.signInWithPassword(
         email: email,
         password: password,
       );
-    } catch (e) {
-      throw Exception('SignInRepository.signIn: $e');
+
+      return Success<AuthResponse, Exception>(authResponse);
+    } on AuthApiException catch (e) {
+      return Failure<AuthResponse, Exception>(e);
     }
   }
 
-  Future<void> signUpWithEmailPassword({
+  Future<Result<AuthResponse, Exception>> signUpWithEmailPassword({
     required String email,
     required String password,
     required String username,
@@ -149,12 +153,14 @@ class AuthRepository {
           'username': username,
         },
       );
-    } catch (e) {
-      throw Exception('SignUpRepository.signUp: $e');
+
+      return Success<AuthResponse, Exception>(authResponse);
+    } on AuthApiException catch (e) {
+      return Failure<AuthResponse, Exception>(e);
     }
   }
 
-  Future<void> anonymousSignin() async {
+  Future<Result<AuthResponse, Exception>> anonymousSignin() async {
     try {
       final AuthResponse authResponse =
           await supabaseService.supabase.auth.signInAnonymously();
@@ -168,16 +174,18 @@ class AuthRepository {
           'username_id': tempUserId,
         },
       );
-    } catch (e) {
-      throw Exception('AnonymousSigninRepository.anonymousSignin: $e');
+
+      return Success<AuthResponse, Exception>(authResponse);
+    } on AuthApiException catch (e) {
+      return Failure<AuthResponse, Exception>(e);
     }
   }
 
   Future<void> signOut() async {
     try {
       await supabaseService.supabase.auth.signOut();
-    } catch (e) {
-      rethrow;
+    } on AuthApiException catch (e) {
+      throw Exception('SignOut: $e');
     }
   }
 

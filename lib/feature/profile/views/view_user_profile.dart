@@ -5,8 +5,10 @@ import 'package:glaze/data/models/follows/follow.dart';
 import 'package:glaze/data/repository/follows_repository/follow_repository_provider.dart';
 import 'package:glaze/data/repository/user_repository/user_repository.dart';
 import 'package:glaze/feature/profile/provider/profile_view_mode_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../components/buttons/primary_button.dart';
+import '../../../core/result_handler/results.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../data/repository/auth_repository/auth_repository_provider.dart';
 import '../widgets/profile_achievements_card.dart';
@@ -99,7 +101,15 @@ class ViewUserProfile extends ConsumerWidget {
                               ref.watch(loggedInUserNotifierProvider);
 
                           final String userId = userState.maybeWhen(
-                              orElse: () => '', data: (data) => data?.id ?? '');
+                            orElse: () => '',
+                            data: (data) {
+                              if (data is Success<User?, Exception>) {
+                                return data.value?.id ?? '';
+                              } else {
+                                return '';
+                              }
+                            },
+                          );
 
                           final followedState = ref.watch(
                               fetchFollowedUserNotifierProvider.call(userId));
@@ -138,9 +148,16 @@ class ViewUserProfile extends ConsumerWidget {
                                                 .notifier)
                                             .onFollowUser(
                                               followerId: userState.maybeWhen(
-                                                  orElse: () => '',
-                                                  data: (data) =>
-                                                      data?.id ?? ''),
+                                                orElse: () => '',
+                                                data: (data) {
+                                                  if (data is Success<User?,
+                                                      Exception>) {
+                                                    return data.value?.id ?? '';
+                                                  } else {
+                                                    return '';
+                                                  }
+                                                },
+                                              ),
                                               followingId: id,
                                             )
                                             .whenComplete(

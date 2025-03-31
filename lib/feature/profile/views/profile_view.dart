@@ -6,6 +6,7 @@ import 'package:glaze/core/styles/color_pallete.dart';
 import 'package:glaze/feature/profile/widgets/profile_users_interest_list.dart';
 import 'package:glaze/data/repository/auth_repository/auth_repository_provider.dart';
 import 'package:glaze/data/repository/user_repository/user_repository.dart';
+import 'package:glaze/feature/templates/loading_layout.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/routing/router.dart';
@@ -26,8 +27,9 @@ class ProfileView extends ConsumerWidget {
 
     final size = MediaQuery.sizeOf(context);
     final width = size.width;
-    return Scaffold(
-      body: SingleChildScrollView(
+    return LoadingLayout(
+      isLoading: ref.watch(logoutNotifierProvider).isLoading,
+      child: SingleChildScrollView(
         child: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,

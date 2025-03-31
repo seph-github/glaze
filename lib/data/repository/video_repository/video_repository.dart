@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:glaze/core/result_handler/results.dart';
 import 'package:glaze/data/entities/video_entity.dart';
 import 'package:glaze/data/models/cached_video/cached_video.dart';
 import 'package:glaze/data/models/video/video_model.dart';
@@ -24,15 +25,21 @@ VideoRepository videoRepository(ref) {
 @riverpod
 class VideosNotifier extends _$VideosNotifier {
   @override
-  Future<List<VideoModel>> build() async {
-    return ref.watch(videoRepositoryProvider).fetchVideos();
+  Future<Result<List<VideoModel>, Exception>> build() async {
+    try {
+      final response = await ref.watch(videoRepositoryProvider).fetchVideos();
+
+      return Success(response);
+    } catch (e) {
+      return Failure(e as Exception);
+    }
   }
 }
 
 @riverpod
 class CacheVideoNotifier extends _$CacheVideoNotifier {
   @override
-  Future<CachedVideo> build() async {
+  Future<Result<CachedVideo, Exception>> build() async {
     final data = await ref.watch(videoRepositoryProvider).fetchVideos();
 
     List<Config> config = List.generate(
@@ -72,8 +79,9 @@ class CacheVideoNotifier extends _$CacheVideoNotifier {
       controllers[index].value.aspectRatio;
       controllers[index].play();
     }
-    // return {'videos': data, 'controllers': controllers};
-    return CachedVideo(model: data, controllers: controllers);
+    return Success(
+      CachedVideo(model: data, controllers: controllers),
+    );
   }
 
   Future<File> _ensureMp4Extension(File file) async {
@@ -98,12 +106,11 @@ class VideoUploadNotifier extends _$VideoUploadNotifier {
   @override
   Future<void> build() async {}
 
-  Future<void> uploadVideo({
+  Future<Result<void, Exception>> uploadVideo({
     required File file,
     required String title,
     required String caption,
     required String category,
-    required String publishAs,
   }) async {
     try {
       final user = await ref.watch(authServiceProvider).getCurrentUser();
@@ -117,12 +124,18 @@ class VideoUploadNotifier extends _$VideoUploadNotifier {
                 caption: caption,
                 category: category,
                 title: title,
-                publishAs: publishAs,
               );
         },
       );
+
+      return const Success(null);
     } catch (e) {
-      rethrow;
+      state = AsyncValue.error(e.toString(), StackTrace.current);
+      return Failure(
+        Exception(
+          e.toString(),
+        ),
+      );
     }
   }
 }
@@ -133,7 +146,6 @@ class VideoRepository {
   final SupabaseService supabaseService;
   Future<List<VideoModel>> fetchVideos() async {
     try {
-      // final videos = await supabaseService.select(table: 'videos');
       final videos = await supabaseService.withReturnValuesRpc(
           fn: 'select_videos_with_owners');
 
@@ -146,32 +158,32 @@ class VideoRepository {
       value.sort(
         (a, b) => b.createdAt!.compareTo(a.createdAt!),
       );
-      // log('videos $value');
       return value;
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<void> uploadVideo({
+  Future<Result<void, Exception>> uploadVideo({
     required File file,
     required String userId,
     required String title,
     required String caption,
     required String category,
-    required String publishAs,
   }) async {
     try {
       final url = await supabaseService.upload(
           file: file, userId: userId, bucketName: 'videos');
 
-      final thumbnailFile = await _getVideoThumbnail(file);
+      print('URL $url');
 
+      final thumbnailFile = await _getVideoThumbnail(
+        await _compressVideo(file),
+      );
+
+      print('THUMBNAIL $thumbnailFile');
       final thumbnailUrl = await supabaseService.upload(
           file: thumbnailFile, userId: userId, bucketName: 'thumbnails');
-
-      log('thumbnailUrl: $thumbnailUrl');
-      log('video_url: $url');
 
       final data = VideoEntity(
         title: title,
@@ -180,6 +192,7 @@ class VideoRepository {
         thumbnailUrl: thumbnailUrl,
         videoUrl: url,
         userId: userId,
+        status: 'active',
         createdAt: DateTime.now(),
       );
 
@@ -187,21 +200,25 @@ class VideoRepository {
         table: 'videos',
         data: data.toMap(),
       );
+
+      return const Success(null);
     } catch (e) {
       log(e.toString());
-      rethrow;
+      return Failure(Exception('VideoRepository.uploadVideo: $e'));
     }
   }
 }
 
-// _compressVideo(File file) async {
-//   // TODO: implement _compressVideo
-//   final MediaInfo? info = await VideoCompress.compressVideo(
-//     file.path,
-//     quality: VideoQuality.HighestQuality,
-//     deleteOrigin: false,
-//   );
-// }
+Future<File> _compressVideo(File file) async {
+  // TODO: implement _compressVideo
+  final MediaInfo? info = await VideoCompress.compressVideo(
+    file.path,
+    quality: VideoQuality.LowQuality,
+    deleteOrigin: false,
+  );
+
+  return File(info!.path!);
+}
 
 Future<File> _getVideoThumbnail(File file) async {
   final thumbnailFile = await VideoCompress.getFileThumbnail(file.path,
