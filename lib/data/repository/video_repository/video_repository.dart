@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -8,6 +7,7 @@ import 'package:glaze/data/models/cached_video/cached_video.dart';
 import 'package:glaze/data/models/video/video_model.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:video_compress/video_compress.dart';
 import 'package:video_player/video_player.dart';
 
@@ -25,13 +25,16 @@ VideoRepository videoRepository(ref) {
 @riverpod
 class VideosNotifier extends _$VideosNotifier {
   @override
-  Future<Result<List<VideoModel>, Exception>> build() async {
+  FutureOr<Result<List<VideoModel>, Exception>> build() async {
     try {
       final response = await ref.watch(videoRepositoryProvider).fetchVideos();
 
-      return Success(response);
-    } catch (e) {
-      return Failure(e as Exception);
+      if (response is Success<List<VideoModel>, Exception>) {
+        return Success<List<VideoModel>, Exception>(response.value);
+      }
+      return Failure<List<VideoModel>, Exception>(response as Exception);
+    } on Exception catch (e) {
+      return Failure<List<VideoModel>, Exception>(e);
     }
   }
 }
@@ -40,47 +43,57 @@ class VideosNotifier extends _$VideosNotifier {
 class CacheVideoNotifier extends _$CacheVideoNotifier {
   @override
   Future<Result<CachedVideo, Exception>> build() async {
-    final data = await ref.watch(videoRepositoryProvider).fetchVideos();
+    Result<List<VideoModel>, Exception> data =
+        await ref.watch(videoRepositoryProvider).fetchVideos();
 
-    List<Config> config = List.generate(
-      data.length,
-      (index) => Config(
-        data[index].videoUrl,
-        stalePeriod: const Duration(hours: 6),
-        maxNrOfCacheObjects: 20,
-      ),
-    )
-        .map(
-          (e) => e,
-        )
-        .toList();
+    if (data is Success<List<VideoModel>, Exception>) {
+      final List<VideoModel> value = data.value;
 
-    final List<CacheManager> cacheManager =
-        config.map((cache) => CacheManager(cache)).toList();
+      List<Config> config = List.generate(
+        value.length,
+        (index) => Config(
+          value[index].videoUrl,
+          stalePeriod: const Duration(hours: 6),
+          maxNrOfCacheObjects: 20,
+        ),
+      )
+          .map(
+            (e) => e,
+          )
+          .toList();
 
-    final List<VideoPlayerController> controllers = List.generate(
-        cacheManager.length, (index) => VideoPlayerController.file(File('')),
-        growable: true);
-    for (int index = 0; index < cacheManager.length; index++) {
-      final List<File> files = List.generate(
-        cacheManager.length,
-        (index) => File(''),
+      final List<CacheManager> cacheManager =
+          config.map((cache) => CacheManager(cache)).toList();
+
+      final List<VideoPlayerController> controllers = List.generate(
+          cacheManager.length, (index) => VideoPlayerController.file(File('')),
+          growable: true);
+      for (int index = 0; index < cacheManager.length; index++) {
+        final List<File> files = List.generate(
+          cacheManager.length,
+          (index) => File(''),
+        );
+        files[index] =
+            await cacheManager[index].getSingleFile(value[index].videoUrl);
+
+        files[index] = await _ensureMp4Extension(files[index]);
+        files[index] = await _moveToTemporaryDirectory(files[index]);
+
+        controllers[index] = VideoPlayerController.file(files[index]);
+
+        await controllers[index].initialize();
+        controllers[index].setLooping(true);
+        controllers[index].value.aspectRatio;
+        controllers[index].play();
+      }
+
+      return Success<CachedVideo, Exception>(
+        CachedVideo(model: value, controllers: controllers),
       );
-      files[index] =
-          await cacheManager[index].getSingleFile(data[index].videoUrl);
-
-      files[index] = await _ensureMp4Extension(files[index]);
-      files[index] = await _moveToTemporaryDirectory(files[index]);
-
-      controllers[index] = VideoPlayerController.file(files[index]);
-
-      await controllers[index].initialize();
-      controllers[index].setLooping(true);
-      controllers[index].value.aspectRatio;
-      controllers[index].play();
     }
-    return Success(
-      CachedVideo(model: data, controllers: controllers),
+
+    return Failure<CachedVideo, Exception>(
+      Exception(data as Exception),
     );
   }
 
@@ -104,9 +117,10 @@ class CacheVideoNotifier extends _$CacheVideoNotifier {
 @riverpod
 class VideoUploadNotifier extends _$VideoUploadNotifier {
   @override
-  Future<void> build() async {}
+  FutureOr<Result<String, Exception>> build() async =>
+      const Success<String, Exception>('');
 
-  Future<Result<void, Exception>> uploadVideo({
+  Future<Result<String, Exception>> uploadVideo({
     required File file,
     required String title,
     required String caption,
@@ -116,26 +130,28 @@ class VideoUploadNotifier extends _$VideoUploadNotifier {
       final user = await ref.watch(authServiceProvider).getCurrentUser();
 
       state = const AsyncLoading();
-      state = await AsyncValue.guard(
-        () async {
-          await ref.watch(videoRepositoryProvider).uploadVideo(
-                file: file,
-                userId: user?.id ?? '',
-                caption: caption,
-                category: category,
-                title: title,
-              );
-        },
+      final result = await AsyncValue.guard(
+        () async => await ref.watch(videoRepositoryProvider).uploadVideo(
+              file: file,
+              userId: user?.id ?? '',
+              caption: caption,
+              category: category,
+              title: title,
+            ),
       );
 
-      return const Success(null);
-    } catch (e) {
-      state = AsyncValue.error(e.toString(), StackTrace.current);
-      return Failure(
-        Exception(
-          e.toString(),
-        ),
-      );
+      state = result;
+
+      if (result.value is Success<String, Exception>) {
+        return result.value!;
+      } else if (result.value is Failure<String, Exception>) {
+        final failure = result.value as Failure<String, Exception>;
+        return Failure<String, Exception>(failure.error);
+      }
+
+      return const Success<String, Exception>('');
+    } on Exception catch (e) {
+      return Failure<String, Exception>(e);
     }
   }
 }
@@ -144,7 +160,7 @@ class VideoRepository {
   const VideoRepository({required this.supabaseService});
 
   final SupabaseService supabaseService;
-  Future<List<VideoModel>> fetchVideos() async {
+  Future<Result<List<VideoModel>, Exception>> fetchVideos() async {
     try {
       final videos = await supabaseService.withReturnValuesRpc(
           fn: 'select_videos_with_owners');
@@ -158,13 +174,13 @@ class VideoRepository {
       value.sort(
         (a, b) => b.createdAt!.compareTo(a.createdAt!),
       );
-      return value;
-    } catch (e) {
-      rethrow;
+      return Success<List<VideoModel>, Exception>(value);
+    } on Exception catch (e) {
+      return Failure<List<VideoModel>, Exception>(e);
     }
   }
 
-  Future<Result<void, Exception>> uploadVideo({
+  Future<Result<String, Exception>> uploadVideo({
     required File file,
     required String userId,
     required String title,
@@ -172,53 +188,63 @@ class VideoRepository {
     required String category,
   }) async {
     try {
-      final url = await supabaseService.upload(
+      final urlResult = await supabaseService.upload(
           file: file, userId: userId, bucketName: 'videos');
 
-      print('URL $url');
+      if (urlResult is Failure<String, Exception>) {
+        final exception = urlResult.error; // Extract the actual exception
+        return Failure<String, Exception>(exception);
+      }
 
-      final thumbnailFile = await _getVideoThumbnail(
-        await _compressVideo(file),
-      );
+      if (urlResult is Success<String, Exception>) {
+        final thumbnailFile = await _getVideoThumbnail(
+          file,
+        );
 
-      print('THUMBNAIL $thumbnailFile');
-      final thumbnailUrl = await supabaseService.upload(
-          file: thumbnailFile, userId: userId, bucketName: 'thumbnails');
+        final thumbnailUrl = await supabaseService.upload(
+            file: thumbnailFile, userId: userId, bucketName: 'thumbnails');
 
-      final data = VideoEntity(
-        title: title,
-        caption: caption,
-        category: category,
-        thumbnailUrl: thumbnailUrl,
-        videoUrl: url,
-        userId: userId,
-        status: 'active',
-        createdAt: DateTime.now(),
-      );
+        if (thumbnailUrl is Failure<String, Exception>) {
+          return Failure<String, Exception>(thumbnailUrl as Exception);
+        } else if (thumbnailUrl is Success<String, Exception>) {
+          final data = VideoEntity(
+            title: title,
+            caption: caption,
+            category: category,
+            thumbnailUrl: thumbnailUrl.value,
+            videoUrl: urlResult.value,
+            glazesCount: 0,
+            userId: userId,
+            status: 'active',
+            createdAt: DateTime.now(),
+          );
 
-      await supabaseService.insert(
-        table: 'videos',
-        data: data.toMap(),
-      );
+          await supabaseService.insert(
+            table: 'videos',
+            data: data.toMap(),
+          );
+        }
 
-      return const Success(null);
-    } catch (e) {
-      log(e.toString());
-      return Failure(Exception('VideoRepository.uploadVideo: $e'));
+        return const Success<String, Exception>('Successfully uploaded');
+      }
+
+      return Failure<String, StorageException>(urlResult as StorageException);
+    } on StorageException catch (e) {
+      return Failure<String, StorageException>(e);
     }
   }
 }
 
-Future<File> _compressVideo(File file) async {
-  // TODO: implement _compressVideo
-  final MediaInfo? info = await VideoCompress.compressVideo(
-    file.path,
-    quality: VideoQuality.LowQuality,
-    deleteOrigin: false,
-  );
+// Future<File> _compressVideo(File file) async {
+//   // TODO: implement _compressVideo
+//   final MediaInfo? info = await VideoCompress.compressVideo(
+//     file.path,
+//     quality: VideoQuality.LowQuality,
+//     deleteOrigin: false,
+//   );
 
-  return File(info!.path!);
-}
+//   return File(info!.path!);
+// }
 
 Future<File> _getVideoThumbnail(File file) async {
   final thumbnailFile = await VideoCompress.getFileThumbnail(file.path,

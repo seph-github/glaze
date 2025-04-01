@@ -14,6 +14,7 @@ class CustomDropDownMenu extends HookWidget {
     required this.onSelected,
     double? borderRadius,
     this.validator,
+    this.filled = false,
   })  : controller = controller ?? TextEditingController(text: initialValue),
         borderRadius = borderRadius ?? 32.0;
 
@@ -24,6 +25,7 @@ class CustomDropDownMenu extends HookWidget {
   final ValueChanged<String?> onSelected;
   final double borderRadius;
   final String? Function(String?)? validator;
+  final bool filled;
 
   @override
   Widget build(BuildContext context) {
@@ -60,6 +62,8 @@ class CustomDropDownMenu extends HookWidget {
       // },
       autovalidateMode: AutovalidateMode.onUserInteraction,
       decoration: InputDecoration(
+        fillColor: ColorPallete.inputFilledColor,
+        filled: filled,
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadius),
           borderSide: const BorderSide(

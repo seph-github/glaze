@@ -9,6 +9,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../components/buttons/primary_button.dart';
 import '../../../components/inputs/input_field.dart';
+import '../../../config/enum/profile_type.dart';
 import '../../../core/result_handler/results.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../data/repository/auth_repository/auth_repository_provider.dart';
@@ -48,12 +49,20 @@ class AuthView extends HookWidget {
       }
     }
 
-    Future<void> signinHandler(WidgetRef ref) async {
+    Future<void> signupHandler(WidgetRef ref) async {
+      final ProfileType profileType;
+      if (recruitingTalent.value) {
+        profileType = ProfileType.recruiter;
+      } else {
+        profileType = ProfileType.user;
+      }
+
       final Result<AuthResponse, Exception> response =
           await ref.read(signupNotifierProvider.notifier).signup(
                 username: usernameController.text,
                 email: providerController.text,
                 password: passwordController.text,
+                profileType: profileType,
               );
 
       if (response is Failure<AuthResponse, Exception>) {
@@ -72,7 +81,7 @@ class AuthView extends HookWidget {
         if (isLogin.value) {
           loginHandler(ref);
         } else {
-          signinHandler(ref);
+          signupHandler(ref);
         }
       }
     }

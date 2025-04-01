@@ -1,8 +1,10 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:io';
 
 import '../../../components/buttons/focus_button.dart';
@@ -11,6 +13,7 @@ import '../../../components/dialogs/dialogs.dart';
 import '../../../components/drop_downs/custom_drop_down_menu.dart';
 import '../../../components/inputs/input_field.dart';
 import '../../../components/morphism_widget.dart';
+import '../../../core/result_handler/results.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../data/repository/category/category_repository.dart';
 import '../../../data/repository/file_picker/file_picker_provider.dart';
@@ -33,7 +36,9 @@ class UploadMomentsCard extends StatelessWidget {
     final TextEditingController fileController = TextEditingController();
 
     void onPickFile(WidgetRef ref) async {
-      await ref.read(filePickerNotifierProvider.notifier).pickFile();
+      await ref
+          .read(filePickerNotifierProvider.notifier)
+          .pickFile(type: FileType.video);
       final pickedFile = ref.watch(filePickerNotifierProvider).maybeWhen(
             orElse: () => null,
             data: (data) => data,
@@ -41,7 +46,7 @@ class UploadMomentsCard extends StatelessWidget {
       if (pickedFile != null) {
         fileController.text = pickedFile.path.split('/').last;
         final fileSize = pickedFile.lengthSync();
-        print('File size ${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB');
+        // print('File size ${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB');
 
         if (fileSize > 100 * 1024 * 1024) {
           // Check if file size exceeds 100MB
@@ -64,36 +69,58 @@ class UploadMomentsCard extends StatelessWidget {
       if (formKey.currentState!.validate()) {
         formKey.currentState!.save();
 
-        ref
-            .read(videoUploadNotifierProvider.notifier)
-            .uploadVideo(
-              file: ref.watch(filePickerNotifierProvider).value!,
-              title: titleController.text,
-              caption: captionController.text,
-              category: categoryController.text,
-            )
-            .whenComplete(
-          () async {
-            titleController.clear();
-            captionController.clear();
-            categoryController.clear(); // Clear the category controller
-            fileController.clear();
-            ref.invalidate(filePickerNotifierProvider);
+        final Result<void, Exception> result =
+            await ref.read(videoUploadNotifierProvider.notifier).uploadVideo(
+                  file: ref.watch(filePickerNotifierProvider).value!,
+                  title: titleController.text,
+                  caption: captionController.text,
+                  category: categoryController.text,
+                );
 
-            if (context.mounted) {
-              await Dialogs.createContentDialog(
-                context,
-                title: 'Success',
-                content: 'Video uploaded successfully',
-                onPressed: () {
-                  router.pop();
-                },
-              );
-            }
+        dynamic error;
 
-            formKey.currentState?.reset();
-          },
-        );
+        if (result is Failure<void, Exception>) {
+          switch (result.error) {
+            case StorageException _:
+              error = result.error as StorageException;
+              break;
+            case PostgrestException _:
+              error = result.error as PostgrestException;
+              break;
+          }
+
+          if (context.mounted) {
+            await Dialogs.createContentDialog(
+              context,
+              title: 'Error',
+              content: error.message.toString(),
+              onPressed: () {
+                router.pop();
+              },
+            );
+          }
+        }
+
+        if (result is Success<void, Exception>) {
+          titleController.clear();
+          captionController.clear();
+          categoryController.clear();
+          fileController.clear();
+          ref.invalidate(filePickerNotifierProvider);
+
+          formKey.currentState?.reset();
+
+          if (context.mounted) {
+            await Dialogs.createContentDialog(
+              context,
+              title: 'Success',
+              content: 'Video uploaded successfully',
+              onPressed: () {
+                router.pop();
+              },
+            );
+          }
+        }
       }
     }
 
@@ -256,7 +283,6 @@ class UploadMomentsCard extends StatelessWidget {
                           ),
                     ),
                     onChanged: (value) {
-                      print('value: $value');
                       final fileName = state.maybeWhen(
                         orElse: () => value,
                         data: (data) => data?.path.split('/').last ?? '',

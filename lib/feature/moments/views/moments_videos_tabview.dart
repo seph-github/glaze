@@ -19,17 +19,17 @@ class MomentsVideosTabview extends StatelessWidget {
         return state.when(
           data: (data) {
             if (data is Success<List<VideoModel>, Exception>) {
-              final List<VideoModel>? result = data.value;
+              final List<VideoModel> result = data.value;
 
               return GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
                 ),
                 padding: const EdgeInsets.only(top: 8.0),
-                itemCount: result?.length,
+                itemCount: result.length,
                 itemBuilder: (context, index) {
                   return CachedNetworkImage(
-                    imageUrl: result?[index].thumbnailUrl ?? '',
+                    imageUrl: result[index].thumbnailUrl,
                     placeholder: (context, url) => const Center(
                       child: CircularProgressIndicator(),
                     ),

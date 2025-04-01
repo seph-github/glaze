@@ -4,6 +4,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../result_handler/results.dart';
+
 part 'supabase_services.g.dart';
 
 @riverpod
@@ -115,7 +117,7 @@ class SupabaseService {
     await supabase.from(table).delete().eq('id', id);
   }
 
-  Future<String> upload({
+  Future<Result<String, Exception>> upload({
     required File file,
     required String userId,
     required String bucketName,
@@ -129,10 +131,11 @@ class SupabaseService {
       final url = supabase.storage.from(bucketName).getPublicUrl(result);
       final filteredUrl = removeDuplicateWords(url);
 
-      return filteredUrl;
-    } catch (e) {
-      Fluttertoast.showToast(msg: e.toString(), toastLength: Toast.LENGTH_LONG);
-      throw Exception('SupabaseService.upload: $e');
+      return Success<String, Exception>(filteredUrl); //filteredUrl;
+    } on StorageException catch (e) {
+      return Failure<String, Exception>(e);
+    } on Exception catch (e) {
+      return Failure<String, Exception>(e);
     }
   }
 

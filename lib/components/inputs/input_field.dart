@@ -13,6 +13,7 @@ class InputField extends HookWidget {
     this.onChanged,
     this.borderRadius,
     this.helper,
+    this.filled = false,
     TextEditingController? controller,
     this.readOnly = false,
   })  : obscureText = false,
@@ -33,6 +34,7 @@ class InputField extends HookWidget {
     this.readOnly = false,
     this.borderRadius,
     this.helper,
+    this.filled = false,
   })  : obscureText = true,
         controller = controller ?? TextEditingController(text: initialValue),
         keyboardType = TextInputType.text,
@@ -51,6 +53,7 @@ class InputField extends HookWidget {
     this.readOnly = false,
     this.borderRadius,
     this.helper,
+    this.filled = false,
     TextEditingController? controller,
   })  : controller = controller ?? TextEditingController(text: initialValue),
         _inputAction = TextInputAction.next,
@@ -70,6 +73,7 @@ class InputField extends HookWidget {
     this.borderRadius,
     this.helper,
     int? maxLines,
+    this.filled = false,
     TextEditingController? controller,
   })  : controller = controller ?? TextEditingController(text: initialValue),
         _inputAction = TextInputAction.next,
@@ -90,6 +94,7 @@ class InputField extends HookWidget {
   final double? borderRadius;
   final Widget? helper;
   final Widget? inputIcon;
+  final bool filled;
 
   @override
   Widget build(BuildContext context) {
@@ -115,6 +120,8 @@ class InputField extends HookWidget {
             hintStyle: const TextStyle(
               color: ColorPallete.hintTextColor,
             ),
+            fillColor: ColorPallete.inputFilledColor,
+            filled: filled,
             prefixIcon: inputIcon != null
                 ? Transform.scale(
                     scale: 0.5,

@@ -90,7 +90,7 @@ class SplashView extends StatelessWidget {
                               .setSplashComplete(true)
                               .then(
                                 (_) => router.pushReplacement(
-                                    const OnboardingRoute().location),
+                                    const AuthRoute().location),
                               );
                         },
                       );

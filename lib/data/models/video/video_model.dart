@@ -13,6 +13,7 @@ class VideoModel with _$VideoModel {
     @JsonKey(name: 'video_id') required String videoId,
     @JsonKey(name: 'video_url') required String videoUrl,
     @JsonKey(name: 'thumbnail_url') required String thumbnailUrl,
+    @JsonKey(name: 'title') String? title,
     String? caption,
     String? category,
     @JsonKey(name: 'glazes_count') int? glazesCount,

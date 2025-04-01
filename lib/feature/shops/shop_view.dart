@@ -30,7 +30,7 @@ class DarkCircleWidget extends StatelessWidget {
           height: size + 16,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Colors.white.withOpacity(0.5), // Stronger white glow
+            color: Colors.white.withValues(alpha: 0.5), // Stronger white glow
           ),
         ),
         // Dark Circle with Gradient and Blur
@@ -39,7 +39,7 @@ class DarkCircleWidget extends StatelessWidget {
           height: 1,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            gradient: RadialGradient(
+            gradient: const RadialGradient(
               colors: [
                 Color(0xFF2C2C2C), // Dark center
                 Color(0xFF1A1A1A), // Dark edges
@@ -49,11 +49,11 @@ class DarkCircleWidget extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color:
-                    Colors.black.withOpacity(0.8), // Inner shadow with opacity
+                color: Colors.black
+                    .withValues(alpha: 0.8), // Inner shadow with opacity
                 blurRadius: 70, // Stronger blur effect
                 spreadRadius: 70,
-                offset: Offset(2, 2), // Slight shadow offset
+                offset: const Offset(2, 2), // Slight shadow offset
               ),
             ],
           ),

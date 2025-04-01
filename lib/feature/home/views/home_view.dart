@@ -98,7 +98,7 @@ class HomeView extends ConsumerWidget {
                                         ),
                                         const Gap(10),
                                         Text(
-                                          cachedVideos?.model?[index].caption ??
+                                          cachedVideos?.model?[index].title ??
                                               '',
                                           style: Theme.of(context)
                                               .textTheme

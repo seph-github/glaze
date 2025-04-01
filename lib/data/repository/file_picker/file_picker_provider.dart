@@ -12,7 +12,7 @@ class FilePickerNotifier extends _$FilePickerNotifier {
   @override
   FutureOr<File?> build() => null;
 
-  Future<File?> pickFile() async {
+  Future<File?> pickFile({required FileType type}) async {
     if (state.isLoading) return null;
 
     final status = await _requestPermissions();
@@ -24,8 +24,7 @@ class FilePickerNotifier extends _$FilePickerNotifier {
 
     state = await AsyncValue.guard(
       () async {
-        final result =
-            await FilePicker.platform.pickFiles(type: FileType.video);
+        final result = await FilePicker.platform.pickFiles(type: type);
 
         if (result != null && result.files.single.path != null) {
           return File(result.files.single.path!);

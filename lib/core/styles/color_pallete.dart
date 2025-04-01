@@ -25,4 +25,5 @@ class ColorPallete {
   static const Color backgroundColor = Color(0XFF0F0F0F);
   static const Color lightBackgroundColor = Color(0xFF161616);
   static const Color borderColor = Color(0xFF9E9E9E);
+  static const Color inputFilledColor = Color(0xFF1E1E1E);
 }

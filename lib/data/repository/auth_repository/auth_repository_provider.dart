@@ -1,6 +1,7 @@
 import 'dart:math' hide log;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:glaze/config/enum/profile_type.dart';
 
 import 'package:glaze/core/services/supabase_services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -63,6 +64,7 @@ class SignupNotifier extends _$SignupNotifier {
     required String email,
     required String password,
     required String username,
+    required ProfileType profileType,
   }) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(
@@ -70,6 +72,7 @@ class SignupNotifier extends _$SignupNotifier {
             email: email,
             password: password,
             username: username,
+            profileType: profileType,
           ),
     );
     return Future.value(state.value);
@@ -138,6 +141,7 @@ class AuthRepository {
     required String email,
     required String password,
     required String username,
+    ProfileType? profileType,
   }) async {
     try {
       final AuthResponse authResponse =
@@ -151,6 +155,7 @@ class AuthRepository {
         table: 'profiles',
         data: {
           'username': username,
+          'role': profileType?.value,
         },
       );
 

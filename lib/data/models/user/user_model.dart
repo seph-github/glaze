@@ -26,6 +26,7 @@ class UserModel with _$UserModel {
     List<GlazeModel>? glazes,
     List<Videos>? videos,
     @JsonKey(name: 'username_id') int? usernameId,
+    @JsonKey(name: 'role') String? role,
   }) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>
