@@ -8,10 +8,10 @@ part 'recruiter_profile_model.g.dart';
 @freezed
 class RecruiterProfileModel with _$RecruiterProfileModel {
   const factory RecruiterProfileModel({
-    required String id,
-    @JsonKey(name: 'user_id') required String userId,
+    String? id,
+    @JsonKey(name: 'user_id') String? userId,
     @JsonKey(name: 'full_name') String? fullName,
-    required String username,
+    String? username,
     String? email,
     @JsonKey(name: 'phone_number') String? phoneNumber,
     String? organization,
@@ -23,6 +23,7 @@ class RecruiterProfileModel with _$RecruiterProfileModel {
     @JsonKey(name: 'subscription_expires_at') DateTime? subscriptionExpiresAt,
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
     @JsonKey(name: 'created_at') DateTime? createdAt,
+    @JsonKey(name: 'is_profile_completed') bool? isProfileCompleted,
   }) = _RecruiterProfileModel;
 
   factory RecruiterProfileModel.fromJson(Map<String, dynamic> json) =>

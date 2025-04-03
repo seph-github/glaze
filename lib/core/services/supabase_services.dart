@@ -94,6 +94,7 @@ class SupabaseService {
         params: params,
       );
     } catch (e) {
+      log('SupabaseService.withReturnValuesRpc: $e');
       throw Exception('SupabaseService.withReturnValuesRpc: $e');
     }
   }

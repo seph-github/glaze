@@ -6,6 +6,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glaze/core/nested_navigation_scaffold.dart';
+import 'package:glaze/data/models/profile/recruiter_profile_model.dart';
 import 'package:glaze/data/models/profile/user_model.dart';
 import 'package:glaze/feature/onboarding/provider/onboarding_provider.dart';
 import 'package:glaze/feature/shops/shop_view.dart';
@@ -44,6 +45,10 @@ GoRouter router(Ref ref) {
     final User? user = await ref.read(authServiceProvider).getCurrentUser();
     final UserModel? profile =
         await ref.read(userRepositoryProvider).fetchUser(id: user?.id);
+
+    final RecruiterProfileModel? recruiterProfile = await ref
+        .read(userRepositoryProvider)
+        .fetchRecruiterProfile(id: user?.id);
     final String path = state.matchedLocation;
     final bool hasSplashCompleted = ref.read(splashProvider).completeSplash;
     final bool hasCompletedOnboarding =
@@ -52,6 +57,8 @@ GoRouter router(Ref ref) {
         ref.read(recruiterProfileProvider).completeRecruiterProfile;
 
     log('router redirect: $path, user: ${user != null}, role: ${profile?.role}, splash completed: $hasSplashCompleted, recruiter profile completed: $hasCompletedRecruiterProfile, onboarding completed: $hasCompletedOnboarding');
+
+    // log('Profile $profile');
 
     if (!hasSplashCompleted) {
       return const SplashRoute().location;
@@ -62,18 +69,21 @@ GoRouter router(Ref ref) {
     }
 
     if (profile?.role == ProfileType.recruiter.value &&
-        !hasCompletedRecruiterProfile) {
+        (recruiterProfile?.isProfileCompleted ?? false)) {
+      print('here if profile is recruiter');
       return ProfileRecruiterFormRoute(id: user.id).location;
     }
 
-    if (!hasCompletedOnboarding) {
-      return const OnboardingRoute().location;
+    if (path == '/' && (profile?.isOnboardingCompleted ?? false)) {
+      print('here if profile is user and recruiter');
+      return OnboardingRoute(id: user.id).location;
     }
 
     if (path == '/auth') {
+      print('here at HOME');
       return const HomeRoute().location;
     }
-
+    print('here none');
     return null;
   }
 
@@ -93,7 +103,7 @@ GoRouter router(Ref ref) {
               GoRoute(
                 path: '/',
                 pageBuilder: (context, state) {
-                  return const NoTransitionPage(
+                  return NoTransitionPage(
                     child: HomeView(),
                   );
                 },
@@ -214,7 +224,7 @@ class HomeRoute extends GoRouteData {
   const HomeRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => const HomeView();
+  Widget build(BuildContext context, GoRouterState state) => HomeView();
 }
 
 @TypedGoRoute<AuthRoute>(path: '/auth')
@@ -281,13 +291,16 @@ class ChallengesRoute extends GoRouteData {
       const ChallengesView();
 }
 
-@TypedGoRoute<OnboardingRoute>(path: '/onboarding')
+@TypedGoRoute<OnboardingRoute>(path: '/onboarding/:id')
 class OnboardingRoute extends GoRouteData {
-  const OnboardingRoute();
+  const OnboardingRoute({required this.id});
+
+  final String id;
 
   @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      const OnboardingView();
+  Widget build(BuildContext context, GoRouterState state) => OnboardingView(
+        id: id,
+      );
 }
 
 @TypedGoRoute<ProfileRecruiterFormRoute>(path: '/profile-recruiter-form/:id')

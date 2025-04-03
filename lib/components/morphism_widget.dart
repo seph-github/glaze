@@ -11,6 +11,7 @@ class MorphismWidget extends StatelessWidget {
     this.child,
     this.onTap,
     this.onDoubleTap,
+    this.onLongPress,
   })  : width = size ?? 60,
         height = size ?? 60;
 
@@ -22,6 +23,7 @@ class MorphismWidget extends StatelessWidget {
     this.child,
     this.onTap,
     this.onDoubleTap,
+    this.onLongPress,
     this.shape = BoxShape.rectangle,
   })  : width = width ?? double.infinity,
         height = height ?? 50;
@@ -33,6 +35,7 @@ class MorphismWidget extends StatelessWidget {
   final Widget? child;
   final VoidCallback? onTap;
   final VoidCallback? onDoubleTap;
+  final VoidCallback? onLongPress;
 
   @override
   Widget build(BuildContext context) {
@@ -113,6 +116,7 @@ class MorphismWidget extends StatelessWidget {
       return GestureDetector(
         onTap: onTap,
         onDoubleTap: onDoubleTap,
+        onLongPress: onLongPress,
         child: Transform(
           alignment: Alignment.center,
           transform: Matrix4.rotationX(3.14159),
@@ -127,6 +131,7 @@ class MorphismWidget extends StatelessWidget {
       return GestureDetector(
         onTap: onTap,
         onDoubleTap: onDoubleTap,
+        onLongPress: onLongPress,
         child: Transform(
           alignment: Alignment.center,
           transform: Matrix4.rotationX(3.14159),
@@ -141,6 +146,7 @@ class MorphismWidget extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       onDoubleTap: onDoubleTap,
+      onLongPress: onLongPress,
       child: Transform(
         alignment: Alignment.center,
         transform: Matrix4.rotationX(3.14159),

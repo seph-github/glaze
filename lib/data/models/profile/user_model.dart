@@ -28,6 +28,7 @@ class UserModel with _$UserModel {
     List<Videos>? videos,
     @JsonKey(name: 'username_id') int? usernameId,
     @JsonKey(name: 'role') String? role,
+    @JsonKey(name: 'is_onboarding_completed') bool? isOnboardingCompleted,
   }) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>

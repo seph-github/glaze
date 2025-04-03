@@ -1,25 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:gap/gap.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:glaze/components/morphism_widget.dart';
 import 'package:glaze/core/result_handler/results.dart';
-import 'package:glaze/core/routing/router.dart';
 import 'package:glaze/feature/home/views/video_player_view.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../data/models/cached_video/cached_video.dart';
 import '../../../data/repository/video_repository/video_repository.dart';
+import '../widgets/home_interactive_card.dart';
 
-class HomeView extends ConsumerWidget {
-  const HomeView({super.key});
+class HomeView extends HookWidget {
+  HomeView({super.key});
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final router = GoRouter.of(context);
+  Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
     final double height = size.height;
     final double width = size.width;
+    final showMoreDonutOptions = useState<bool>(false);
+    final showShareButton = useState<bool>(false);
 
     return Consumer(
       builder: (context, ref, child) {
@@ -54,107 +56,63 @@ class HomeView extends ConsumerWidget {
                               bottom: -100,
                               left: 0,
                               right: 0,
-                              child: Container(
+                              child: HomeInteractiveCard(
+                                onGlazeLongPress: () {
+                                  showMoreDonutOptions.value = true;
+                                },
+                                onGlazeTap: () {},
+                                onShareLongPress: () {
+                                  showShareButton.value = true;
+                                },
+                                key: _scaffoldKey,
                                 width: width,
-                                height: height * 0.3,
-                                padding: const EdgeInsets.all(16.0),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.rectangle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color:
-                                          Colors.black.withValues(alpha: 0.6),
-                                      offset: const Offset(0, 0),
-                                      blurRadius: 100,
-                                      spreadRadius: 50,
-                                    ),
-                                  ],
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        MorphismWidget.rounded(
-                                          onTap: () {
-                                            router.push(const ChallengesRoute()
-                                                .location);
-                                          },
-                                          width: width / 2,
-                                          height: 40,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: <Widget>[
-                                              SvgPicture.asset(
-                                                  'assets/images/svg/Trophy Icon.svg'),
-                                              const Gap(10),
-                                              const Text('Best Content'),
-                                            ],
-                                          ),
-                                        ),
-                                        const Gap(10),
-                                        Text(
-                                          cachedVideos?.model?[index].title ??
-                                              '',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleLarge
-                                              ?.copyWith(
-                                                  fontWeight: FontWeight.bold),
-                                        ),
-                                        GestureDetector(
-                                          onTap: () {
-                                            final userId = cachedVideos
-                                                ?.model?[index].userId;
-
-                                            router.push(ViewUserProfileRoute(
-                                                    id: userId ?? '')
-                                                .location);
-                                          },
-                                          child: Text(
-                                            'By @${cachedVideos?.model?[index].username}',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyMedium
-                                                ?.copyWith(
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                          ),
-                                        ),
-                                        Text(
-                                          '# Trending',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyMedium
-                                              ?.copyWith(
-                                                  fontWeight: FontWeight.bold),
-                                        ),
-                                      ],
-                                    ),
-                                    Column(
-                                      children: <Widget>[
-                                        MorphismWidget.circle(
-                                          onTap: () {},
-                                          size: 45.0,
-                                          child: SvgPicture.asset(
-                                              'assets/images/svg/Glaze Donuts Icon.svg'),
-                                        ),
-                                        const Gap(10),
-                                        MorphismWidget.circle(
-                                          size: 45.0,
-                                          child: SvgPicture.asset(
-                                              'assets/images/svg/share_icon.svg'),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
+                                height: height,
+                                cachedVideos: cachedVideos,
+                                index: index,
                               ),
                             ),
+                            if (showMoreDonutOptions.value ||
+                                showShareButton.value)
+                              GestureDetector(
+                                onTap: () {
+                                  showMoreDonutOptions.value = false;
+                                  showShareButton.value = false;
+                                },
+                                child: Container(
+                                  height: double.infinity,
+                                  width: double.infinity,
+                                  color: Colors.black.withValues(alpha: 0.4),
+                                ),
+                              ),
+                            if (showMoreDonutOptions.value)
+                              Positioned(
+                                right: 16.0,
+                                bottom: 175.0,
+                                child: MorphismWidget.rounded(
+                                  width: width / 2.25,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16.0),
+                                    child: Row(
+                                      spacing: 10.0,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        SvgPicture.asset(
+                                            'assets/images/svg/Glaze Donuts Icon.svg'),
+                                        SvgPicture.asset(
+                                            'assets/images/svg/Glaze Donuts Icon.svg'),
+                                        SvgPicture.asset(
+                                            'assets/images/svg/Glaze Donuts Icon.svg'),
+                                        SvgPicture.asset(
+                                            'assets/images/svg/Plus icon.svg'),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              )
                           ],
                         );
                       },

@@ -97,7 +97,7 @@ class UpdateRecruiterProfileNotifier extends _$UpdateRecruiterProfileNotifier {
     try {
       state = const AsyncLoading();
 
-      final RecruiterProfileModel recruiterProfile = await ref
+      final RecruiterProfileModel? recruiterProfile = await ref
           .read(userRepositoryProvider)
           .fetchRecruiterProfile(id: userId);
 
@@ -110,7 +110,7 @@ class UpdateRecruiterProfileNotifier extends _$UpdateRecruiterProfileNotifier {
               organization: organization,
               interests: interests,
               identificationUrl: identificationUrl,
-              recruiterProfileEntity: recruiterProfile,
+              recruiterProfileEntity: recruiterProfile!,
             ),
       );
 
@@ -156,7 +156,7 @@ class UserRepository {
 
   final SupabaseService supabaseService;
 
-  FutureOr<UserModel?> fetchUser({required String? id}) async {
+  FutureOr<UserModel?> fetchUser({String? id}) async {
     try {
       if (id == null) return null;
 
@@ -172,7 +172,7 @@ class UserRepository {
     return null;
   }
 
-  Future<UserModel?> fetchUsersProfile({required String id}) async {
+  Future<UserModel?> fetchUsersProfile({String? id}) async {
     try {
       final response = await supabaseService.withReturnValuesRpc(
           fn: 'find_user_by_id', params: {'params_user_id': id});
@@ -184,8 +184,7 @@ class UserRepository {
     return null;
   }
 
-  Future<RecruiterProfileModel> fetchRecruiterProfile(
-      {required String? id}) async {
+  Future<RecruiterProfileModel?> fetchRecruiterProfile({String? id}) async {
     try {
       final response = await supabaseService.select(
         table: 'recruiters',
@@ -203,6 +202,22 @@ class UserRepository {
       throw Exception(
         e.toString(),
       );
+    }
+  }
+
+  Future<void> setFlagsCompleted({
+    required String id,
+    required Map<String, dynamic> data,
+    required String table,
+  }) async {
+    try {
+      await supabaseService.update(
+        table: table,
+        id: id,
+        data: data,
+      );
+    } catch (e) {
+      throw Exception(e.toString());
     }
   }
 
@@ -250,7 +265,7 @@ class UserRepository {
         await supabaseService.update(
           table: 'recruiters',
           data: body.toMap(),
-          id: recruiterProfileEntity.id,
+          id: recruiterProfileEntity.id ?? '',
         );
 
         return const Success<String, Exception>(

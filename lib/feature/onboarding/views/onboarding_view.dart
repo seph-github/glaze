@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
+import 'package:glaze/data/repository/user_repository/user_repository.dart';
 
 import '../../../components/buttons/primary_button.dart';
 import '../../../core/routing/router.dart';
@@ -9,7 +10,12 @@ import '../../../core/styles/color_pallete.dart';
 import '../provider/onboarding_provider.dart';
 
 class OnboardingView extends ConsumerWidget {
-  const OnboardingView({super.key});
+  const OnboardingView({
+    super.key,
+    required this.id,
+  });
+
+  final String id;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -53,12 +59,15 @@ class OnboardingView extends ConsumerWidget {
               label: 'Continue',
               onPressed: () async {
                 if (index == state.length - 1) {
-                  await ref
-                      .read(onboardingProvider)
-                      .setOnBoardingComplete(true)
-                      .then(
-                        (_) => ref.refresh(routerProvider),
-                      );
+                  await ref.read(userRepositoryProvider).setFlagsCompleted(
+                    id: '1',
+                    table: 'profiles',
+                    data: {
+                      'is_onboarding_completed': true,
+                    },
+                  ).then(
+                    (_) => ref.refresh(routerProvider),
+                  );
                 }
                 ref.read(onboardingDataNotifierProvider.notifier).next();
               },
