@@ -126,6 +126,8 @@ class AuthView extends HookWidget {
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter a username';
+                            } else if (value.contains('')) {
+                              return 'Username cannot contain spaces, please use underscores instead';
                             }
                             return null;
                           },
@@ -252,6 +254,9 @@ class AuthView extends HookWidget {
                           GestureDetector(
                             onTap: () {
                               isLogin.value = !isLogin.value;
+                              usernameController.clear();
+                              providerController.clear();
+                              passwordController.clear();
                             },
                             child: Text(
                               isLogin.value ? ' Sign up' : ' Login',

@@ -6,7 +6,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glaze/core/nested_navigation_scaffold.dart';
-import 'package:glaze/data/models/user/user_model.dart';
+import 'package:glaze/data/models/profile/user_model.dart';
 import 'package:glaze/feature/onboarding/provider/onboarding_provider.dart';
 import 'package:glaze/feature/shops/shop_view.dart';
 import 'package:glaze/feature/profile/views/profile_view.dart';
@@ -23,6 +23,7 @@ import '../../feature/challenges/views/challenges_view.dart';
 import '../../feature/home/views/home_view.dart';
 import '../../feature/moments/views/moments_view.dart';
 import '../../feature/onboarding/views/onboarding_view.dart';
+import '../../feature/profile/provider/recruiter_profile_provider.dart';
 import '../../feature/profile/views/profile_recruiter_form.dart';
 import '../../feature/profile/views/view_user_profile.dart';
 import '../../feature/splash/providers/splash_provider.dart';
@@ -39,6 +40,43 @@ final profileNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'profile');
 
 @Riverpod(keepAlive: true)
 GoRouter router(Ref ref) {
+  FutureOr<String?> redirect(BuildContext context, GoRouterState state) async {
+    final User? user = await ref.read(authServiceProvider).getCurrentUser();
+    final UserModel? profile =
+        await ref.read(userRepositoryProvider).fetchUser(id: user?.id);
+    final String path = state.matchedLocation;
+    final bool hasSplashCompleted = ref.read(splashProvider).completeSplash;
+    final bool hasCompletedOnboarding =
+        ref.read(onboardingProvider).completeOnBoarding;
+    final bool hasCompletedRecruiterProfile =
+        ref.read(recruiterProfileProvider).completeRecruiterProfile;
+
+    log('router redirect: $path, user: ${user != null}, role: ${profile?.role}, splash completed: $hasSplashCompleted, recruiter profile completed: $hasCompletedRecruiterProfile, onboarding completed: $hasCompletedOnboarding');
+
+    if (!hasSplashCompleted) {
+      return const SplashRoute().location;
+    }
+
+    if (user == null) {
+      return const AuthRoute().location;
+    }
+
+    if (profile?.role == ProfileType.recruiter.value &&
+        !hasCompletedRecruiterProfile) {
+      return ProfileRecruiterFormRoute(id: user.id).location;
+    }
+
+    if (!hasCompletedOnboarding) {
+      return const OnboardingRoute().location;
+    }
+
+    if (path == '/auth') {
+      return const HomeRoute().location;
+    }
+
+    return null;
+  }
+
   final router = GoRouter(
     debugLogDiagnostics: true,
     routes: [
@@ -118,44 +156,7 @@ GoRouter router(Ref ref) {
       ),
       ...$appRoutes,
     ],
-    redirect: (context, state) async {
-      final User? user = await ref.read(authServiceProvider).getCurrentUser();
-      final UserModel? profile =
-          await ref.read(userRepositoryProvider).fetchUser(id: user?.id);
-      final String path = state.matchedLocation;
-      final bool hasSplashCompleted = ref.read(splashProvider).completeSplash;
-      final bool hasCompletedOnboarding =
-          ref.read(onboardingProvider).completeOnBoarding;
-
-      log('router redirect: $path, user: ${user != null}, role: ${profile?.role}, splash screen completed $hasSplashCompleted, on boarding completed $hasCompletedOnboarding');
-
-      if (path == '/' && user == null && !hasSplashCompleted) {
-        return const SplashRoute().location;
-      }
-
-      if (path == '/auth' && user != null) {
-        return const AuthRoute().location;
-      }
-
-      if (path == '/' &&
-          user != null &&
-          profile?.role == ProfileType.recruiter.value &&
-          hasSplashCompleted &&
-          !hasCompletedOnboarding) {
-        return ProfileRecruiterFormRoute(id: user.id).location;
-      }
-
-      if (path == '/profile' && user == null) {
-        return const AuthRoute().location;
-      }
-
-      // Ensure no unnecessary redirects to the home route
-      // if (path == '/' && user != null) {
-      //   return null;
-      // }
-
-      return null;
-    },
+    redirect: redirect,
   );
 
   ref.listen(

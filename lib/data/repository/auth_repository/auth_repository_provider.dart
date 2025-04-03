@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:math' hide log;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -161,6 +162,7 @@ class AuthRepository {
 
       return Success<AuthResponse, Exception>(authResponse);
     } on AuthApiException catch (e) {
+      log(e.message);
       return Failure<AuthResponse, Exception>(e);
     }
   }

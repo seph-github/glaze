@@ -4,18 +4,21 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import '../../core/styles/color_pallete.dart';
 
 class FocusButton extends HookWidget {
-  const FocusButton({
+  FocusButton({
     super.key,
     this.child,
     this.onTap,
     this.hintText,
     this.helper,
     double? borderRadius,
-    this.controller,
+    TextEditingController? controller,
     this.isLoading = false,
     this.validator,
     this.onChanged,
-  }) : borderRadius = borderRadius ?? 32.0;
+    this.filled = false,
+    this.initialValue,
+  })  : controller = controller ?? TextEditingController(text: initialValue),
+        borderRadius = borderRadius ?? 32.0;
 
   final Widget? child;
   final TextEditingController? controller;
@@ -26,6 +29,8 @@ class FocusButton extends HookWidget {
   final bool isLoading;
   final String? Function(String?)? validator;
   final void Function(String)? onChanged;
+  final bool filled;
+  final String? initialValue;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +38,7 @@ class FocusButton extends HookWidget {
 
     return TextFormField(
       readOnly: true,
+      initialValue: initialValue,
       focusNode: focusNode,
       validator: validator,
       controller: controller,
@@ -42,6 +48,8 @@ class FocusButton extends HookWidget {
         hintStyle: const TextStyle(
           color: ColorPallete.hintTextColor,
         ),
+        fillColor: ColorPallete.inputFilledColor,
+        filled: filled,
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadius),
           borderSide: const BorderSide(

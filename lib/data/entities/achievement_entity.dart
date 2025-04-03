@@ -1,3 +1,5 @@
+import '../../config/enum/achievement_type.dart';
+
 class AchievementEntity {
   final String id;
   final String userId;
@@ -18,15 +20,6 @@ class AchievementEntity {
     this.type,
     this.createdAt,
   });
-}
-
-enum AchievementType {
-  glaze,
-  upload,
-  comment,
-  like,
-  follow,
-  reply,
 }
 
 extension AchievementTypeExtension on AchievementType {

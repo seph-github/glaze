@@ -10,10 +10,13 @@ import 'package:glaze/data/repository/file_picker/file_picker_provider.dart';
 
 import '../../../core/styles/color_pallete.dart';
 
-class RecruiterIndentificationCard extends ConsumerWidget {
-  const RecruiterIndentificationCard({
+class RecruiterIdentificationCard extends ConsumerWidget {
+  const RecruiterIdentificationCard({
     super.key,
+    this.recruiterIdentificationImageUrl,
   });
+
+  final String? recruiterIdentificationImageUrl;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -43,6 +46,15 @@ class RecruiterIndentificationCard extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
+              // if (recruiterIdentificationImageUrl != null)
+              //   ClipRRect(
+              //     borderRadius: BorderRadius.circular(8.0),
+              //     child: AspectRatio(
+              //       aspectRatio: 16 / 9,
+              //       child: CachedNetworkImage(
+              //           imageUrl: recruiterIdentificationImageUrl!),
+              //     ),
+              //   ),
               pickedFile != null
                   ? ClipRRect(
                       borderRadius: BorderRadius.circular(8.0),
@@ -83,10 +95,12 @@ class RecruiterIndentificationCard extends ConsumerWidget {
                     ),
               ),
               const Gap(10),
-              ElevatedButton(
-                onPressed: () async => ref.refresh(filePickerNotifierProvider),
-                child: const Text('Clear'),
-              ),
+              if (pickedFile != null || recruiterIdentificationImageUrl != null)
+                ElevatedButton(
+                  onPressed: () async =>
+                      ref.refresh(filePickerNotifierProvider),
+                  child: const Text('Clear'),
+                ),
             ],
           ),
         ),

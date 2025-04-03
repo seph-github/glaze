@@ -14,6 +14,7 @@ class UserModel with _$UserModel {
     required String id,
     String? username,
     String? email,
+    @JsonKey(name: 'phone_number') String? phoneNumber,
     @JsonKey(name: 'profile_image_url') String? profileImageUrl,
     String? bio,
     String? provider,

@@ -10,7 +10,7 @@ import 'package:glaze/feature/templates/loading_layout.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/routing/router.dart';
-import '../../../data/models/user/user_model.dart';
+import '../../../data/models/profile/user_model.dart';
 import '../widgets/profile_achievements_card.dart';
 import '../widgets/profile_interaction_card.dart';
 import '../widgets/profile_moments_card.dart';

@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:fluttertoast/fluttertoast.dart';
@@ -105,6 +106,7 @@ class SupabaseService {
     try {
       await supabase.from(table).update(data).eq('id', id);
     } catch (e) {
+      log('SupabaseService.update: $e');
       Fluttertoast.showToast(msg: e.toString(), toastLength: Toast.LENGTH_LONG);
       throw Exception('SupabaseService.update: $e');
     }
