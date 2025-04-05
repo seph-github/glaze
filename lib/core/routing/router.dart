@@ -5,10 +5,9 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:glaze/core/nested_navigation_scaffold.dart';
 import 'package:glaze/data/models/profile/recruiter_profile_model.dart';
 import 'package:glaze/data/models/profile/user_model.dart';
-import 'package:glaze/feature/onboarding/provider/onboarding_provider.dart';
+import 'package:glaze/feature/dashboard/views/dashboard_view.dart';
 import 'package:glaze/feature/shops/shop_view.dart';
 import 'package:glaze/feature/profile/views/profile_view.dart';
 import 'package:glaze/data/repository/auth_repository/auth_repository_provider.dart';
@@ -24,7 +23,6 @@ import '../../feature/challenges/views/challenges_view.dart';
 import '../../feature/home/views/home_view.dart';
 import '../../feature/moments/views/moments_view.dart';
 import '../../feature/onboarding/views/onboarding_view.dart';
-import '../../feature/profile/provider/recruiter_profile_provider.dart';
 import '../../feature/profile/views/profile_recruiter_form.dart';
 import '../../feature/profile/views/view_user_profile.dart';
 import '../../feature/splash/providers/splash_provider.dart';
@@ -32,6 +30,8 @@ import '../../feature/splash/views/splash_view.dart';
 import '../../feature/settings/views/general_settings_view.dart';
 
 part 'router.g.dart';
+
+final _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 
 final homeNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'home');
 final momentsNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'moments');
@@ -45,127 +45,58 @@ GoRouter router(Ref ref) {
     final User? user = await ref.read(authServiceProvider).getCurrentUser();
     final UserModel? profile =
         await ref.read(userRepositoryProvider).fetchUser(id: user?.id);
-
     final RecruiterProfileModel? recruiterProfile = await ref
         .read(userRepositoryProvider)
         .fetchRecruiterProfile(id: user?.id);
-    final String path = state.matchedLocation;
+
+    final String currentPath = state.matchedLocation;
     final bool hasSplashCompleted = ref.read(splashProvider).completeSplash;
-    final bool hasCompletedOnboarding =
-        ref.read(onboardingProvider).completeOnBoarding;
-    final bool hasCompletedRecruiterProfile =
-        ref.read(recruiterProfileProvider).completeRecruiterProfile;
 
-    log('router redirect: $path, user: ${user != null}, role: ${profile?.role}, splash completed: $hasSplashCompleted, recruiter profile completed: $hasCompletedRecruiterProfile, onboarding completed: $hasCompletedOnboarding');
+    log('router redirect: $currentPath, user: ${user != null}, role: ${profile?.role}, splash completed: $hasSplashCompleted');
 
-    // log('Profile $profile');
-
+    // Step 1: Ensure splash screen is completed
     if (!hasSplashCompleted) {
       return const SplashRoute().location;
     }
 
+    // Step 2: Navigate to auth screen if user is not authenticated
     if (user == null) {
       return const AuthRoute().location;
     }
 
+    // Step 3: Check user role and redirect accordingly
     if (profile?.role == ProfileType.recruiter.value &&
-        (recruiterProfile?.isProfileCompleted ?? false)) {
-      print('here if profile is recruiter');
+        profile?.isOnboardingCompleted == false &&
+        recruiterProfile?.isProfileCompleted == false) {
       return ProfileRecruiterFormRoute(id: user.id).location;
-    }
-
-    if (path == '/' && (profile?.isOnboardingCompleted ?? false)) {
-      print('here if profile is user and recruiter');
+    } else if (profile?.role == ProfileType.recruiter.value &&
+        profile?.isOnboardingCompleted == false &&
+        recruiterProfile?.isProfileCompleted == true) {
+      return OnboardingRoute(id: user.id).location;
+    } else if (profile?.role == ProfileType.user.value &&
+        profile?.isOnboardingCompleted == false) {
       return OnboardingRoute(id: user.id).location;
     }
 
-    if (path == '/auth') {
-      print('here at HOME');
+    // Step 4: Default to home/dashboard if the user is authenticated
+    if (currentPath == const SplashRoute().location &&
+        (profile?.role == 'recruiter' || profile?.role == 'user') &&
+        profile?.isOnboardingCompleted == true) {
       return const HomeRoute().location;
     }
-    print('here none');
+
+    if (currentPath == const HomeRoute().location) {
+      return null;
+    }
+
     return null;
   }
 
   final router = GoRouter(
+    navigatorKey: _rootNavigatorKey,
+    initialLocation: const SplashRoute().location,
     debugLogDiagnostics: true,
-    routes: [
-      StatefulShellRoute.indexedStack(
-        builder: (context, state, child) {
-          return NestedNavigationScaffold(
-            navigationShell: child,
-          );
-        },
-        branches: [
-          StatefulShellBranch(
-            navigatorKey: homeNavigatorKey,
-            routes: [
-              GoRoute(
-                path: '/',
-                pageBuilder: (context, state) {
-                  return NoTransitionPage(
-                    child: HomeView(),
-                  );
-                },
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            navigatorKey: momentsNavigatorKey,
-            routes: [
-              GoRoute(
-                path: '/moments',
-                pageBuilder: (context, state) {
-                  return const NoTransitionPage(
-                    child: MomentsView(),
-                  );
-                },
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            navigatorKey: uploadMomentKey,
-            routes: [
-              GoRoute(
-                path: '/upload-moments',
-                pageBuilder: (context, state) {
-                  return const NoTransitionPage(
-                    child: Placeholder(),
-                  );
-                },
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            navigatorKey: premiumNavigatorKey,
-            routes: [
-              GoRoute(
-                path: '/shop',
-                pageBuilder: (context, state) {
-                  return const NoTransitionPage(
-                    child: ShopView(),
-                  );
-                },
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            navigatorKey: profileNavigatorKey,
-            routes: [
-              GoRoute(
-                path: '/profile',
-                pageBuilder: (context, state) {
-                  return const NoTransitionPage(
-                    child: ProfileView(),
-                  );
-                },
-              ),
-            ],
-          ),
-        ],
-      ),
-      ...$appRoutes,
-    ],
+    routes: $appRoutes,
     redirect: redirect,
   );
 
@@ -185,6 +116,7 @@ GoRouter router(Ref ref) {
             break;
           case AuthChangeEvent.signedIn:
             log('signedIn');
+            router.go(const HomeRoute().location);
             ref.watch(userNotifierProvider);
             break;
           case AuthChangeEvent.signedOut:
@@ -211,6 +143,110 @@ GoRouter router(Ref ref) {
   return router;
 }
 
+@TypedStatefulShellRoute<DashboardShellRoute>(
+  branches: [
+    TypedStatefulShellBranch<HomeShellBranch>(
+      routes: [
+        TypedGoRoute<HomeRoute>(path: '/'),
+      ],
+    ),
+    TypedStatefulShellBranch<MomentsShellBranch>(
+      routes: [
+        TypedGoRoute<MomentsRoute>(path: '/moments'),
+      ],
+    ),
+    TypedStatefulShellBranch<NoViewShellBranch>(
+      routes: [
+        TypedGoRoute<NoViewRoute>(path: '/placeholder'),
+      ],
+    ),
+    TypedStatefulShellBranch<ShopShellBranch>(
+      routes: [
+        TypedGoRoute<ShopRoute>(path: '/shop'),
+      ],
+    ),
+    TypedStatefulShellBranch<ProfileShellBranch>(
+      routes: [
+        TypedGoRoute<ProfileRoute>(path: '/profile'),
+      ],
+    ),
+  ],
+)
+class DashboardShellRoute extends StatefulShellRouteData {
+  const DashboardShellRoute();
+
+  @override
+  Widget builder(
+    BuildContext context,
+    GoRouterState state,
+    StatefulNavigationShell navigationShell,
+  ) {
+    return DashboardView(
+      navigationShell: navigationShell,
+    );
+  }
+}
+
+class HomeShellBranch extends StatefulShellBranchData {
+  NoTransitionPage builder(
+    BuildContext context,
+    GoRouterState state,
+    StatefulNavigationShell navigationShell,
+  ) {
+    return NoTransitionPage(
+      child: HomeView(),
+    );
+  }
+}
+
+class MomentsShellBranch extends StatefulShellBranchData {
+  NoTransitionPage builder(
+    BuildContext context,
+    GoRouterState state,
+    StatefulNavigationShell navigationShell,
+  ) {
+    return const NoTransitionPage(
+      child: MomentsView(),
+    );
+  }
+}
+
+class NoViewShellBranch extends StatefulShellBranchData {
+  NoTransitionPage builder(
+    BuildContext context,
+    GoRouterState state,
+    StatefulNavigationShell navigationShell,
+  ) {
+    return const NoTransitionPage(
+      child: Placeholder(),
+    );
+  }
+}
+
+class ShopShellBranch extends StatefulShellBranchData {
+  NoTransitionPage builder(
+    BuildContext context,
+    GoRouterState state,
+    StatefulNavigationShell navigationShell,
+  ) {
+    return const NoTransitionPage(
+      child: ShopView(),
+    );
+  }
+}
+
+class ProfileShellBranch extends StatefulShellBranchData {
+  NoTransitionPage builder(
+    BuildContext context,
+    GoRouterState state,
+    StatefulNavigationShell navigationShell,
+  ) {
+    return const NoTransitionPage(
+      child: ProfileView(),
+    );
+  }
+}
+
 @TypedGoRoute<SplashRoute>(path: '/splash')
 class SplashRoute extends GoRouteData {
   const SplashRoute();
@@ -235,20 +271,46 @@ class AuthRoute extends GoRouteData {
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return Consumer(
-      builder: (context, ref, child) {
-        User? isSignedIn;
-        ref.watch(authServiceProvider).getCurrentUser().then(
-              (value) async => isSignedIn = value,
-            );
-        if (isSignedIn != null) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            context.go('/');
-          });
-        }
-        return const AuthView();
-      },
-    );
+    // return Consumer(
+    //   builder: (context, ref, child) {
+    //     User? isSignedIn;
+    //     ref.watch(authServiceProvider).getCurrentUser().then(
+    //           (value) async => isSignedIn = value,
+    //         );
+    //     if (isSignedIn != null) {
+    //       WidgetsBinding.instance.addPostFrameCallback((_) {
+    //         context.go('/');
+    //       });
+    //     }
+    return const AuthView();
+    // },
+    // );
+  }
+}
+
+@TypedGoRoute<ShopRoute>(path: '/shop')
+class ShopRoute extends GoRouteData {
+  const ShopRoute();
+
+  @override
+  Widget build(
+    BuildContext context,
+    GoRouterState state,
+  ) {
+    return const ShopView();
+  }
+}
+
+@TypedGoRoute<MomentsRoute>(path: '/moments')
+class MomentsRoute extends GoRouteData {
+  const MomentsRoute();
+
+  @override
+  Widget build(
+    BuildContext context,
+    GoRouterState state,
+  ) {
+    return const MomentsView();
   }
 }
 
@@ -314,4 +376,13 @@ class ProfileRecruiterFormRoute extends GoRouteData {
       ProfileRecruiterForm(
         userId: id,
       );
+}
+
+@TypedGoRoute<NoViewRoute>(path: '/placeholder')
+class NoViewRoute extends GoRouteData {
+  const NoViewRoute();
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const Placeholder();
+  }
 }

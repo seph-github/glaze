@@ -191,7 +191,7 @@ class ProfileView extends ConsumerWidget {
                 onPressed: () async {
                   ref.read(logoutNotifierProvider.notifier).logout();
                 },
-                isLoading: ref.watch(logoutNotifierProvider).isLoading,
+                // isLoading: ref.watch(logoutNotifierProvider).isLoading,
               ),
             ],
           ),

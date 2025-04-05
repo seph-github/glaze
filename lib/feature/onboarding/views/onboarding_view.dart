@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/data/repository/user_repository/user_repository.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../components/buttons/primary_button.dart';
 import '../../../core/routing/router.dart';
@@ -19,8 +20,32 @@ class OnboardingView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    print('OnboardingView id: $id');
     final state = ref.watch(onboardingDataProvider);
     final index = ref.watch(onboardingDataNotifierProvider);
+    final router = GoRouter.of(context);
+
+    Future<void> handleContinue({bool? skip = false}) async {
+      print('Recruiter ID: $id');
+      if (index == state.length - 1 || skip == true) {
+        await ref
+            .read(userRepositoryProvider)
+            .setFlagsCompleted(
+              id: id,
+              table: 'profiles',
+              data: ({
+                'is_onboarding_completed': true,
+              }),
+            )
+            .then(
+              (_) => router.pushReplacement(
+                const HomeRoute().location,
+              ),
+            );
+      }
+      ref.read(onboardingDataNotifierProvider.notifier).next();
+    }
+
     return Scaffold(
       appBar: AppBar(),
       body: Padding(
@@ -57,20 +82,7 @@ class OnboardingView extends ConsumerWidget {
             const Gap(32.0),
             PrimaryButton(
               label: 'Continue',
-              onPressed: () async {
-                if (index == state.length - 1) {
-                  await ref.read(userRepositoryProvider).setFlagsCompleted(
-                    id: '1',
-                    table: 'profiles',
-                    data: {
-                      'is_onboarding_completed': true,
-                    },
-                  ).then(
-                    (_) => ref.refresh(routerProvider),
-                  );
-                }
-                ref.read(onboardingDataNotifierProvider.notifier).next();
-              },
+              onPressed: handleContinue,
             ),
           ],
         ),
@@ -81,9 +93,12 @@ class OnboardingView extends ConsumerWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'Skip',
-              style: Theme.of(context).textTheme.titleLarge,
+            GestureDetector(
+              onTap: () async => await handleContinue(skip: true),
+              child: Text(
+                'Skip',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
             ),
             Container(
               height: 60.0,

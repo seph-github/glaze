@@ -52,3 +52,4 @@ app.*.map.json
 /dart-defines/
 **/ios/Flutter/Dart-Defines.xcconfig
 /supabase
+/lib/gen

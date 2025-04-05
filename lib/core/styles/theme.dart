@@ -76,4 +76,7 @@ ThemeData theme = ThemeData(
       fontFamily: 'Roboto Regular',
     ),
   ),
+  pageTransitionsTheme: const PageTransitionsTheme(
+    builders: <TargetPlatform, PageTransitionsBuilder>{},
+  ),
 );

@@ -19,7 +19,7 @@ class Dialogs {
           content: Text(content),
           actions: [
             TextButton(
-              onPressed: () => onPressed?.call(),
+              onPressed: () => onPressed,
               child: const Text('OK'),
             ),
           ],

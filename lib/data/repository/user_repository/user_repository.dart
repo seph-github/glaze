@@ -101,6 +101,12 @@ class UpdateRecruiterProfileNotifier extends _$UpdateRecruiterProfileNotifier {
           .read(userRepositoryProvider)
           .fetchRecruiterProfile(id: userId);
 
+      if (recruiterProfile == null) {
+        return Failure<String, Exception>(
+          Exception('Recruiter profile not found'),
+        );
+      }
+
       state = await AsyncValue.guard(
         () => ref.watch(userRepositoryProvider).updateRecruiterProfile(
               userId: userId,
@@ -110,7 +116,7 @@ class UpdateRecruiterProfileNotifier extends _$UpdateRecruiterProfileNotifier {
               organization: organization,
               interests: interests,
               identificationUrl: identificationUrl,
-              recruiterProfileEntity: recruiterProfile!,
+              recruiterProfileEntity: recruiterProfile,
             ),
       );
 
@@ -217,7 +223,9 @@ class UserRepository {
         data: data,
       );
     } catch (e) {
-      throw Exception(e.toString());
+      throw Exception(
+        e.toString(),
+      );
     }
   }
 
@@ -232,6 +240,8 @@ class UserRepository {
     required RecruiterProfileModel recruiterProfileEntity,
   }) async {
     try {
+      RecruiterProfileEntity? body;
+      print('Recruiter Profile Entity: $recruiterProfileEntity');
       final urlResult = await supabaseService.upload(
         file: identificationUrl!,
         userId: userId,
@@ -244,23 +254,41 @@ class UserRepository {
       }
 
       if (urlResult is Success<String, Exception>) {
-        final identificationUrl = urlResult.value;
+        final String identificationUrl = urlResult.value;
 
-        final RecruiterProfileEntity body = RecruiterProfileEntity(
-          fullName: fullName,
-          username: recruiterProfileEntity.username,
-          email: email,
-          phoneNumber: phoneNumber,
-          organization: organization,
-          interests: interests,
-          identificationUrl: identificationUrl,
-          isVerified: recruiterProfileEntity.isVerified,
-          subscriptionStatus: recruiterProfileEntity.subscriptionStatus,
-          subscriptionStartedAt: recruiterProfileEntity.subscriptionStartedAt,
-          subscriptionExpiresAt: recruiterProfileEntity.subscriptionExpiresAt,
-          updatedAt: DateTime.now(),
-          createdAt: recruiterProfileEntity.createdAt,
-        );
+        if (identificationUrl.isEmpty) {
+          return Failure<String, Exception>(
+            Exception('Failed to upload image'),
+          );
+        } else if (recruiterProfileEntity.email != null) {
+          print('here at email not empty');
+          body = RecruiterProfileEntity(
+            fullName: fullName,
+            username: recruiterProfileEntity.username,
+            phoneNumber: phoneNumber,
+            organization: organization,
+            interests: interests,
+            identificationUrl: identificationUrl,
+            updatedAt: DateTime.now(),
+            isProfileCompleted: true,
+          );
+        } else if (recruiterProfileEntity.phoneNumber != null) {
+          print('here at phone not empty');
+          body = RecruiterProfileEntity(
+            fullName: fullName,
+            username: recruiterProfileEntity.username,
+            email: email,
+            organization: organization,
+            interests: interests,
+            identificationUrl: identificationUrl,
+            updatedAt: DateTime.now(),
+            isProfileCompleted: true,
+          );
+        } else {
+          return Failure<String, Exception>(
+            Exception('Recruiter profile is incomplete'),
+          );
+        }
 
         await supabaseService.update(
           table: 'recruiters',

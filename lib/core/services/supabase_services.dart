@@ -105,6 +105,7 @@ class SupabaseService {
     required Map<String, dynamic> data,
   }) async {
     try {
+      print('Payload sent to Supabase: $data');
       await supabase.from(table).update(data).eq('id', id);
     } catch (e) {
       log('SupabaseService.update: $e');

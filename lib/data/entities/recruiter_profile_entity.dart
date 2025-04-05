@@ -12,6 +12,7 @@ class RecruiterProfileEntity {
   final DateTime? subscriptionExpiresAt;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  final bool isProfileCompleted;
 
   RecruiterProfileEntity({
     this.fullName,
@@ -27,6 +28,7 @@ class RecruiterProfileEntity {
     this.subscriptionExpiresAt,
     this.createdAt,
     this.updatedAt,
+    this.isProfileCompleted = false,
   });
 
   Map<String, dynamic> toMap() {
@@ -43,6 +45,7 @@ class RecruiterProfileEntity {
       'subscription_expires_at': subscriptionExpiresAt?.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
       'created_at': createdAt?.toIso8601String(),
+      'is_profile_completed': isProfileCompleted,
     };
   }
 }

@@ -95,7 +95,7 @@ class RecruiterIdentificationCard extends ConsumerWidget {
                     ),
               ),
               const Gap(10),
-              if (pickedFile != null || recruiterIdentificationImageUrl != null)
+              if (pickedFile != null)
                 ElevatedButton(
                   onPressed: () async =>
                       ref.refresh(filePickerNotifierProvider),
