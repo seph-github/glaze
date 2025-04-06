@@ -43,11 +43,8 @@ final profileNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'profile');
 GoRouter router(Ref ref) {
   FutureOr<String?> redirect(BuildContext context, GoRouterState state) async {
     final User? user = await ref.read(authServiceProvider).getCurrentUser();
-    final UserModel? profile =
-        await ref.read(userRepositoryProvider).fetchUser(id: user?.id);
-    final RecruiterProfileModel? recruiterProfile = await ref
-        .read(userRepositoryProvider)
-        .fetchRecruiterProfile(id: user?.id);
+    final UserModel? profile = await ref.read(userRepositoryProvider).fetchUser(id: user?.id);
+    final RecruiterProfileModel? recruiterProfile = await ref.read(userRepositoryProvider).fetchRecruiterProfile(id: user?.id);
 
     final String currentPath = state.matchedLocation;
     final bool hasSplashCompleted = ref.read(splashProvider).completeSplash;
@@ -65,23 +62,16 @@ GoRouter router(Ref ref) {
     }
 
     // Step 3: Check user role and redirect accordingly
-    if (profile?.role == ProfileType.recruiter.value &&
-        profile?.isOnboardingCompleted == false &&
-        recruiterProfile?.isProfileCompleted == false) {
+    if (profile?.role == ProfileType.recruiter.value && profile?.isOnboardingCompleted == false && recruiterProfile?.isProfileCompleted == false) {
       return ProfileRecruiterFormRoute(id: user.id).location;
-    } else if (profile?.role == ProfileType.recruiter.value &&
-        profile?.isOnboardingCompleted == false &&
-        recruiterProfile?.isProfileCompleted == true) {
+    } else if (profile?.role == ProfileType.recruiter.value && profile?.isOnboardingCompleted == false && recruiterProfile?.isProfileCompleted == true) {
       return OnboardingRoute(id: user.id).location;
-    } else if (profile?.role == ProfileType.user.value &&
-        profile?.isOnboardingCompleted == false) {
+    } else if (profile?.role == ProfileType.user.value && profile?.isOnboardingCompleted == false) {
       return OnboardingRoute(id: user.id).location;
     }
 
     // Step 4: Default to home/dashboard if the user is authenticated
-    if (currentPath == const SplashRoute().location &&
-        (profile?.role == 'recruiter' || profile?.role == 'user') &&
-        profile?.isOnboardingCompleted == true) {
+    if (currentPath == const SplashRoute().location && (profile?.role == 'recruiter' || profile?.role == 'user') && profile?.isOnboardingCompleted == true) {
       return const HomeRoute().location;
     }
 
@@ -106,7 +96,10 @@ GoRouter router(Ref ref) {
       if (next is AsyncError) {
         router.go(const AuthRoute().location);
       }
-      if (next case AsyncData(value: final auth)) {
+      if (next
+          case AsyncData(
+            value: final auth
+          )) {
         switch (auth.event) {
           case AuthChangeEvent.initialSession:
             log('initialSession');
@@ -340,8 +333,7 @@ class GeneralSettingsRoute extends GoRouteData {
   const GeneralSettingsRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      const GeneralSettingsView();
+  Widget build(BuildContext context, GoRouterState state) => const GeneralSettingsView();
 }
 
 @TypedGoRoute<ChallengesRoute>(path: '/challenges')
@@ -349,8 +341,7 @@ class ChallengesRoute extends GoRouteData {
   const ChallengesRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      const ChallengesView();
+  Widget build(BuildContext context, GoRouterState state) => const ChallengesView();
 }
 
 @TypedGoRoute<OnboardingRoute>(path: '/onboarding/:id')
@@ -372,8 +363,7 @@ class ProfileRecruiterFormRoute extends GoRouteData {
   final String id;
 
   @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      ProfileRecruiterForm(
+  Widget build(BuildContext context, GoRouterState state) => ProfileRecruiterForm(
         userId: id,
       );
 }

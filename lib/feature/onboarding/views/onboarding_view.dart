@@ -24,6 +24,7 @@ class OnboardingView extends ConsumerWidget {
     final state = ref.watch(onboardingDataProvider);
     final index = ref.watch(onboardingDataNotifierProvider);
     final router = GoRouter.of(context);
+    final Size size = MediaQuery.sizeOf(context);
 
     Future<void> handleContinue({bool? skip = false}) async {
       print('Recruiter ID: $id');
@@ -53,7 +54,7 @@ class OnboardingView extends ConsumerWidget {
         child: Column(
           children: <Widget>[
             Container(
-              height: 450.0,
+              height: size.height * 0.5,
               width: double.infinity,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16.0),

@@ -16,6 +16,7 @@ class LoadingLayout extends HookWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           if (child != null) child!,

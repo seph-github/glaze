@@ -11,17 +11,24 @@ import '../../../data/repository/video_repository/video_repository.dart';
 import '../widgets/home_interactive_card.dart';
 
 class HomeView extends HookWidget {
-  HomeView({super.key});
-
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  const HomeView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final controller = usePageController();
     final size = MediaQuery.sizeOf(context);
     final double height = size.height;
     final double width = size.width;
     final showMoreDonutOptions = useState<bool>(false);
     final showShareButton = useState<bool>(false);
+
+    void toggleDonutOptions(bool value) {
+      showMoreDonutOptions.value = value;
+    }
+
+    void toggleShareButton(bool value) {
+      showShareButton.value = value;
+    }
 
     return Consumer(
       builder: (context, ref, child) {
@@ -36,13 +43,13 @@ class HomeView extends HookWidget {
 
               return Scaffold(
                 body: RefreshIndicator(
-                  onRefresh: () =>
-                      ref.refresh(videoRepositoryProvider).fetchVideos(),
+                  onRefresh: () => ref.refresh(videoRepositoryProvider).fetchVideos(),
                   color: Colors.white12,
                   triggerMode: RefreshIndicatorTriggerMode.onEdge,
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 500),
                     child: PageView.builder(
+                      controller: controller,
                       itemCount: cachedVideos.controllers?.length,
                       scrollDirection: Axis.vertical,
                       itemBuilder: (context, index) {
@@ -53,66 +60,33 @@ class HomeView extends HookWidget {
                               controller: cachedVideos?.controllers?[index],
                             ),
                             Positioned(
-                              bottom: -100,
+                              bottom: 0,
                               left: 0,
                               right: 0,
                               child: HomeInteractiveCard(
-                                onGlazeLongPress: () {
-                                  showMoreDonutOptions.value = true;
-                                },
+                                key: PageStorageKey('HomeInteractiveCard_$index'),
+                                onGlazeLongPress: () => toggleDonutOptions(true),
                                 onGlazeTap: () {},
-                                onShareLongPress: () {
-                                  showShareButton.value = true;
-                                },
-                                key: _scaffoldKey,
+                                onShareLongPress: () => toggleShareButton(true),
                                 width: width,
                                 height: height,
                                 cachedVideos: cachedVideos,
                                 index: index,
                               ),
                             ),
-                            if (showMoreDonutOptions.value ||
-                                showShareButton.value)
+                            if (showMoreDonutOptions.value || showShareButton.value)
                               GestureDetector(
                                 onTap: () {
-                                  showMoreDonutOptions.value = false;
-                                  showShareButton.value = false;
+                                  toggleDonutOptions(false);
+                                  toggleShareButton(false);
                                 },
                                 child: Container(
                                   height: double.infinity,
                                   width: double.infinity,
-                                  color: Colors.black.withValues(alpha: 0.4),
+                                  color: Colors.black.withOpacity(0.4),
                                 ),
                               ),
-                            if (showMoreDonutOptions.value)
-                              Positioned(
-                                right: 16.0,
-                                bottom: 175.0,
-                                child: MorphismWidget.rounded(
-                                  width: width / 2.25,
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16.0),
-                                    child: Row(
-                                      spacing: 10.0,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        SvgPicture.asset(
-                                            'assets/images/svg/Glaze Donuts Icon.svg'),
-                                        SvgPicture.asset(
-                                            'assets/images/svg/Glaze Donuts Icon.svg'),
-                                        SvgPicture.asset(
-                                            'assets/images/svg/Glaze Donuts Icon.svg'),
-                                        SvgPicture.asset(
-                                            'assets/images/svg/Plus icon.svg'),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              )
+                            if (showMoreDonutOptions.value) buildDonutOptions(context, width: width),
                           ],
                         );
                       },
@@ -132,6 +106,29 @@ class HomeView extends HookWidget {
           loading: () => const _LoadingView(),
         );
       },
+    );
+  }
+
+  Widget buildDonutOptions(BuildContext context, {double? width}) {
+    return Positioned(
+      right: 16.0,
+      bottom: 140.0,
+      child: MorphismWidget.rounded(
+        width: width! / 2.25,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SvgPicture.asset('assets/images/svg/Glaze Donuts Icon.svg'),
+              SvgPicture.asset('assets/images/svg/Glaze Donuts Icon.svg'),
+              SvgPicture.asset('assets/images/svg/Glaze Donuts Icon.svg'),
+              SvgPicture.asset('assets/images/svg/Plus icon.svg'),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
