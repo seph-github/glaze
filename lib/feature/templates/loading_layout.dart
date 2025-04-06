@@ -8,14 +8,17 @@ class LoadingLayout extends HookWidget {
     super.key,
     this.child,
     this.isLoading = false,
+    this.appBar,
   });
 
   final Widget? child;
   final bool isLoading;
+  final PreferredSizeWidget? appBar;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: appBar,
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [

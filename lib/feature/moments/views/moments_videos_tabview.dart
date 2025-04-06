@@ -24,6 +24,7 @@ class MomentsVideosTabview extends StatelessWidget {
               return GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
+                  childAspectRatio: 9 / 16,
                 ),
                 padding: const EdgeInsets.only(top: 8.0),
                 itemCount: result.length,
@@ -34,7 +35,6 @@ class MomentsVideosTabview extends StatelessWidget {
                       child: CircularProgressIndicator(),
                     ),
                     imageBuilder: (context, imageProvider) => Container(
-                      margin: const EdgeInsets.all(1.0),
                       decoration: BoxDecoration(
                         image: DecorationImage(
                           image: imageProvider,

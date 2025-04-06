@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:video_player/video_player.dart';
 import 'dart:async';
+
+import '../../../gen/assets.gen.dart';
 
 class VideoPlayerView extends HookWidget {
   const VideoPlayerView({
@@ -47,7 +50,8 @@ class VideoPlayerView extends HookWidget {
               ),
               child: controller.value.isPlaying
                   ? const Icon(Icons.pause)
-                  : const Icon(Icons.play_arrow),
+                  : SvgPicture.asset(Assets.images.svg.playIcon.path,
+                      height: 24.0),
             ),
         ],
       ),

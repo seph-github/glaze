@@ -1,14 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
+import 'package:glaze/feature/templates/loading_layout.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../core/styles/color_pallete.dart';
+import '../../../gen/assets.gen.dart';
 
 class GeneralSettingsView extends StatelessWidget {
   const GeneralSettingsView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: Padding(
+    final router = GoRouter.of(context);
+    return LoadingLayout(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            Assets.images.svg.backArrowIcon.path,
+          ),
+          style: IconButton.styleFrom(
+            backgroundColor: ColorPallete.inputFilledColor,
+            shape: const CircleBorder(),
+          ),
+          onPressed: () {
+            router.pop();
+          },
+        ),
+      ),
+      child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 18.0),
         child: Column(
           children: <Widget>[

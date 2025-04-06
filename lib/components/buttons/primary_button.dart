@@ -52,11 +52,7 @@ class PrimaryButton extends StatelessWidget {
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (icon != null)
-                    const Icon(
-                      Icons.abc_sharp,
-                      size: 24.0,
-                    ),
+                  if (icon != null) icon ?? const SizedBox.shrink(),
                   const Gap(10),
                   Text(label),
                 ],

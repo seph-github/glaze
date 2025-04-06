@@ -72,7 +72,10 @@ class HomeInteractiveCard extends StatelessWidget {
               const Gap(10),
               Text(
                 cachedVideos?.model?[index].title ?? '',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context)
+                    .textTheme
+                    .titleLarge
+                    ?.copyWith(fontWeight: FontWeight.bold),
               ),
               GestureDetector(
                 onTap: () {
@@ -82,12 +85,18 @@ class HomeInteractiveCard extends StatelessWidget {
                 },
                 child: Text(
                   'By @${cachedVideos?.model?[index].username}',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ),
               Text(
                 '# Trending',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -97,11 +106,14 @@ class HomeInteractiveCard extends StatelessWidget {
                 onTap: onGlazeTap,
                 onLongPress: onGlazeLongPress,
                 size: 45.0,
-                child: SvgPicture.asset('assets/images/svg/Glaze Donuts Icon.svg'),
+                child:
+                    SvgPicture.asset('assets/images/svg/Glaze Donuts Icon.svg'),
               ),
               const Gap(10),
               MorphismWidget.circle(
-                onTap: onShareTap,
+                onTap: () {
+                  onShareTap?.call();
+                },
                 onLongPress: onShareLongPress,
                 size: 45.0,
                 child: SvgPicture.asset('assets/images/svg/share_icon.svg'),

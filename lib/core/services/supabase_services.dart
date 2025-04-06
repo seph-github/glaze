@@ -80,10 +80,16 @@ class SupabaseService {
     required String fn,
     Map<String, dynamic>? params,
   }) async {
-    await supabase.rpc(
-      fn,
-      params: params,
-    );
+    try {
+      await supabase.rpc(
+        fn,
+        params: params,
+      );
+    } catch (e) {
+      log('SupabaseService.voidFunctionRpc: $e');
+      Fluttertoast.showToast(msg: e.toString(), toastLength: Toast.LENGTH_LONG);
+      throw Exception('SupabaseService.voidFunctionRpc: $e');
+    }
   }
 
   Future<List<Map<String, dynamic>>> withReturnValuesRpc(

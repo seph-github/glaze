@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 
 import '../../../core/styles/color_pallete.dart';
+import '../../../gen/assets.gen.dart';
 
 class ProfileAchievementsCard extends StatelessWidget {
   const ProfileAchievementsCard({
@@ -10,34 +12,79 @@ class ProfileAchievementsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.0),
+    final achievements = [
+      Assets.images.svg.privacyProtectorBadge.path,
+      Assets.images.svg.heartfeltCommunicatorBadge.path,
+      Assets.images.svg.gemCollectorBadge.path,
+      Assets.images.svg.timeKeeperBadge.path,
+      Assets.images.svg.sparkIgniterBadge.path,
+      Assets.images.svg.achievementAceBadge.path,
+      Assets.images.svg.precisionArcherBadge.path,
+      Assets.images.svg.swordmasterBadge.path,
+    ];
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Achievements',
-            style: TextStyle(fontSize: 20),
-          ),
-          Gap(10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              AchievementsButton(
-                label: '🍩',
+              const Text(
+                'Achievements',
+                style: TextStyle(fontSize: 20),
               ),
-              AchievementsButton(
-                label: '✨',
-              ),
-              AchievementsButton(
-                label: '🌀',
-              ),
-              AchievementsButton(
-                label: '💎',
-              ),
+              if (achievements.length >= 8)
+                const Text(
+                  'View All',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: ColorPallete.magenta,
+                  ),
+                ),
             ],
           ),
+          const Gap(10),
+          GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 4,
+              childAspectRatio: 1.0,
+              mainAxisSpacing: 10.0,
+              crossAxisSpacing: 10.0,
+            ),
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: achievements.length,
+            itemBuilder: (_, index) {
+              return Transform.scale(
+                scale: 0.9,
+                child: SvgPicture.asset(
+                  achievements[index],
+                  height: 70,
+                  fit: BoxFit.cover,
+                ),
+              );
+            },
+          ),
+          // Wrap(
+          //   alignment: WrapAlignment.spaceBetween,
+          //   direction: Axis.horizontal,
+          //   runAlignment: WrapAlignment.start,
+          //   children: achievements
+          //       .map(
+          //         (achievements) => SvgPicture.asset(
+          //           achievements,
+          //           height: 70,
+          //           fit: BoxFit.cover,
+          //         ),
+          //       )
+          //       .toList(),
+          // ),
         ],
       ),
     );

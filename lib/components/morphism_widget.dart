@@ -114,7 +114,9 @@ class MorphismWidget extends StatelessWidget {
 
     if (shape == BoxShape.circle) {
       return GestureDetector(
-        onTap: onTap,
+        onTap: () {
+          onTap?.call();
+        },
         onDoubleTap: onDoubleTap,
         onLongPress: onLongPress,
         child: Transform(
@@ -129,7 +131,9 @@ class MorphismWidget extends StatelessWidget {
 
     if (shape == BoxShape.rectangle) {
       return GestureDetector(
-        onTap: onTap,
+        onTap: () {
+          onTap?.call();
+        },
         onDoubleTap: onDoubleTap,
         onLongPress: onLongPress,
         child: Transform(
@@ -144,7 +148,9 @@ class MorphismWidget extends StatelessWidget {
     }
 
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        onTap?.call();
+      },
       onDoubleTap: onDoubleTap,
       onLongPress: onLongPress,
       child: Transform(

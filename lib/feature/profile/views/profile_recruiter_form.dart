@@ -129,10 +129,10 @@ class ProfileRecruiterForm extends HookWidget {
               if (context.mounted) {
                 await Dialogs.createContentDialog(
                   context,
-                  title: 'Error',
+                  title: 'Error Updating Profile',
                   content: error.message.toString(),
                   onPressed: () {
-                    Navigator.pop(context);
+                    router.pop(context);
                   },
                 );
               }
@@ -140,23 +140,7 @@ class ProfileRecruiterForm extends HookWidget {
 
             if (result is Success<String, Exception>) {
               if (context.mounted) {
-                await Dialogs.createContentDialog(
-                  context,
-                  title: 'Success',
-                  content: result.value,
-                  onPressed: () async {
-                    ref.invalidate(recruiterInterestsNotifierProvider);
-                    ref.invalidate(filePickerNotifierProvider);
-                    fullnameController.clear();
-                    emailController.clear();
-                    interestController.clear();
-                    organizationController.clear();
-                    phoneController.clear();
-
-                    router
-                        .pushReplacement(OnboardingRoute(id: userId).location);
-                  },
-                );
+                router.go(OnboardingRoute(id: userId).location);
               }
             }
           }
@@ -177,19 +161,6 @@ class ProfileRecruiterForm extends HookWidget {
                     orElse: () => '',
                     data: (data) => data?.phoneNumber ?? phoneController.text,
                   );
-              // organizationController.text = recruiterProfileState.maybeWhen(
-              //   orElse: () => organizationController.text,
-              //   data: (data) => data?.organization ?? '',
-              // );
-
-              // List<String> interestList = recruiterProfileState.maybeWhen(
-              //   orElse: () => [],
-              //   data: (data) => data?.interests ?? [],
-              // );
-
-              // ref
-              //     .read(recruiterInterestsNotifierProvider.notifier)
-              //     .initializedInterest(interestList);
 
               return Padding(
                 padding: const EdgeInsets.all(16.0),

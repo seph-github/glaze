@@ -145,55 +145,60 @@ class UploadMomentsCard extends StatelessWidget {
             children: <Widget>[
               Align(
                 alignment: Alignment.topRight,
-                child: Consumer(builder: (context, ref, _) {
-                  return MorphismWidget.circle(
-                    onTap: () async {
-                      if (titleController.text.isNotEmpty ||
-                          captionController.text.isNotEmpty ||
-                          categoryController.text.isNotEmpty ||
-                          publishAsController.text.isNotEmpty ||
-                          ref.watch(filePickerNotifierProvider).value != null) {
-                        await showDialog(
-                          context: context,
-                          builder: (ctx) {
-                            return AlertDialog.adaptive(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16.0),
-                              ),
-                              title: const Text('Discard changes?'),
-                              content: const Text(
-                                  'Are you sure you want to discard your changes?'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(ctx),
-                                  child: const Text('Cancel'),
+                child: Consumer(
+                  builder: (context, ref, _) {
+                    return MorphismWidget.circle(
+                      onTap: () async {
+                        if (titleController.text.isNotEmpty ||
+                            captionController.text.isNotEmpty ||
+                            categoryController.text.isNotEmpty ||
+                            publishAsController.text.isNotEmpty ||
+                            ref.watch(filePickerNotifierProvider).value !=
+                                null) {
+                          await showDialog(
+                            context: context,
+                            builder: (ctx) {
+                              return AlertDialog.adaptive(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16.0),
                                 ),
-                                TextButton(
-                                  onPressed: () {
-                                    titleController.clear();
-                                    captionController.clear();
-                                    categoryController.clear();
-                                    publishAsController.clear();
-                                    ref.invalidate(filePickerNotifierProvider);
-                                    Navigator.popUntil(
-                                      context,
-                                      (route) => route.isFirst,
-                                    );
-                                  },
-                                  child: const Text('Discard'),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      } else {
-                        router.pop();
-                      }
-                    },
-                    size: 28.0,
-                    child: SvgPicture.asset('assets/images/svg/Close Icon.svg'),
-                  );
-                }),
+                                title: const Text('Discard changes?'),
+                                content: const Text(
+                                    'Are you sure you want to discard your changes?'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(ctx),
+                                    child: const Text('Cancel'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      titleController.clear();
+                                      captionController.clear();
+                                      categoryController.clear();
+                                      publishAsController.clear();
+                                      ref.invalidate(
+                                          filePickerNotifierProvider);
+                                      Navigator.popUntil(
+                                        context,
+                                        (route) => route.isFirst,
+                                      );
+                                    },
+                                    child: const Text('Discard'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        } else {
+                          router.pop();
+                        }
+                      },
+                      size: 28.0,
+                      child:
+                          SvgPicture.asset('assets/images/svg/Close Icon.svg'),
+                    );
+                  },
+                ),
               ),
               MorphismWidget.circle(
                 size: 64.0,
@@ -228,6 +233,7 @@ class UploadMomentsCard extends StatelessWidget {
                   return null;
                 },
               ),
+              const Gap(10.0),
               InputField.paragraph(
                 controller: captionController,
                 maxLines: 5,
@@ -239,7 +245,7 @@ class UploadMomentsCard extends StatelessWidget {
                   return null;
                 },
               ),
-              const Gap(16.0),
+              const Gap(26.0),
               Consumer(
                 builder: (context, ref, _) {
                   final state = ref.watch(categoriesNotifierProvider);
@@ -267,7 +273,7 @@ class UploadMomentsCard extends StatelessWidget {
                   );
                 },
               ),
-              const Gap(16.0),
+              const Gap(26.0),
               Consumer(
                 builder: (context, ref, _) {
                   final state = ref.watch(filePickerNotifierProvider);
@@ -331,7 +337,7 @@ class UploadMomentsCard extends StatelessWidget {
                   );
                 },
               ),
-              const Gap(16.0),
+              const Gap(26.0),
               Consumer(
                 builder: (context, ref, _) {
                   return PrimaryButton(

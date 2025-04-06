@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
+
 import 'package:glaze/components/buttons/primary_button.dart';
 import 'package:glaze/core/styles/color_pallete.dart';
 import 'package:glaze/feature/profile/widgets/profile_users_interest_list.dart';
 import 'package:glaze/data/repository/auth_repository/auth_repository_provider.dart';
 import 'package:glaze/data/repository/user_repository/user_repository.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
+import 'package:glaze/gen/fonts.gen.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/routing/router.dart';
 import '../../../data/models/profile/user_model.dart';
+import '../../../gen/assets.gen.dart';
 import '../widgets/profile_achievements_card.dart';
 import '../widgets/profile_interaction_card.dart';
 import '../widgets/profile_moments_card.dart';
@@ -28,6 +32,48 @@ class ProfileView extends ConsumerWidget {
     final size = MediaQuery.sizeOf(context);
     final width = size.width;
     return LoadingLayout(
+      appBar: AppBar(
+        centerTitle: false,
+        title: const Text('Profile'),
+        titleTextStyle: Theme.of(context).textTheme.headlineLarge?.copyWith(
+              fontFamily: FontFamily.hitAndRun,
+            ),
+        actions: [
+          InkWell(
+            onTap: () {},
+            child: Container(
+              width: 46.0,
+              height: width,
+              padding: const EdgeInsets.all(12.0),
+              decoration: const BoxDecoration(
+                color: ColorPallete.secondaryColor,
+                shape: BoxShape.circle,
+              ),
+              child: SvgPicture.asset(Assets.images.svg.messageIcon.path),
+            ),
+          ),
+          const Gap(12.0),
+          InkWell(
+            borderRadius: BorderRadius.circular(64.0),
+            radius: 64.0,
+            splashFactory: NoSplash.splashFactory,
+            onTap: () {
+              router.push(const GeneralSettingsRoute().location);
+            },
+            child: Container(
+              width: 46.0,
+              height: width,
+              padding: const EdgeInsets.all(12.0),
+              decoration: const BoxDecoration(
+                color: ColorPallete.secondaryColor,
+                shape: BoxShape.circle,
+              ),
+              child: SvgPicture.asset(Assets.images.svg.settingsIcon.path),
+            ),
+          ),
+          const Gap(16.0),
+        ],
+      ),
       isLoading: ref.watch(logoutNotifierProvider).isLoading,
       child: SingleChildScrollView(
         child: SafeArea(
@@ -39,33 +85,13 @@ class ProfileView extends ConsumerWidget {
                   orElse: () => '',
                   data: (data) => data?.profileImageUrl,
                 ),
-              ),
-              const Gap(8),
-              Text(
-                value.maybeWhen(
+                username: value.maybeWhen(
                   orElse: () => '',
-                  data: (data) {
-                    return '@${data?.username ?? data?.usernameId.toString()}';
-                  },
+                  data: (data) => data?.username,
                 ),
-                style: const TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(
-                width: width * 0.6,
-                child: Text(
-                  value.maybeWhen(
-                    orElse: () => '',
-                    data: (data) => data?.bio ?? '',
-                  ),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 12.0,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey,
-                  ),
+                bio: value.maybeWhen(
+                  orElse: () => '',
+                  data: (data) => data?.bio,
                 ),
               ),
               const ProfileUsersInterestList(),
@@ -89,38 +115,41 @@ class ProfileView extends ConsumerWidget {
                   ),
                 ),
               ),
-              const Gap(20),
-              // Consumer(
-              //   builder: (context, ref, _) {
-              //     final userValue = ref.watch(loggedInUserNotifierProvider);
-
-              //     return value.maybeWhen(
-              //       orElse: () {
-              //         return const SizedBox.shrink();
-              //       },
-              //       data: (data) {
-              //         if (data?.id ==
-              //             userValue.maybeWhen(
-              //                 orElse: () => '', data: (data) => data?.id)) {
-              //           return const SizedBox.shrink();
-              //         }
-
-              //         return Padding(
-              //           padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              //           child: Column(
-              //             children: [
-              //               PrimaryButton(
-              //                 label: 'Follow',
-              //                 onPressed: () {},
-              //               ),
-              //               const SizedBox(height: 20),
-              //             ],
-              //           ),
-              //         );
-              //       },
-              //     );
-              //   },
-              // ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    PrimaryButton(
+                      width: width * 0.45,
+                      label: 'Edit Profile',
+                      icon: SvgPicture.asset(
+                        Assets.images.svg.editProfileIcon.path,
+                      ),
+                      backgroundColor: ColorPallete.secondaryColor,
+                      onPressed: () {
+                        router.push(
+                          ProfileUserFormRoute(
+                            id: value.maybeWhen(
+                              orElse: () => '',
+                              data: (data) => data?.id ?? '',
+                            ),
+                          ).location,
+                        );
+                      },
+                    ),
+                    PrimaryButton(
+                      width: width * 0.45,
+                      label: 'Share Profile',
+                      icon: SvgPicture.asset(
+                        Assets.images.svg.shareIcon.path,
+                      ),
+                      backgroundColor: ColorPallete.secondaryColor,
+                      onPressed: () {},
+                    ),
+                  ],
+                ),
+              ),
               const ProfileAchievementsCard(),
               const SizedBox(height: 20),
               ProfileMomentsCard(
@@ -131,60 +160,8 @@ class ProfileView extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              Container(
-                width: double.infinity,
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(16.0),
-                  ),
-                  border: Border.fromBorderSide(
-                    BorderSide(
-                      color: ColorPallete.strawberryGlaze,
-                      width: 1,
-                    ),
-                  ),
-                ),
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Glaze',
-                      style: TextStyle(fontSize: 20),
-                    ),
-                    const SizedBox(height: 20),
-                    Wrap(
-                      direction: Axis.horizontal,
-                      spacing: 12.0,
-                      runSpacing: 12.0,
-                      alignment: WrapAlignment.start,
-                      children: value.maybeWhen(
-                        orElse: () => [],
-                        data: (glaze) {
-                          final glazes = glaze?.glazes;
-                          return glazes
-                                  ?.map(
-                                    (glaze) => const GlazeButton(
-                                      label: '🍩',
-                                    ),
-                                  )
-                                  .toList() ??
-                              [];
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
               const SizedBox(height: 20),
               const SizedBox(height: 20),
-              PrimaryButton(
-                label: 'General Settings',
-                backgroundColor: Colors.transparent,
-                onPressed: () =>
-                    router.push(const GeneralSettingsRoute().location),
-              ),
               PrimaryButton(
                 label: 'Log Out',
                 backgroundColor: Colors.transparent,
