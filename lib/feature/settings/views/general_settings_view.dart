@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:gap/gap.dart';
+import 'package:glaze/feature/settings/widgets/settings_menu_tile.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/styles/color_pallete.dart';
 import '../../../gen/assets.gen.dart';
+import '../widgets/settings_content_card.dart';
 
-class GeneralSettingsView extends StatelessWidget {
+class GeneralSettingsView extends HookWidget {
   const GeneralSettingsView({super.key});
 
   @override
   Widget build(BuildContext context) {
     final router = GoRouter.of(context);
+    final lightmode = useState<bool>(false);
     return LoadingLayout(
       appBar: AppBar(
         leading: IconButton(
@@ -32,105 +35,101 @@ class GeneralSettingsView extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 18.0),
         child: Column(
           children: <Widget>[
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                const Text('General Settings'),
-                const Gap(10),
-                Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.white12,
-                    borderRadius: BorderRadius.circular(32.0),
+            SettingsContentCard(
+              cardLabel: 'General Settings',
+              children: [
+                SettingsMenuTile(
+                  label: 'Light Mode',
+                  icon: SvgPicture.asset(Assets.images.svg.lightModeIcon.path),
+                  value: lightmode.value,
+                  onChanged: (value) {
+                    lightmode.value = value;
+                  },
+                ),
+                SettingsMenuTile(
+                  label: 'Language',
+                  icon: SvgPicture.asset(Assets.images.svg.languageIcon.path),
+                  trailing: const Icon(
+                    Icons.chevron_right_rounded,
+                    size: 24.0,
                   ),
-                  child: Column(
-                    children: <Widget>[
-                      ListTile(
-                        leading: Container(
-                          padding: const EdgeInsets.all(4.0),
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.grey,
-                          ),
-                          child: const Icon(
-                            Icons.settings,
-                            color: Colors.white,
-                            size: 32.0,
-                          ),
-                        ),
-                        title: const Text('Dark Mode'),
-                        trailing: Switch(
-                          value: true,
-                          onChanged: (value) => {},
-                          inactiveTrackColor: Colors.grey,
-                          activeColor: Colors.grey,
-                        ),
-                      ),
-                      ListTile(
-                        leading: Container(
-                          padding: const EdgeInsets.all(4.0),
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.grey,
-                          ),
-                          child: const Icon(
-                            Icons.settings,
-                            color: Colors.white,
-                            size: 32.0,
-                          ),
-                        ),
-                        title: const Text('Dark Mode'),
-                        trailing: Switch(
-                          value: true,
-                          onChanged: (value) => {},
-                          inactiveTrackColor: Colors.grey,
-                          activeColor: Colors.grey,
-                        ),
-                      ),
-                      ListTile(
-                        leading: Container(
-                          padding: const EdgeInsets.all(4.0),
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.grey,
-                          ),
-                          child: const Icon(
-                            Icons.settings,
-                            color: Colors.white,
-                            size: 32.0,
-                          ),
-                        ),
-                        title: const Text('Dark Mode'),
-                        trailing: Switch(
-                          value: true,
-                          onChanged: (value) => {},
-                          inactiveTrackColor: Colors.grey,
-                          activeColor: Colors.grey,
-                        ),
-                      ),
-                      ListTile(
-                        leading: Container(
-                          padding: const EdgeInsets.all(4.0),
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.grey,
-                          ),
-                          child: const Icon(
-                            Icons.settings,
-                            color: Colors.white,
-                            size: 32.0,
-                          ),
-                        ),
-                        title: const Text('Dark Mode'),
-                        trailing: Switch(
-                          value: true,
-                          onChanged: (value) => {},
-                          inactiveTrackColor: Colors.grey,
-                          activeColor: Colors.grey,
-                        ),
-                      ),
-                    ],
+                  onChanged: (value) => {},
+                ),
+                SettingsMenuTile(
+                  label: 'Notification Settings',
+                  icon: SvgPicture.asset(
+                      Assets.images.svg.notificationSettingsIcon.path),
+                  trailing: const Icon(
+                    Icons.chevron_right_rounded,
+                    size: 24.0,
                   ),
+                  onChanged: (value) => {},
+                ),
+                SettingsMenuTile(
+                  label: 'Privacy and Security',
+                  icon: SvgPicture.asset(
+                      Assets.images.svg.privacySecurityIcon.path),
+                  trailing: const Icon(
+                    Icons.chevron_right_rounded,
+                    size: 24.0,
+                  ),
+                  onChanged: (value) => {},
+                ),
+              ],
+            ),
+            SettingsContentCard(
+              cardLabel: 'Account Settings',
+              children: [
+                SettingsMenuTile(
+                  label: 'Personal Details',
+                  icon: SvgPicture.asset(
+                      Assets.images.svg.personalDetailsIcon.path),
+                  value: lightmode.value,
+                  onChanged: (value) {
+                    lightmode.value = value;
+                  },
+                ),
+                SettingsMenuTile(
+                  label: 'Donut Shop',
+                  icon:
+                      SvgPicture.asset(Assets.images.svg.shopInactiveIcon.path),
+                  trailing: const Icon(
+                    Icons.chevron_right_rounded,
+                    size: 24.0,
+                  ),
+                  onChanged: (value) => {},
+                ),
+              ],
+            ),
+            SettingsContentCard(
+              cardLabel: 'SUPPORT & LEGAL',
+              children: [
+                SettingsMenuTile(
+                  label: 'Help Center',
+                  icon: SvgPicture.asset(Assets.images.svg.helpCenterIcon.path),
+                  value: lightmode.value,
+                  onChanged: (value) {
+                    lightmode.value = value;
+                  },
+                ),
+                SettingsMenuTile(
+                  label: 'Contact Support',
+                  icon: SvgPicture.asset(Assets.images.svg.phoneIcon.path),
+                  trailing: const Icon(
+                    Icons.chevron_right_rounded,
+                    size: 24.0,
+                  ),
+                  onChanged: (value) => {},
+                ),
+                SettingsMenuTile(
+                  label: 'Terms & Conditions',
+                  icon: SvgPicture.asset(
+                      Assets.images.svg.termsConditionsIcon.path),
+                  trailing: const Icon(
+                    Icons.chevron_right_rounded,
+                    size: 24.0,
+                  ),
+                  onChanged: (value) => {},
                 ),
               ],
             ),
