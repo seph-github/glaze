@@ -50,7 +50,6 @@ class UserProfileImageWidget extends StatelessWidget {
                 )
               : null,
         ),
-        const Gap(8),
         Text(
           username ?? '',
           style: const TextStyle(

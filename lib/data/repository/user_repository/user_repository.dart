@@ -248,31 +248,31 @@ class UserRepository {
       if (urlResult is Failure<String, Exception>) {
         final exception = urlResult.error;
         return Failure<String, Exception>(exception);
+      } else {
+        if (urlResult is Success<String, Exception>) {
+          final String identificationUrl = urlResult.value;
+
+          final Map<String, dynamic> params = {
+            'params_user_id': userId,
+            'params_full_name': fullName,
+            'params_email': email,
+            'params_phone_number': phoneNumber,
+            'params_organization': organization,
+            'params_interests': interests,
+            'params_recruiter_id_url': identificationUrl,
+          };
+
+          await supabaseService.voidFunctionRpc(
+            fn: 'update_recruiter_profile',
+            params: params,
+          );
+
+          return const Success<String, Exception>(
+              'Profile Successfully Created!');
+        }
+
+        return Failure<String, Exception>(urlResult as Exception);
       }
-
-      if (urlResult is Success<String, Exception>) {
-        final String identificationUrl = urlResult.value;
-
-        final Map<String, dynamic> params = {
-          'params_user_id': userId,
-          'params_full_name': fullName,
-          'params_email': email,
-          'params_phone_number': phoneNumber,
-          'params_organization': organization,
-          'params_interests': interests,
-          'params_recruiter_id_url': identificationUrl,
-        };
-
-        await supabaseService.voidFunctionRpc(
-          fn: 'update_recruiter_profile',
-          params: params,
-        );
-
-        return const Success<String, Exception>(
-            'Profile Successfully Created!');
-      }
-
-      return Failure<String, Exception>(urlResult as Exception);
     } catch (e) {
       return Failure<String, Exception>(e as Exception);
     }

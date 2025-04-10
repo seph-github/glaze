@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:math' hide log;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -76,6 +75,15 @@ class SignupNotifier extends _$SignupNotifier {
             profileType: profileType,
           ),
     );
+
+    if (state.value is Success<AuthResponse, Exception>) {
+      final result = state.value;
+      if (result is Success<AuthResponse, Exception>) {
+        return Success<AuthResponse, Exception>(result.value);
+      }
+      return Failure<AuthResponse, Exception>(Exception('Unexpected state'));
+    }
+
     return Future.value(state.value);
   }
 }
@@ -149,11 +157,6 @@ class AuthRepository {
           await supabaseService.supabase.auth.signUp(
         email: email,
         password: password,
-      );
-
-      await supabaseService.update(
-        id: authResponse.user!.id,
-        table: 'profiles',
         data: {
           'username': username,
           'role': profileType?.value,
@@ -162,7 +165,6 @@ class AuthRepository {
 
       return Success<AuthResponse, Exception>(authResponse);
     } on AuthApiException catch (e) {
-      log(e.message);
       return Failure<AuthResponse, Exception>(e);
     }
   }

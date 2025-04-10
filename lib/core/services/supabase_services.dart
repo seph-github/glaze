@@ -72,8 +72,14 @@ class SupabaseService {
   Future<void> insert({
     required String table,
     required Map<String, dynamic> data,
+    String? column,
+    String? value,
   }) async {
-    await supabase.from(table).insert(data);
+    if (column != null && value != null) {
+      await supabase.from(table).insert(data).eq(column, value);
+    } else {
+      await supabase.from(table).insert(data);
+    }
   }
 
   Future<void> voidFunctionRpc({

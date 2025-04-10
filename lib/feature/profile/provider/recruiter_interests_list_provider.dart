@@ -13,6 +13,7 @@ class RecruiterInterestsNotifier extends _$RecruiterInterestsNotifier {
     } else {
       state.add(value);
     }
+    print('new state: $state');
   }
 
   void initializedInterest(List<String> value) {

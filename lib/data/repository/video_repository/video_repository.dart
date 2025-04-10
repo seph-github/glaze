@@ -83,8 +83,12 @@ class CacheVideoNotifier extends _$CacheVideoNotifier {
 
         await controllers[index].initialize();
         controllers[index].setLooping(true);
-        controllers[index].value.aspectRatio;
-        controllers[index].play();
+
+        if (index == 0) {
+          controllers[index].play();
+        } else {
+          controllers[index].pause();
+        }
       }
 
       return Success<CachedVideo, Exception>(

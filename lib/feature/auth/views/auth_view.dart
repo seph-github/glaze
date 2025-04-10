@@ -13,6 +13,7 @@ import '../../../config/enum/profile_type.dart';
 import '../../../core/result_handler/results.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../data/repository/auth_repository/auth_repository_provider.dart';
+import '../../../gen/assets.gen.dart';
 import '../widgets/auth_header.dart';
 import '../widgets/auth_provider_toggle_widget.dart';
 import '../widgets/auth_sso_widget.dart';
@@ -26,24 +27,19 @@ class AuthView extends HookWidget {
     final providerController = useTextEditingController();
     final passwordController = useTextEditingController();
     final usernameController = useTextEditingController();
-    final toggleItems = useState<List<String>>([
-      'Email',
-      'Phone'
-    ]);
-    final itemsValue = useState<List<bool>>([
-      true,
-      false
-    ]);
+    final toggleItems = useState<List<String>>(['Email', 'Phone']);
+    final itemsValue = useState<List<bool>>([true, false]);
     final selectedIndex = useState<int>(0);
     final isLogin = useState<bool>(true);
     final agreedToTermsAndCon = useState<bool>(false);
     final recruitingTalent = useState<bool>(false);
 
     Future<void> loginHandler(WidgetRef ref) async {
-      final Result<AuthResponse, Exception> response = await ref.watch(loginNotifierProvider.notifier).login(
-            email: providerController.text,
-            password: passwordController.text,
-          );
+      final Result<AuthResponse, Exception> response =
+          await ref.watch(loginNotifierProvider.notifier).login(
+                email: providerController.text.trim(),
+                password: passwordController.text.trim(),
+              );
 
       if (response is Failure<AuthResponse, Exception>) {
         final error = response.error as AuthException;
@@ -62,10 +58,10 @@ class AuthView extends HookWidget {
         profileType = ProfileType.user;
       }
 
-      final Result<AuthResponse, Exception> response = await ref.read(signupNotifierProvider.notifier).signup(
-            username: usernameController.text,
-            email: providerController.text,
-            password: passwordController.text,
+      final response = await ref.read(signupNotifierProvider.notifier).signup(
+            username: usernameController.text.trim(),
+            email: providerController.text.trim(),
+            password: passwordController.text.trim(),
             profileType: profileType,
           );
 
@@ -91,13 +87,17 @@ class AuthView extends HookWidget {
     }
 
     Future<void> onAnonymousSignin(WidgetRef ref) async {
-      await ref.read(anonymousSigninNotifierProvider.notifier).anonymousSignin();
+      await ref
+          .read(anonymousSigninNotifierProvider.notifier)
+          .anonymousSignin();
     }
 
     return Consumer(
       builder: (context, ref, _) {
         return LoadingLayout(
-          isLoading: ref.watch(loginNotifierProvider).isLoading || ref.watch(signupNotifierProvider).isLoading || ref.watch(anonymousSigninNotifierProvider).isLoading,
+          isLoading: ref.watch(loginNotifierProvider).isLoading ||
+              ref.watch(signupNotifierProvider).isLoading ||
+              ref.watch(anonymousSigninNotifierProvider).isLoading,
           child: SafeArea(
             child: Form(
               key: formKey,
@@ -116,28 +116,35 @@ class AuthView extends HookWidget {
                     const Gap(20),
                     if (!isLogin.value)
                       InputField.text(
-                        inputIcon: SvgPicture.asset('assets/images/svg/profile_icon.svg'),
+                        inputIcon: SvgPicture.asset(
+                            Assets.images.svg.profileIcon.path),
                         hintText: 'Choose a username',
                         controller: usernameController,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter a username';
-                          } else if (value.length < 5) {
+                          } else if (value.length < 3) {
                             return 'Username must be at least 3 characters long';
                           } else if (value.length > 20) {
                             return 'Username must be less than 20 characters long';
-                          } else if (RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
+                          } else if (RegExp(r'^[a-zA-Z0-9_]+$')
+                              .hasMatch(value)) {
                             return null;
                           } else {
                             return 'Username can only contain letters, numbers, and underscores';
                           }
-                          // return null;
                         },
                       ),
                     if (!isLogin.value) const Gap(20),
                     InputField.email(
-                      inputIcon: toggleItems.value[selectedIndex.value] == 'Email' ? SvgPicture.asset('assets/images/svg/email_icon.svg') : SvgPicture.asset('assets/images/svg/phone_icon.svg'),
-                      hintText: toggleItems.value[selectedIndex.value] == 'Email' ? 'Enter your email' : '+1234567890',
+                      inputIcon: toggleItems.value[selectedIndex.value] ==
+                              'Email'
+                          ? SvgPicture.asset(Assets.images.svg.emailIcon.path)
+                          : SvgPicture.asset(Assets.images.svg.phoneIcon.path),
+                      hintText:
+                          toggleItems.value[selectedIndex.value] == 'Email'
+                              ? 'Enter your email'
+                              : '+1234567890',
                       controller: providerController,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -152,7 +159,8 @@ class AuthView extends HookWidget {
                     ),
                     const Gap(16),
                     InputField.password(
-                      inputIcon: SvgPicture.asset('assets/images/svg/password_icon.svg'),
+                      inputIcon:
+                          SvgPicture.asset(Assets.images.svg.passwordIcon.path),
                       hintText: 'Enter your password',
                       controller: passwordController,
                       validator: (value) {
@@ -192,7 +200,13 @@ class AuthView extends HookWidget {
                       ),
                     const Gap(30),
                     PrimaryButton(
-                      onPressed: (agreedToTermsAndCon.value && usernameController.text.isNotEmpty && providerController.text.isNotEmpty && passwordController.text.isNotEmpty) || isLogin.value ? () => onSubmit(ref) : null,
+                      onPressed: (agreedToTermsAndCon.value &&
+                                  usernameController.text.isNotEmpty &&
+                                  providerController.text.isNotEmpty &&
+                                  passwordController.text.isNotEmpty) ||
+                              isLogin.value
+                          ? () => onSubmit(ref)
+                          : null,
                       label: isLogin.value ? 'Login' : 'Sign Up',
                     ),
                     const Gap(20),
@@ -210,7 +224,10 @@ class AuthView extends HookWidget {
                         children: [
                           Text(
                             'Are You Recruiting Talent?',
-                            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelLarge
+                                ?.copyWith(
                                   fontWeight: FontWeight.w900,
                                 ),
                           ),
@@ -227,8 +244,13 @@ class AuthView extends HookWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          isLogin.value ? 'Don\'t have an account?' : 'Already have an account?',
-                          style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.grey),
+                          isLogin.value
+                              ? 'Don\'t have an account?'
+                              : 'Already have an account?',
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelLarge
+                              ?.copyWith(color: Colors.grey),
                         ),
                         GestureDetector(
                           onTap: () {

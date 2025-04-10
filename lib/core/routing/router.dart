@@ -9,7 +9,7 @@ import 'package:glaze/data/models/profile/recruiter_profile_model.dart';
 import 'package:glaze/data/models/profile/user_model.dart';
 import 'package:glaze/feature/dashboard/views/dashboard_view.dart';
 import 'package:glaze/feature/profile/views/profile_user_form.dart';
-import 'package:glaze/feature/shops/shop_view.dart';
+import 'package:glaze/feature/shops/views/shop_view.dart';
 import 'package:glaze/feature/profile/views/profile_view.dart';
 import 'package:glaze/data/repository/auth_repository/auth_repository_provider.dart';
 import 'package:glaze/data/repository/user_repository/user_repository.dart';
@@ -52,7 +52,7 @@ GoRouter router(Ref ref) {
 
     final String currentPath = state.matchedLocation;
     final bool hasSplashCompleted = ref.read(splashProvider).completeSplash;
-
+    log('user: $profile');
     log('router redirect: $currentPath, user: ${user != null}, role: ${profile?.role}, splash completed: $hasSplashCompleted');
 
     // Step 1: Ensure splash screen is completed
@@ -83,10 +83,10 @@ GoRouter router(Ref ref) {
     if (currentPath == const SplashRoute().location &&
         (profile?.role == 'recruiter' || profile?.role == 'user') &&
         profile?.isOnboardingCompleted == true) {
-      return const HomeRoute().location;
+      return (ProfileRecruiterFormRoute(id: user.id).location);
     }
 
-    if (currentPath == const HomeRoute().location) {
+    if (currentPath == ProfileRecruiterFormRoute(id: user.id).location) {
       return null;
     }
 

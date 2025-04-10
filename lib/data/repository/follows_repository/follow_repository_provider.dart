@@ -18,8 +18,10 @@ class FollowUserNotifier extends _$FollowUserNotifier {
   @override
   FutureOr<void> build() {}
 
-  Future<void> onFollowUser(
-      {required String followerId, required String followingId}) async {
+  Future<void> onFollowUser({
+    required String followerId,
+    required String followingId,
+  }) async {
     try {
       state = const AsyncLoading();
       state = await AsyncValue.guard(

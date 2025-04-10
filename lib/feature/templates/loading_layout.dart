@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:lottie/lottie.dart';
-// import 'package:glaze/core/styles/color_pallete.dart';
 
 class LoadingLayout extends HookWidget {
   const LoadingLayout({
@@ -9,15 +8,20 @@ class LoadingLayout extends HookWidget {
     this.child,
     this.isLoading = false,
     this.appBar,
+    this.bottomNavigationBar,
+    this.backgroundColor,
   });
 
   final Widget? child;
   final bool isLoading;
   final PreferredSizeWidget? appBar;
+  final Widget? bottomNavigationBar;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: backgroundColor ?? Theme.of(context).colorScheme.surface,
       appBar: appBar,
       resizeToAvoidBottomInset: false,
       body: Stack(
@@ -25,7 +29,9 @@ class LoadingLayout extends HookWidget {
           if (child != null) child!,
           if (isLoading) ...[
             Container(
-              color: Colors.black.withValues(alpha: 0.5), // Darkened overlay
+              color: Colors.black.withValues(
+                alpha: 0.5,
+              ),
             ),
             Center(
               child: SizedBox(
@@ -39,6 +45,7 @@ class LoadingLayout extends HookWidget {
           ],
         ],
       ),
+      bottomNavigationBar: bottomNavigationBar,
     );
   }
 }

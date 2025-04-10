@@ -6,6 +6,7 @@ import 'package:gap/gap.dart';
 import 'package:glaze/components/morphism_widget.dart';
 import 'package:glaze/core/result_handler/results.dart';
 import 'package:glaze/feature/home/views/video_player_view.dart';
+import 'package:glaze/feature/templates/loading_layout.dart';
 import 'package:glaze/gen/assets.gen.dart';
 import 'package:go_router/go_router.dart';
 
@@ -26,6 +27,8 @@ class HomeView extends HookWidget {
     final double width = size.width;
     final showMoreDonutOptions = useState<bool>(false);
     final showShareButton = useState<bool>(false);
+    final focusNode = useFocusNode();
+    final currentIndex = useState<int>(0);
 
     void toggleDonutOptions(bool value) {
       showMoreDonutOptions.value = value;
@@ -34,6 +37,10 @@ class HomeView extends HookWidget {
     void toggleShareButton(bool value) {
       showShareButton.value = value;
     }
+
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   focusNode.requestFocus();
+    // });
 
     return Consumer(
       builder: (context, ref, child) {
@@ -46,8 +53,8 @@ class HomeView extends HookWidget {
             if (data is Success<CachedVideo, Exception>) {
               cachedVideos = data.value;
 
-              return Scaffold(
-                body: RefreshIndicator(
+              return LoadingLayout(
+                child: RefreshIndicator(
                   onRefresh: () =>
                       ref.refresh(videoRepositoryProvider).fetchVideos(),
                   color: Colors.white12,
@@ -58,53 +65,77 @@ class HomeView extends HookWidget {
                       allowImplicitScrolling: true,
                       controller: controller,
                       onPageChanged: (index) {
-                        cachedVideos?.controllers?[index == 0 ? 0 : index - 1]
-                            .pause();
+                        currentIndex.value = index;
+
+                        cachedVideos?.controllers?[0].play();
+                        for (int i = 0;
+                            i < (cachedVideos?.controllers?.length ?? 0);
+                            i++) {
+                          if (i != index) {
+                            cachedVideos?.controllers?[i].pause();
+                          } else {
+                            cachedVideos?.controllers?[i].play();
+                          }
+                        }
                       },
                       itemCount: cachedVideos.controllers?.length,
                       scrollDirection: Axis.vertical,
                       itemBuilder: (context, index) {
-                        return Stack(
-                          alignment: Alignment.bottomCenter,
-                          children: [
-                            VideoPlayerView(
-                              controller: cachedVideos?.controllers?[index],
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              left: 0,
-                              right: 0,
-                              child: HomeInteractiveCard(
-                                key: PageStorageKey(
-                                    'HomeInteractiveCard_$index'),
-                                onGlazeLongPress: () =>
-                                    toggleDonutOptions(true),
-                                onShareTap: () async =>
-                                    await showShareOptions(context),
-                                width: width,
-                                height: height,
-                                cachedVideos: cachedVideos,
-                                index: index,
+                        return Focus(
+                          focusNode: focusNode,
+                          autofocus: focusNode.hasFocus,
+                          canRequestFocus: true,
+                          onFocusChange: (value) {
+                            if (value) {
+                              cachedVideos?.controllers?[currentIndex.value]
+                                  .play();
+                            } else {
+                              cachedVideos?.controllers?[currentIndex.value]
+                                  .pause();
+                            }
+                          },
+                          child: Stack(
+                            alignment: Alignment.bottomCenter,
+                            children: [
+                              VideoPlayerView(
+                                controller: cachedVideos?.controllers?[index],
                               ),
-                            ),
-                            if (showMoreDonutOptions.value ||
-                                showShareButton.value)
-                              GestureDetector(
-                                onTap: () {
-                                  toggleDonutOptions(false);
-                                  toggleShareButton(false);
-                                },
-                                child: Container(
-                                  height: double.infinity,
-                                  width: double.infinity,
-                                  color: Colors.black.withValues(alpha: 0.7),
+                              Positioned(
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                child: HomeInteractiveCard(
+                                  key: PageStorageKey(
+                                      'HomeInteractiveCard_$index'),
+                                  onGlazeLongPress: () =>
+                                      toggleDonutOptions(true),
+                                  onShareTap: () async =>
+                                      await showShareOptions(context),
+                                  width: width,
+                                  height: height,
+                                  cachedVideos: cachedVideos,
+                                  index: index,
                                 ),
                               ),
-                            if (showMoreDonutOptions.value)
-                              buildDonutOptions(context, width: width),
-                            // if (showShareButton.value)
-                            //   buildShareOptions(context, width: width),
-                          ],
+                              if (showMoreDonutOptions.value ||
+                                  showShareButton.value)
+                                GestureDetector(
+                                  onTap: () {
+                                    toggleDonutOptions(false);
+                                    toggleShareButton(false);
+                                  },
+                                  child: Container(
+                                    height: double.infinity,
+                                    width: double.infinity,
+                                    color: Colors.black.withValues(alpha: 0.7),
+                                  ),
+                                ),
+                              if (showMoreDonutOptions.value)
+                                buildDonutOptions(context, width: width),
+                              // if (showShareButton.value)
+                              //   buildShareOptions(context, width: width),
+                            ],
+                          ),
                         );
                       },
                     ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:lottie/lottie.dart';
+// import 'package:lottie/lottie.dart';
 
 import '../../core/styles/color_pallete.dart';
 
@@ -44,11 +44,14 @@ class PrimaryButton extends StatelessWidget {
           ),
         ),
         child: isLoading ?? false
-            ? Lottie.asset(
-                'assets/lotties/donut_sprinkled.json',
-                height: 32.0,
-                width: 32.0,
+            ? const CircularProgressIndicator(
+                color: ColorPallete.whiteSmoke,
               )
+            // Lottie.asset(
+            //     'assets/lotties/donut_sprinkled.json',
+            //     height: 32.0,
+            //     width: 32.0,
+            //   )
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

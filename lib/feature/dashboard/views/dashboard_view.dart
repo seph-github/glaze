@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:glaze/feature/templates/loading_layout.dart';
+import 'package:glaze/gen/assets.gen.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../moments/widgets/upload_moments_card.dart';
@@ -29,8 +31,51 @@ class DashboardView extends HookWidget {
     }
 
     path.value = router.state.matchedLocation;
-    return Scaffold(
-      body: ClipRRect(
+    return LoadingLayout(
+      bottomNavigationBar: NavigationBar(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        selectedIndex: _navigationShell.currentIndex,
+        indicatorColor: Colors.transparent,
+        indicatorShape: null,
+        overlayColor: const WidgetStatePropertyAll<Color>(
+          Colors.transparent,
+        ),
+        destinations: [
+          NavigationDestination(
+            icon: SvgPicture.asset(Assets.images.svg.homeOutlined.path),
+            selectedIcon: SvgPicture.asset(Assets.images.svg.homeFillIcon.path),
+            label: 'Home',
+          ),
+          NavigationDestination(
+            icon: SvgPicture.asset(Assets.images.svg.momentsInactiveIcon.path),
+            selectedIcon:
+                SvgPicture.asset(Assets.images.svg.momentsFillIcon.path),
+            label: 'Moments',
+          ),
+          NavigationDestination(
+            icon: Container(
+              width: 50.0,
+              height: 50.0,
+              margin: const EdgeInsets.only(top: 30),
+              child: SvgPicture.asset(Assets.images.svg.addIcon.path),
+            ),
+            label: '',
+          ),
+          NavigationDestination(
+            icon: SvgPicture.asset(Assets.images.svg.shopOutlined.path),
+            selectedIcon: SvgPicture.asset(Assets.images.svg.shopFillIcon.path),
+            label: 'Shops',
+          ),
+          NavigationDestination(
+            icon: SvgPicture.asset(Assets.images.svg.profileIcon.path),
+            selectedIcon:
+                SvgPicture.asset(Assets.images.svg.profileFillIcon.path),
+            label: 'Profile',
+          )
+        ],
+        onDestinationSelected: goBranch,
+      ),
+      child: ClipRRect(
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(
             24.0,
@@ -40,49 +85,6 @@ class DashboardView extends HookWidget {
           ),
         ),
         child: _navigationShell,
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _navigationShell.currentIndex,
-        indicatorColor: Colors.transparent,
-        indicatorShape: null,
-        overlayColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
-        destinations: [
-          NavigationDestination(
-            icon: SvgPicture.asset('assets/images/svg/home_outlined.svg'),
-            selectedIcon:
-                SvgPicture.asset('assets/images/svg/home_fill_icon.svg'),
-            label: 'Home',
-          ),
-          NavigationDestination(
-            icon:
-                SvgPicture.asset('assets/images/svg/moments_inactive_icon.svg'),
-            selectedIcon:
-                SvgPicture.asset('assets/images/svg/moments_fill_icon.svg'),
-            label: 'Moments',
-          ),
-          NavigationDestination(
-            icon: Container(
-              width: 50.0,
-              height: 50.0,
-              margin: const EdgeInsets.only(top: 30),
-              child: SvgPicture.asset('assets/images/svg/add_icon.svg'),
-            ),
-            label: '',
-          ),
-          NavigationDestination(
-            icon: SvgPicture.asset('assets/images/svg/shop_inactive_icon.svg'),
-            selectedIcon:
-                SvgPicture.asset('assets/images/svg/shop_fill_icon.svg'),
-            label: 'Shops',
-          ),
-          NavigationDestination(
-            icon: SvgPicture.asset('assets/images/svg/profile_icon.svg'),
-            selectedIcon:
-                SvgPicture.asset('assets/images/svg/profile_fill_icon.svg'),
-            label: 'Profile',
-          )
-        ],
-        onDestinationSelected: goBranch,
       ),
     );
   }

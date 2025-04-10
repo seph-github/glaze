@@ -1,23 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
+import 'package:glaze/components/app_bar_with_back_button.dart';
 import 'package:glaze/data/models/follows/follow.dart';
 import 'package:glaze/data/repository/follows_repository/follow_repository_provider.dart';
 import 'package:glaze/data/repository/user_repository/user_repository.dart';
-import 'package:glaze/feature/profile/provider/profile_view_mode_provider.dart';
+import 'package:glaze/feature/templates/loading_layout.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../components/buttons/primary_button.dart';
-import '../../../core/result_handler/results.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../data/repository/auth_repository/auth_repository_provider.dart';
+import '../../../gen/assets.gen.dart';
 import '../widgets/profile_achievements_card.dart';
 import '../widgets/profile_interaction_card.dart';
 import '../widgets/profile_moments_card.dart';
 import '../widgets/profile_users_interest_list.dart';
 import '../widgets/user_profile_image_widget.dart';
 
-class ViewUserProfile extends ConsumerWidget {
+class ViewUserProfile extends HookWidget {
   const ViewUserProfile({
     super.key,
     required this.id,
@@ -26,34 +29,30 @@ class ViewUserProfile extends ConsumerWidget {
   final String id;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
     final width = size.width;
-
-    WidgetsBinding.instance.addPostFrameCallback(
-      (timeStamp) async {
-        bool viewMode =
-            await ref.watch(authServiceProvider).getCurrentUser().then(
-          (value) {
-            return value?.id == id;
-          },
-        );
-
-        ref
-            .read(profileViewModeNotifierProvider.notifier)
-            .changeViewMode(!viewMode);
-      },
-    );
+    final viewMode = useState<bool>(false);
+    final user = useState<User?>(null);
+    final userId = useState<String>('');
 
     return Consumer(builder: (context, ref, _) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) async {
+          user.value = await ref.watch(authServiceProvider).getCurrentUser();
+          userId.value = user.value?.id ?? '';
+          viewMode.value = user.value?.id == id;
+        },
+      );
+
       final state = ref.watch(
         getUserProfileNotifierProvider.call(id),
       );
-      return Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-        ),
-        body: state.when(
+
+      return LoadingLayout(
+        isLoading: state.isLoading,
+        appBar: const AppBarWithBackButton(),
+        child: state.when(
           data: (data) {
             return SingleChildScrollView(
               child: SafeArea(
@@ -63,7 +62,6 @@ class ViewUserProfile extends ConsumerWidget {
                     UserProfileImageWidget(
                       imageUrl: data?.profileImageUrl,
                     ),
-                    const Gap(8),
                     Text(
                       '@${data?.username ?? data?.usernameId.toString()}',
                       style: const TextStyle(
@@ -94,25 +92,13 @@ class ViewUserProfile extends ConsumerWidget {
                       ),
                     ),
                     const Gap(20),
-                    if (ref.watch(profileViewModeNotifierProvider))
+                    if (!viewMode.value)
                       Consumer(
                         builder: (context, ref, _) {
-                          final userState =
-                              ref.watch(loggedInUserNotifierProvider);
-
-                          final String userId = userState.maybeWhen(
-                            orElse: () => '',
-                            data: (data) {
-                              if (data is Success<User?, Exception>) {
-                                return data.value?.id ?? '';
-                              } else {
-                                return '';
-                              }
-                            },
+                          final followedState = ref.read(
+                            fetchFollowedUserNotifierProvider
+                                .call(userId.value),
                           );
-
-                          final followedState = ref.watch(
-                              fetchFollowedUserNotifierProvider.call(userId));
 
                           final List<Follow> followedUsers =
                               followedState.maybeWhen(
@@ -130,8 +116,9 @@ class ViewUserProfile extends ConsumerWidget {
                                     PrimaryButton(
                                       isLoading: ref
                                           .watch(
-                                              fetchFollowedUserNotifierProvider
-                                                  .call(userId))
+                                            fetchFollowedUserNotifierProvider
+                                                .call(userId.value),
+                                          )
                                           .isLoading,
                                       backgroundColor: followedUsers.any(
                                               (follow) =>
@@ -147,30 +134,23 @@ class ViewUserProfile extends ConsumerWidget {
                                             .read(followUserNotifierProvider
                                                 .notifier)
                                             .onFollowUser(
-                                              followerId: userState.maybeWhen(
-                                                orElse: () => '',
-                                                data: (data) {
-                                                  if (data is Success<User?,
-                                                      Exception>) {
-                                                    return data.value?.id ?? '';
-                                                  } else {
-                                                    return '';
-                                                  }
-                                                },
-                                              ),
+                                              followerId: userId.value,
                                               followingId: id,
                                             )
                                             .whenComplete(
                                               () => ref.refresh(
                                                 fetchFollowedUserNotifierProvider
-                                                    .call(userId),
+                                                    .call(userId.value),
                                               ),
                                             );
                                       },
                                       width: width / 1.25,
                                     ),
-                                    const Gap(10),
-                                    const Icon(Icons.message),
+                                    const Gap(5),
+                                    SvgPicture.asset(
+                                      Assets.images.svg.messageIcon.path,
+                                      width: 48.0,
+                                    ),
                                   ],
                                 ),
                                 const SizedBox(height: 20),

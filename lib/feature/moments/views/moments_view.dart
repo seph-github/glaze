@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/feature/moments/views/moments_videos_tabview.dart';
 import 'package:glaze/feature/moments/widgets/search_field.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
 
+import '../../../gen/assets.gen.dart';
 import '../../../gen/fonts.gen.dart';
 
 class MomentsView extends ConsumerWidget {
@@ -21,9 +23,9 @@ class MomentsView extends ConsumerWidget {
 
     final List<Widget> tabViews = [
       const MomentsVideosTabview(),
-      const MomentsVideosTabview(),
-      const MomentsVideosTabview(),
-      const MomentsVideosTabview(),
+      const UnderConstruction(),
+      const UnderConstruction(),
+      const UnderConstruction(),
     ];
 
     return LoadingLayout(
@@ -97,6 +99,23 @@ class MomentsView extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class UnderConstruction extends StatelessWidget {
+  const UnderConstruction({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text('Coming soon...'),
+          SvgPicture.asset(Assets.images.svg.glazeDonutsIcon.path),
+        ],
       ),
     );
   }

@@ -21,5 +21,12 @@
     "http",
     "net"
   ],
-  "yaml.schemaStore.enable": false
+  "yaml.schemaStore.enable": false,
+  "files.readonlyExclude": {
+    "lib/custom_code/**": true,
+    "lib/flutter_flow/custom_functions.dart": true,
+    "pubspec.yaml": true,
+    "lib/flutter_flow/function_changes.json": true,
+    ".vscode/settings.json": true
+  }
 }

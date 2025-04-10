@@ -61,6 +61,7 @@ dependencies:
   lottie: ^3.3.1
   shimmer: ^3.0.0
   dotted_border: ^2.1.0
+  supabase: ^2.6.3
 
 dev_dependencies:
   flutter_test:
@@ -127,8 +128,23 @@ flutter:
     - family: Roboto Regular
       fonts:
         - asset: assets/fonts/Roboto-Regular.ttf
-          style: normal
-          weight: 500
+    - family: Roboto Medium
+      fonts:
+        - asset: assets/fonts/Roboto-Medium.ttf
+    - family: Roboto Bold
+      fonts:
+        - asset: assets/fonts/Roboto-Bold.ttf
+    - family: Roboto Black
+      fonts:
+        - asset: assets/fonts/Roboto-Black.ttf
+    - family: Roboto Italic
+      fonts:
+        - asset: assets/fonts/Roboto-Italic.ttf
+    - family: Roboto SemiBold
+      fonts:
+        - asset: assets/fonts/Roboto-SemiBold.ttf
+          # style: normal
+          # weight: 500
   #   - family: Trajan Pro
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf

@@ -42,8 +42,10 @@ class ProfileRecruiterForm extends HookWidget {
     TextEditingController? emailController = TextEditingController();
     TextEditingController? phoneController = TextEditingController();
     TextEditingController? organizationController = TextEditingController();
-    TextEditingController? interestController = TextEditingController();
+    // TextEditingController? interestController = TextEditingController();
     final GoRouter router = GoRouter.of(context);
+    final interests = useState<List>([]);
+    final categories = useState<List<CategoryModel>>([]);
 
     Future<void> showInterestListModal(
         BuildContext context, List<CategoryModel> interests) {
@@ -98,6 +100,11 @@ class ProfileRecruiterForm extends HookWidget {
 
         final File? file = ref.watch(filePickerNotifierProvider).value;
         final intestList = ref.watch(recruiterInterestsNotifierProvider);
+
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          categories.value =
+              await ref.watch(categoryRepositoryProvider).fetchCategories();
+        });
 
         Future<void> handleSubmit() async {
           if (formKey.currentState?.validate() ?? false) {
@@ -258,78 +265,52 @@ class ProfileRecruiterForm extends HookWidget {
                             },
                           ),
                           const Gap(16),
-                          StatefulBuilder(
-                            builder: (context, setState) {
-                              return Consumer(
-                                builder: (context, ref, _) {
-                                  final selectedInterests = ref.watch(
-                                      recruiterInterestsNotifierProvider);
-
-                                  return FocusButton(
-                                    controller: interestController,
-                                    filled: true,
-                                    hintText: selectedInterests.isNotEmpty
-                                        ? null
-                                        : 'Choose your Interests',
-                                    child: selectedInterests.isNotEmpty
-                                        ? SizedBox(
-                                            height: 50,
-                                            child: ListView(
-                                              scrollDirection: Axis.horizontal,
-                                              children: selectedInterests
-                                                  .map(
-                                                    (interest) => Column(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        Container(
-                                                          margin:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                            horizontal: 4,
-                                                          ),
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                                  horizontal: 8,
-                                                                  vertical: 4),
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        16),
-                                                            border: Border.all(
-                                                              color: ColorPallete
-                                                                  .strawberryGlaze,
-                                                            ),
-                                                          ),
-                                                          child: Text(interest),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  )
-                                                  .toList(),
-                                            ),
-                                          )
-                                        : null,
-                                    onTap: () async {
-                                      final List<CategoryModel> interests =
-                                          await ref.watch(
-                                              categoriesNotifierProvider
-                                                  .future);
-
-                                      if (context.mounted) {
-                                        await showInterestListModal(
-                                            context, interests);
-                                      }
-                                      setState(() {});
-                                    },
-                                  );
-                                },
-                              );
-                            },
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Choose your Interests',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                              ),
+                              const Gap(10),
+                              Wrap(
+                                runAlignment: WrapAlignment.spaceEvenly,
+                                alignment: WrapAlignment.spaceAround,
+                                spacing: 4.0,
+                                direction: Axis.horizontal,
+                                children: categories.value.map(
+                                  (category) {
+                                    final isSelected = ref.watch(
+                                      recruiterInterestsNotifierProvider.select(
+                                          (value) =>
+                                              value.contains(category.name)),
+                                    );
+                                    return ChoiceChip(
+                                      label: Text(category.name),
+                                      selected: isSelected,
+                                      showCheckmark: false,
+                                      shape: const StadiumBorder(),
+                                      backgroundColor: Colors.transparent,
+                                      selectedColor: ColorPallete.magenta,
+                                      onSelected: (selected) {
+                                        ref
+                                            .read(
+                                                recruiterInterestsNotifierProvider
+                                                    .notifier)
+                                            .addToInterestList(category.name);
+                                        interests.value = ref.watch(
+                                            recruiterInterestsNotifierProvider);
+                                      },
+                                    );
+                                  },
+                                ).toList(),
+                              ),
+                            ],
                           ),
                           const Gap(16),
                           RecruiterIdentificationCard(
@@ -353,7 +334,7 @@ class ProfileRecruiterForm extends HookWidget {
                           ),
                           const Gap(16),
                           PrimaryButton(
-                            label: 'Start with \$10/month',
+                            label: 'Submit Verification',
                             onPressed: handleSubmit,
                           ),
                         ],
