@@ -7,8 +7,8 @@ import 'package:glaze/data/models/profile/recruiter_profile_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/result_handler/results.dart';
+import '../../../feature/auth/services/auth_services.dart';
 import '../../models/profile/user_model.dart';
-import '../auth_repository/auth_repository_provider.dart';
 
 part 'user_repository.g.dart';
 
@@ -31,12 +31,11 @@ class UserNotifier extends _$UserNotifier {
 
       state = await AsyncValue.guard(
         () async {
-          final user = await ref.watch(authServiceProvider).getCurrentUser();
+          final user = AuthServices().currentUser;
 
-          final UserModel? userModel =
-              await ref.watch(userRepositoryProvider).fetchUser(
-                    id: user?.id,
-                  );
+          final UserModel? userModel = await ref.watch(userRepositoryProvider).fetchUser(
+                id: user?.id,
+              );
 
           return userModel;
         },
@@ -61,10 +60,9 @@ class GetUserProfileNotifier extends _$GetUserProfileNotifier {
       state = const AsyncLoading();
       state = await AsyncValue.guard(
         () async {
-          final userModel =
-              await ref.watch(userRepositoryProvider).fetchUsersProfile(
-                    id: id,
-                  );
+          final userModel = await ref.watch(userRepositoryProvider).fetchUsersProfile(
+                id: id,
+              );
 
           return userModel;
         },
@@ -79,10 +77,9 @@ class GetUserProfileNotifier extends _$GetUserProfileNotifier {
 }
 
 @riverpod
-class UpdateRecruiterProfileNotifier extends _$UpdateRecruiterProfileNotifier {
+class ProfileCompletionNotifier extends _$ProfileCompletionNotifier {
   @override
-  FutureOr<Result<String, Exception>> build() async =>
-      const Success<String, Exception>('');
+  FutureOr<Result<String, Exception>> build() async => const Success<String, Exception>('');
 
   Future<Result<String, Exception>> updateRecruiterProfile({
     required String userId,
@@ -92,13 +89,12 @@ class UpdateRecruiterProfileNotifier extends _$UpdateRecruiterProfileNotifier {
     String? organization,
     List<String>? interests,
     File? identificationUrl,
+    File? profileImage,
   }) async {
     try {
       state = const AsyncLoading();
 
-      final RecruiterProfileModel? recruiterProfile = await ref
-          .read(userRepositoryProvider)
-          .fetchRecruiterProfile(id: userId);
+      final RecruiterProfileModel? recruiterProfile = await ref.read(userRepositoryProvider).fetchRecruiterProfile(id: userId);
 
       if (recruiterProfile == null) {
         return Failure<String, Exception>(
@@ -107,7 +103,7 @@ class UpdateRecruiterProfileNotifier extends _$UpdateRecruiterProfileNotifier {
       }
 
       state = await AsyncValue.guard(
-        () => ref.watch(userRepositoryProvider).updateRecruiterProfile(
+        () => ref.watch(userRepositoryProvider).profileCompletion(
               userId: userId,
               fullName: fullName,
               email: email,
@@ -115,7 +111,7 @@ class UpdateRecruiterProfileNotifier extends _$UpdateRecruiterProfileNotifier {
               organization: organization,
               interests: interests,
               identificationUrl: identificationUrl,
-              recruiterProfileEntity: recruiterProfile,
+              profileImage: profileImage,
             ),
       );
 
@@ -134,11 +130,9 @@ class UpdateRecruiterProfileNotifier extends _$UpdateRecruiterProfileNotifier {
 @riverpod
 class RecruiterProfileNotifier extends _$RecruiterProfileNotifier {
   @override
-  FutureOr<RecruiterProfileModel?> build(String id) =>
-      fetchRecruiterProfile(id: id);
+  FutureOr<RecruiterProfileModel?> build(String id) => fetchRecruiterProfile(id: id);
 
-  Future<RecruiterProfileModel> fetchRecruiterProfile(
-      {required String id}) async {
+  Future<RecruiterProfileModel> fetchRecruiterProfile({required String id}) async {
     try {
       state = const AsyncLoading();
       state = await AsyncValue.guard(
@@ -167,7 +161,9 @@ class UserRepository {
 
       final response = await supabaseService.withReturnValuesRpc(
         fn: 'find_user_by_id',
-        params: {'params_user_id': id},
+        params: {
+          'params_user_id': id
+        },
       );
 
       return UserModel.fromJson(response.first);
@@ -179,8 +175,9 @@ class UserRepository {
 
   Future<UserModel?> fetchUsersProfile({String? id}) async {
     try {
-      final response = await supabaseService.withReturnValuesRpc(
-          fn: 'find_user_by_id', params: {'params_user_id': id});
+      final response = await supabaseService.withReturnValuesRpc(fn: 'find_user_by_id', params: {
+        'params_user_id': id
+      });
 
       return UserModel.fromJson(response.first);
     } catch (e) {
@@ -228,7 +225,7 @@ class UserRepository {
     }
   }
 
-  Future<Result<String, Exception>> updateRecruiterProfile({
+  Future<Result<String, Exception>> profileCompletion({
     required String userId,
     required String fullName,
     String? email,
@@ -236,44 +233,60 @@ class UserRepository {
     String? organization,
     List<String>? interests,
     File? identificationUrl,
-    required RecruiterProfileModel recruiterProfileEntity,
+    File? profileImage,
   }) async {
     try {
-      final urlResult = await supabaseService.upload(
-        file: identificationUrl!,
-        userId: userId,
-        bucketName: 'recruiter-identification-images',
-      );
+      String recruiterIdUrl = '';
 
-      if (urlResult is Failure<String, Exception>) {
-        final exception = urlResult.error;
-        return Failure<String, Exception>(exception);
-      } else {
-        if (urlResult is Success<String, Exception>) {
-          final String identificationUrl = urlResult.value;
+      if (identificationUrl != null) {
+        final identificationUrlResult = await supabaseService.upload(
+          file: identificationUrl,
+          userId: userId,
+          bucketName: 'recruiter-identification-images',
+        );
 
-          final Map<String, dynamic> params = {
-            'params_user_id': userId,
-            'params_full_name': fullName,
-            'params_email': email,
-            'params_phone_number': phoneNumber,
-            'params_organization': organization,
-            'params_interests': interests,
-            'params_recruiter_id_url': identificationUrl,
-          };
-
-          await supabaseService.voidFunctionRpc(
-            fn: 'update_recruiter_profile',
-            params: params,
-          );
-
-          return const Success<String, Exception>(
-              'Profile Successfully Created!');
+        if (identificationUrlResult is Success<String, Exception>) {
+          recruiterIdUrl = identificationUrlResult.value;
+        } else {
+          final exception = identificationUrlResult as Failure<String, Exception>;
+          return Failure<String, Exception>(exception.error);
         }
-
-        return Failure<String, Exception>(urlResult as Exception);
       }
+
+      if (profileImage == null) {
+        return Failure<String, Exception>(Exception('User ID is null'));
+      } else {
+        final profileImageUrl = await supabaseService.upload(
+          file: profileImage,
+          userId: userId,
+          bucketName: 'profile-images',
+        );
+
+        if (profileImageUrl is Failure<String, Exception>) {
+          final exception = profileImageUrl.error;
+          return Failure<String, Exception>(exception);
+        } else {
+          if (profileImageUrl is Success<String, Exception>) {
+            final paramsProfileImageUrl = profileImageUrl.value;
+
+            final Map<String, dynamic> profileParams = {
+              'full_name': fullName,
+              'phone_number': phoneNumber,
+              'interests': interests,
+              'profile_image_url': paramsProfileImageUrl,
+            };
+
+            await supabaseService.update(
+              table: 'profiles',
+              id: userId,
+              data: profileParams,
+            );
+          }
+        }
+      }
+      return const Success<String, Exception>('Profile Created Successfully');
     } catch (e) {
+      print('Exception: $e');
       return Failure<String, Exception>(e as Exception);
     }
   }

@@ -5,8 +5,8 @@ import 'package:gap/gap.dart';
 
 import 'package:glaze/components/buttons/primary_button.dart';
 import 'package:glaze/core/styles/color_pallete.dart';
+import 'package:glaze/feature/auth/providers/auth_provider.dart';
 import 'package:glaze/feature/profile/widgets/profile_users_interest_list.dart';
-import 'package:glaze/data/repository/auth_repository/auth_repository_provider.dart';
 import 'package:glaze/data/repository/user_repository/user_repository.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
 import 'package:glaze/gen/fonts.gen.dart';
@@ -32,6 +32,7 @@ class ProfileView extends ConsumerWidget {
     final size = MediaQuery.sizeOf(context);
     final width = size.width;
     return LoadingLayout(
+      isLoading: ref.watch(authNotifierProvider).isLoading,
       appBar: AppBar(
         centerTitle: false,
         title: const Text('Profile'),
@@ -74,7 +75,6 @@ class ProfileView extends ConsumerWidget {
           const Gap(16.0),
         ],
       ),
-      isLoading: ref.watch(logoutNotifierProvider).isLoading,
       child: SingleChildScrollView(
         child: SafeArea(
           child: Column(
@@ -94,7 +94,12 @@ class ProfileView extends ConsumerWidget {
                   data: (data) => data?.bio,
                 ),
               ),
-              const ProfileUsersInterestList(),
+              ProfileUsersInterestList(
+                interests: value.maybeWhen(
+                  orElse: () => [],
+                  data: (data) => data?.interests,
+                ),
+              ),
               const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -135,6 +140,10 @@ class ProfileView extends ConsumerWidget {
                               data: (data) => data?.id ?? '',
                             ),
                           ).location,
+                          extra: value.maybeWhen(
+                            orElse: () => null,
+                            data: (data) => data,
+                          ),
                         );
                       },
                     ),
@@ -166,9 +175,9 @@ class ProfileView extends ConsumerWidget {
                 label: 'Log Out',
                 backgroundColor: Colors.transparent,
                 onPressed: () async {
-                  ref.read(logoutNotifierProvider.notifier).logout();
+                  // ref.read(logoutNotifierProvider.notifier).logout();
+                  ref.read(authNotifierProvider.notifier).signOut();
                 },
-                // isLoading: ref.watch(logoutNotifierProvider).isLoading,
               ),
             ],
           ),

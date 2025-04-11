@@ -15,7 +15,11 @@ class UploadMoment extends HookWidget {
     super.key,
   });
 
-  final List<String> options = ['Option 1', 'Option 2', 'Option 3'];
+  final List<String> options = [
+    'Option 1',
+    'Option 2',
+    'Option 3'
+  ];
   @override
   Widget build(BuildContext context) {
     final TextEditingController titleController = useTextEditingController();
@@ -58,9 +62,7 @@ class UploadMoment extends HookWidget {
                 height: 16.0,
               ),
               FocusButton(
-                onTap: () async => await ref
-                    .read(filePickerNotifierProvider.notifier)
-                    .pickFile(type: FileType.video),
+                onTap: () async => ref.read(filePickerNotifierProvider.notifier).pickFile(type: FileType.video),
                 helper: const Text('Maximum file size: 100MB'),
                 child: Row(
                   children: [
@@ -69,9 +71,7 @@ class UploadMoment extends HookWidget {
                       width: 16.0,
                     ),
                     Text(
-                      state == null
-                          ? ''
-                          : 'File to be upload size ${(state.lengthSync() / 1024).toStringAsFixed(2)}',
+                      state == null ? '' : 'File to be upload size ${(state.lengthSync() / 1024).toStringAsFixed(2)}',
                     ),
                   ],
                 ),

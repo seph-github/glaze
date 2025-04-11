@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../components/morphism_widget.dart';
 import '../../../core/routing/router.dart';
-import '../../../data/models/cached_video/cached_video.dart';
+import '../models/cached_video_content.dart';
 
 class HomeInteractiveCard extends StatelessWidget {
   const HomeInteractiveCard({
@@ -24,7 +24,7 @@ class HomeInteractiveCard extends StatelessWidget {
   final double width;
   final double height;
 
-  final CachedVideo? cachedVideos;
+  final CachedVideoContent? cachedVideos;
   final VoidCallback? onGlazeTap;
   final VoidCallback? onGlazeLongPress;
   final VoidCallback? onShareTap;
@@ -71,32 +71,23 @@ class HomeInteractiveCard extends StatelessWidget {
               ),
               const Gap(10),
               Text(
-                cachedVideos?.model?[index].title ?? '',
-                style: Theme.of(context)
-                    .textTheme
-                    .titleLarge
-                    ?.copyWith(fontWeight: FontWeight.bold),
+                cachedVideos?.videoContents?[index].title ?? '',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               ),
               GestureDetector(
                 onTap: () {
-                  final userId = cachedVideos?.model?[index].userId;
+                  final userId = cachedVideos?.videoContents?[index].userId;
 
                   router.push(ViewUserProfileRoute(id: userId ?? '').location);
                 },
                 child: Text(
-                  'By @${cachedVideos?.model?[index].username}',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium
-                      ?.copyWith(fontWeight: FontWeight.bold),
+                  'By @${cachedVideos?.videoContents?[index].username}',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ),
               Text(
                 '# Trending',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -106,8 +97,7 @@ class HomeInteractiveCard extends StatelessWidget {
                 onTap: onGlazeTap,
                 onLongPress: onGlazeLongPress,
                 size: 45.0,
-                child:
-                    SvgPicture.asset('assets/images/svg/Glaze Donuts Icon.svg'),
+                child: SvgPicture.asset('assets/images/svg/Glaze Donuts Icon.svg'),
               ),
               const Gap(10),
               MorphismWidget.circle(

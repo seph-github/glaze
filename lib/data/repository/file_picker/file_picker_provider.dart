@@ -10,30 +10,17 @@ part 'file_picker_provider.g.dart';
 @riverpod
 class FilePickerNotifier extends _$FilePickerNotifier {
   @override
-  FutureOr<File?> build() => null;
+  Future<File?> build() async => null;
 
-  Future<File?> pickFile({required FileType type}) async {
-    if (state.isLoading) return null;
+  Future<File?> pickFile({FileType? type}) async {
+    final pickedFile = await FilePicker.platform.pickFiles(type: type ?? FileType.any);
 
-    final status = await _requestPermissions();
-
-    if (!status) {
-      state = AsyncValue.error("Permission Denied", StackTrace.current);
+    if (pickedFile == null) {
       return null;
     }
 
-    state = await AsyncValue.guard(
-      () async {
-        final result = await FilePicker.platform.pickFiles(type: type);
-
-        if (result != null && result.files.single.path != null) {
-          return File(result.files.single.path!);
-        } else {
-          return null;
-        }
-      },
-    );
-    return null;
+    print('Picked file: ${pickedFile.files.single.path}');
+    return File(pickedFile.files.single.path!);
   }
 }
 
@@ -76,8 +63,5 @@ Future<bool> _requestPermissions() async {
       break;
   }
 
-  return (permissionStatus == PermissionStatus.limited ||
-      permissionStatus == PermissionStatus.provisional ||
-      permissionStatus == PermissionStatus.restricted ||
-      permissionStatus == PermissionStatus.granted);
+  return (permissionStatus == PermissionStatus.limited || permissionStatus == PermissionStatus.provisional || permissionStatus == PermissionStatus.restricted || permissionStatus == PermissionStatus.granted);
 }

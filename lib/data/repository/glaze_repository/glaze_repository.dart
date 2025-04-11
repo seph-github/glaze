@@ -1,7 +1,7 @@
 import 'package:glaze/core/services/supabase_services.dart';
-import 'package:glaze/data/repository/auth_repository/auth_repository_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../feature/auth/services/auth_services.dart';
 import '../../models/glaze/glaze_model.dart';
 
 part 'glaze_repository.g.dart';
@@ -16,7 +16,7 @@ GlazeRepository glazeRepository(ref) {
 class GlazeNotifier extends _$GlazeNotifier {
   @override
   FutureOr<List<GlazeModel>> build() async {
-    final user = await ref.watch(authServiceProvider).getCurrentUser();
+    final user = AuthServices().currentUser;
     if (user == null) return [];
     return ref.watch(glazeRepositoryProvider).fetchUserGlaze(
           userId: user.id,
@@ -25,13 +25,11 @@ class GlazeNotifier extends _$GlazeNotifier {
 }
 
 class GlazeRepository {
-  GlazeRepository({required SupabaseService supabaseService})
-      : _supabaseService = supabaseService;
+  GlazeRepository({required SupabaseService supabaseService}) : _supabaseService = supabaseService;
 
   final SupabaseService _supabaseService;
 
-  Future<void> onGlaze(
-      {required String videoId, required String userId}) async {
+  Future<void> onGlaze({required String videoId, required String userId}) async {
     try {
       await _supabaseService.voidFunctionRpc(
         fn: 'toggle_glaze',
@@ -52,9 +50,7 @@ class GlazeRepository {
         filterColumn: 'user_id',
         filterValue: userId,
       );
-      return response
-          .map<GlazeModel>((json) => GlazeModel.fromJson(json))
-          .toList();
+      return response.map<GlazeModel>((json) => GlazeModel.fromJson(json)).toList();
     } catch (e) {
       throw Exception('GlazeRepository.fetchUserGlaze: $e');
     }

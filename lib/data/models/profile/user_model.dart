@@ -12,11 +12,13 @@ part 'user_model.g.dart';
 class UserModel with _$UserModel {
   const factory UserModel({
     required String id,
+    @JsonKey(name: 'full_name') String? fullName,
     String? username,
     String? email,
     @JsonKey(name: 'phone_number') String? phoneNumber,
     @JsonKey(name: 'profile_image_url') String? profileImageUrl,
     String? bio,
+    @JsonKey(name: 'interests') List<String>? interests,
     String? provider,
     String? badges,
     @JsonKey(name: 'total_glazes') int? totalGlazes,
@@ -26,11 +28,10 @@ class UserModel with _$UserModel {
     @JsonKey(name: 'created_at') DateTime? createdAt,
     List<GlazeModel>? glazes,
     List<Videos>? videos,
-    @JsonKey(name: 'username_id') int? usernameId,
+    @JsonKey(name: 'username_id') String? usernameId,
     @JsonKey(name: 'role') String? role,
     @JsonKey(name: 'is_onboarding_completed') bool? isOnboardingCompleted,
   }) = _UserModel;
 
-  factory UserModel.fromJson(Map<String, dynamic> json) =>
-      _$UserModelFromJson(json);
+  factory UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
 }

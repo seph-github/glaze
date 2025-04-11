@@ -1,31 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:glaze/feature/profile/widgets/profile_users_hobby.dart';
+import 'package:glaze/feature/profile/widgets/profile_users_interest.dart';
 
 class ProfileUsersInterestList extends StatelessWidget {
   const ProfileUsersInterestList({
     super.key,
+    this.interests,
   });
+
+  final List<String>? interests;
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-
-    final List<String> interests = ['Art', 'Music', 'Sports'];
+    if (interests == null || interests!.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     return SizedBox(
-      height: 20,
       width: width * 0.75,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: interests
+      child: Wrap(
+        direction: Axis.horizontal,
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        runAlignment: WrapAlignment.center,
+        children: interests!
             .map(
               (interest) => Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  ProfileHobbies(hobby: interest),
-                  if (interest != interests.last)
+                  ProfileUserInterest(interest: interest),
+                  if (interest != interests!.last)
                     Container(
-                      width: 6,
-                      height: 6,
+                      width: 4,
+                      height: 4,
                       margin: const EdgeInsets.symmetric(horizontal: 4),
                       decoration: const BoxDecoration(
                         shape: BoxShape.circle,

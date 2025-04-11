@@ -20,14 +20,12 @@ class OnboardingView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    print('OnboardingView id: $id');
     final state = ref.watch(onboardingDataProvider);
     final index = ref.watch(onboardingDataNotifierProvider);
     final router = GoRouter.of(context);
     final Size size = MediaQuery.sizeOf(context);
 
     Future<void> handleContinue({bool? skip = false}) async {
-      print('Recruiter ID: $id');
       if (index == state.length - 1 || skip == true) {
         await ref
             .read(userRepositoryProvider)

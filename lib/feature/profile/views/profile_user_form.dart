@@ -7,8 +7,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/components/buttons/primary_button.dart';
+import 'package:glaze/config/enum/profile_type.dart';
 import 'package:glaze/config/strings/string_extension.dart';
+import 'package:glaze/data/models/profile/user_model.dart';
 import 'package:glaze/data/repository/file_picker/file_picker_provider.dart';
+import 'package:glaze/feature/profile/widgets/interest_choice_chip.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
 import 'package:go_router/go_router.dart';
 
@@ -25,25 +28,45 @@ class ProfileUserForm extends HookWidget {
   const ProfileUserForm({
     super.key,
     required this.id,
+    this.data,
   });
 
   final String id;
+  final UserModel? data;
   @override
   Widget build(BuildContext context) {
+    print('ProfileUserForm data : $data');
     final formKey = useMemoized(() => GlobalKey<FormState>());
     final router = GoRouter.of(context);
     final imageUrl = useState<String?>(null);
     File? file;
 
-    TextEditingController? fullnameController = TextEditingController();
-    TextEditingController? emailController = TextEditingController();
-    TextEditingController? phoneController = TextEditingController();
+    TextEditingController? fullnameController = TextEditingController(text: data?.fullName);
+    TextEditingController? emailController = TextEditingController(text: data?.email);
+    TextEditingController? phoneController = TextEditingController(text: data?.phoneNumber);
     TextEditingController? organizationController = TextEditingController();
-    TextEditingController? interestController = TextEditingController();
+    TextEditingController? interestController = TextEditingController(text: data?.interests?.join(', '));
+    final categories = useState<List<CategoryModel>>([]);
+    final updatedSelectedInterests = useState<List<String>>([]);
 
     return Consumer(
       builder: (context, ref, _) {
         file = ref.watch(filePickerNotifierProvider).value;
+        List<String> selectedInterests = [];
+
+        WidgetsBinding.instance.addPostFrameCallback(
+          (_) async {
+            if (categories.value.isEmpty) {
+              categories.value = await ref.read(categoryRepositoryProvider).fetchCategories();
+
+              print('initialized interest: ${updatedSelectedInterests.value}');
+            }
+            selectedInterests = ref.read(recruiterInterestsNotifierProvider.notifier).initializeInterestsList(data?.interests ?? []);
+          },
+        );
+
+        void handleUpdateInterest() {}
+
         return LoadingLayout(
           appBar: AppBar(
             leading: IconButton(
@@ -68,8 +91,7 @@ class ProfileUserForm extends HookWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Form(
                 key: formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                child: ListView(
                   children: <Widget>[
                     Column(
                       children: [
@@ -104,14 +126,8 @@ class ProfileUserForm extends HookWidget {
                               : null,
                         ),
                         TextButton(
-                          child: Text(
-                              ref.watch(filePickerNotifierProvider).value !=
-                                      null
-                                  ? 'Change Photo'
-                                  : 'Pick Photo'),
-                          onPressed: () => ref
-                              .read(filePickerNotifierProvider.notifier)
-                              .pickFile(type: FileType.image),
+                          child: Text(ref.watch(filePickerNotifierProvider).value != null ? 'Change Photo' : 'Pick Photo'),
+                          onPressed: () => ref.read(filePickerNotifierProvider.notifier).pickFile(type: FileType.image),
                         )
                       ],
                     ),
@@ -119,7 +135,7 @@ class ProfileUserForm extends HookWidget {
                     InputField.text(
                       controller: fullnameController,
                       inputIcon: SvgPicture.asset(
-                        'assets/images/svg/profile.svg',
+                        Assets.images.svg.profileIcon.path,
                       ),
                       hintText: 'Full name',
                       filled: true,
@@ -133,7 +149,6 @@ class ProfileUserForm extends HookWidget {
                     const Gap(10),
                     InputField.email(
                       controller: emailController,
-                      // readOnly: data?.email != null,
                       inputIcon: SvgPicture.asset(
                         Assets.images.svg.emailIcon.path,
                       ),
@@ -151,10 +166,7 @@ class ProfileUserForm extends HookWidget {
                     const Gap(10),
                     InputField.text(
                       controller: phoneController,
-                      // initialValue: data?.phoneNumber ?? '',
-                      // readOnly: data?.phoneNumber != null,
                       inputIcon: SvgPicture.asset(
-                        // 'assets/images/svg/phone_icon.svg',
                         Assets.images.svg.phoneIcon.path,
                       ),
                       hintText: 'Phone number',
@@ -166,97 +178,40 @@ class ProfileUserForm extends HookWidget {
                         return null;
                       },
                     ),
-                    const Gap(10),
-                    InputField.text(
-                      controller: organizationController,
-                      inputIcon: SvgPicture.asset(
-                        // 'assets/images/svg/Organization Icon.svg',
-                        Assets.images.svg.organizationIcon.path,
+                    if (data?.role == ProfileType.recruiter.name)
+                      Column(
+                        children: [
+                          const Gap(10),
+                          InputField.text(
+                            controller: organizationController,
+                            inputIcon: SvgPicture.asset(
+                              Assets.images.svg.organizationIcon.path,
+                            ),
+                            hintText: 'Organization',
+                            filled: true,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your organization';
+                              }
+                              return null;
+                            },
+                          ),
+                        ],
                       ),
-                      hintText: 'Organization',
-                      filled: true,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your organization';
-                        }
-                        return null;
-                      },
-                    ),
                     const Gap(16),
-                    StatefulBuilder(
-                      builder: (context, setState) {
-                        return Consumer(
-                          builder: (context, ref, _) {
-                            final selectedInterests =
-                                ref.watch(recruiterInterestsNotifierProvider);
-
-                            return FocusButton(
-                              controller: interestController,
-                              filled: true,
-                              hintText: selectedInterests.isNotEmpty
-                                  ? null
-                                  : 'Choose your Interests',
-                              child: selectedInterests.isNotEmpty
-                                  ? SizedBox(
-                                      height: 50,
-                                      child: ListView(
-                                        scrollDirection: Axis.horizontal,
-                                        children: selectedInterests
-                                            .map(
-                                              (interest) => Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Container(
-                                                    margin: const EdgeInsets
-                                                        .symmetric(
-                                                      horizontal: 4,
-                                                    ),
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 8,
-                                                        vertical: 4),
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              16),
-                                                      border: Border.all(
-                                                        color: ColorPallete
-                                                            .strawberryGlaze,
-                                                      ),
-                                                    ),
-                                                    child: Text(interest),
-                                                  ),
-                                                ],
-                                              ),
-                                            )
-                                            .toList(),
-                                      ),
-                                    )
-                                  : null,
-                              onTap: () async {
-                                final List<CategoryModel> interests = await ref
-                                    .watch(categoriesNotifierProvider.future);
-
-                                if (context.mounted) {
-                                  // await showInterestListModal(context, interests);
-                                  await GlazeModal.showInterestListModal(
-                                    context,
-                                    interests,
-                                  );
-                                }
-                                setState(() {});
-                              },
-                            );
-                          },
-                        );
+                    InterestChoiceChip(
+                      categories: categories.value,
+                      selectedInterests: selectedInterests,
+                      onSelected: (value) {
+                        updatedSelectedInterests.value.add(value);
                       },
                     ),
-                    const Spacer(),
+                    const Gap(32.0),
                     PrimaryButton(
                       label: 'Save',
                       onPressed: () {},
                     ),
+                    const Gap(32.0),
                   ],
                 ),
               ),

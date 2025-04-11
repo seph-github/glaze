@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 
 import '../../../core/styles/color_pallete.dart';
+import '../../../gen/assets.gen.dart';
 
 class RecruiterHeaderCard extends StatelessWidget {
   const RecruiterHeaderCard({
@@ -35,7 +36,7 @@ class RecruiterHeaderCard extends StatelessWidget {
           Row(
             children: <Widget>[
               SvgPicture.asset(
-                'assets/images/svg/Star Icon.svg',
+                Assets.images.svg.starIcon.path,
                 height: 18.0,
               ),
               const Gap(15),
@@ -52,7 +53,7 @@ class RecruiterHeaderCard extends StatelessWidget {
           Row(
             children: <Widget>[
               SvgPicture.asset(
-                'assets/images/svg/Star Icon.svg',
+                Assets.images.svg.starIcon.path,
                 height: 18.0,
               ),
               const Gap(15),
@@ -69,7 +70,7 @@ class RecruiterHeaderCard extends StatelessWidget {
           Row(
             children: <Widget>[
               SvgPicture.asset(
-                'assets/images/svg/Star Icon.svg',
+                Assets.images.svg.starIcon.path,
                 height: 18.0,
               ),
               const Gap(15),

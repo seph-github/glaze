@@ -42,6 +42,7 @@ class PrimaryButton extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadius),
           ),
+          padding: EdgeInsets.zero,
         ),
         child: isLoading ?? false
             ? const CircularProgressIndicator(

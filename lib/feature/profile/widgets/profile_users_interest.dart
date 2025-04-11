@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
-class ProfileHobbies extends StatelessWidget {
-  const ProfileHobbies({
+class ProfileUserInterest extends StatelessWidget {
+  const ProfileUserInterest({
     super.key,
-    this.hobby,
+    this.interest,
     this.icon = Icons.sports_baseball_outlined,
   });
 
-  final String? hobby;
+  final String? interest;
   final IconData? icon;
 
   @override
@@ -18,13 +18,13 @@ class ProfileHobbies extends StatelessWidget {
       children: [
         Icon(
           icon,
-          size: 18.0,
+          size: 12.0,
         ),
-        const Gap(5),
+        const Gap(3),
         Text(
-          hobby ?? 'Hobby',
+          interest ?? '',
           style: const TextStyle(
-            fontSize: 14.0,
+            fontSize: 12.0,
             fontWeight: FontWeight.w500,
           ),
         ),

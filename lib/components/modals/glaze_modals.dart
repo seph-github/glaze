@@ -6,8 +6,7 @@ import '../../data/models/category/category_model.dart';
 import '../../feature/profile/provider/recruiter_interests_list_provider.dart';
 
 class GlazeModal {
-  static Future<void> showInterestListModal(
-      BuildContext context, List<CategoryModel> interests) {
+  static Future<void> showInterestListModal(BuildContext context, List<CategoryModel> interests) {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -17,8 +16,7 @@ class GlazeModal {
         return StatefulBuilder(
           builder: (context, setState) => Consumer(
             builder: (context, ref, child) {
-              final selectedInterests =
-                  ref.watch(recruiterInterestsNotifierProvider);
+              final selectedInterests = ref.watch(recruiterInterestsNotifierProvider);
 
               return ListView.builder(
                 shrinkWrap: true,
@@ -36,15 +34,42 @@ class GlazeModal {
                     selected: isSelected,
                     selectedTileColor: ColorPallete.inputFilledColor,
                     onChanged: (value) {
-                      ref
-                          .read(recruiterInterestsNotifierProvider.notifier)
-                          .addToInterestList(interestName);
+                      ref.read(recruiterInterestsNotifierProvider.notifier).addToInterestList(interestName);
                       setState(() {});
                     },
                   );
                 },
               );
             },
+          ),
+        );
+      },
+    );
+  }
+
+  static Future<void> showPermissionDeniedModal(BuildContext context, String permissionName) {
+    return showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      backgroundColor: ColorPallete.inputFilledColor,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Permission Denied',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Please enable $permissionName permission in your device settings.',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ],
           ),
         );
       },

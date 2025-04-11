@@ -1,0 +1,85 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:glaze/feature/auth/services/auth_services.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../../config/enum/profile_type.dart';
+
+part 'auth_provider.freezed.dart';
+part 'auth_provider.g.dart';
+
+@freezed
+abstract class AuthState with _$AuthState {
+  const factory AuthState({
+    @Default(null) AuthResponse? authResponse,
+    @Default(false) bool isLoading,
+    Exception? error,
+  }) = _AuthState;
+
+  const AuthState._();
+}
+
+@riverpod
+class AuthNotifier extends _$AuthNotifier {
+  @override
+  AuthState build() {
+    return const AuthState();
+  }
+
+  Future<void> signInWithEmailPassword({
+    required String email,
+    required String password,
+  }) async {
+    state = state.copyWith(isLoading: true);
+    try {
+      final authResponse = await AuthServices().signInWithEmailPassword(
+        email: email,
+        password: password,
+      );
+      state = state.copyWith(authResponse: authResponse, isLoading: false);
+    } catch (e) {
+      print('Error signing in riverpod: $e');
+      state = state.copyWith(isLoading: false, error: e as Exception);
+    }
+  }
+
+  Future<void> signUpWithEmailPassword({
+    required String email,
+    required String password,
+    required String username,
+    ProfileType? profileType,
+  }) async {
+    state = state.copyWith(isLoading: true);
+    try {
+      final authResponse = await AuthServices().signUpWithEmailPassword(
+        email: email,
+        password: password,
+        username: username,
+        profileType: profileType,
+      );
+      state = state.copyWith(authResponse: authResponse, isLoading: false);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e as Exception);
+    }
+  }
+
+  Future<void> anonymousSignin() async {
+    state = state.copyWith(isLoading: true);
+    try {
+      final authResponse = await AuthServices().anonymousSignin();
+      state = state.copyWith(authResponse: authResponse, isLoading: false);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e as Exception);
+    }
+  }
+
+  Future<void> signOut() async {
+    state = state.copyWith(isLoading: true);
+    try {
+      await AuthServices().signOut();
+      state = state.copyWith(authResponse: null, isLoading: false);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e as Exception);
+    }
+  }
+}

@@ -54,6 +54,10 @@
 	<!-- ✅ Grants Permission to Access Photo Library -->
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We need access to your photo library to view saved videos.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Your custom message explaining why the app needs access to the camera.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Your custom message explaining why the app needs access to the microphone.</string>	
 	<!-- ✅ Grants Permission to Save Videos to the Gallery -->
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>We need permission to save videos to your photo gallery.</string>

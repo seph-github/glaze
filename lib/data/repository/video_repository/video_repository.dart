@@ -12,7 +12,7 @@ import 'package:video_compress/video_compress.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../core/services/supabase_services.dart';
-import '../auth_repository/auth_repository_provider.dart';
+import '../../../feature/auth/services/auth_services.dart';
 
 part 'video_repository.g.dart';
 
@@ -43,8 +43,7 @@ class VideosNotifier extends _$VideosNotifier {
 class CacheVideoNotifier extends _$CacheVideoNotifier {
   @override
   Future<Result<CachedVideo, Exception>> build() async {
-    Result<List<VideoModel>, Exception> data =
-        await ref.watch(videoRepositoryProvider).fetchVideos();
+    Result<List<VideoModel>, Exception> data = await ref.watch(videoRepositoryProvider).fetchVideos();
 
     if (data is Success<List<VideoModel>, Exception>) {
       final List<VideoModel> value = data.value;
@@ -62,19 +61,15 @@ class CacheVideoNotifier extends _$CacheVideoNotifier {
           )
           .toList();
 
-      final List<CacheManager> cacheManager =
-          config.map((cache) => CacheManager(cache)).toList();
+      final List<CacheManager> cacheManager = config.map((cache) => CacheManager(cache)).toList();
 
-      final List<VideoPlayerController> controllers = List.generate(
-          cacheManager.length, (index) => VideoPlayerController.file(File('')),
-          growable: true);
+      final List<VideoPlayerController> controllers = List.generate(cacheManager.length, (index) => VideoPlayerController.file(File('')), growable: true);
       for (int index = 0; index < cacheManager.length; index++) {
         final List<File> files = List.generate(
           cacheManager.length,
           (index) => File(''),
         );
-        files[index] =
-            await cacheManager[index].getSingleFile(value[index].videoUrl);
+        files[index] = await cacheManager[index].getSingleFile(value[index].videoUrl);
 
         files[index] = await _ensureMp4Extension(files[index]);
         files[index] = await _moveToTemporaryDirectory(files[index]);
@@ -121,8 +116,7 @@ class CacheVideoNotifier extends _$CacheVideoNotifier {
 @riverpod
 class VideoUploadNotifier extends _$VideoUploadNotifier {
   @override
-  FutureOr<Result<String, Exception>> build() async =>
-      const Success<String, Exception>('');
+  FutureOr<Result<String, Exception>> build() async => const Success<String, Exception>('');
 
   Future<Result<String, Exception>> uploadVideo({
     required File file,
@@ -131,7 +125,7 @@ class VideoUploadNotifier extends _$VideoUploadNotifier {
     required String category,
   }) async {
     try {
-      final user = await ref.watch(authServiceProvider).getCurrentUser();
+      final user = AuthServices().currentUser;
 
       state = const AsyncLoading();
       final result = await AsyncValue.guard(
@@ -166,8 +160,7 @@ class VideoRepository {
   final SupabaseService supabaseService;
   Future<Result<List<VideoModel>, Exception>> fetchVideos() async {
     try {
-      final videos = await supabaseService.withReturnValuesRpc(
-          fn: 'select_videos_with_owners');
+      final videos = await supabaseService.withReturnValuesRpc(fn: 'select_videos_with_owners');
 
       final value = videos
           .map<VideoModel>(
@@ -192,8 +185,7 @@ class VideoRepository {
     required String category,
   }) async {
     try {
-      final urlResult = await supabaseService.upload(
-          file: file, userId: userId, bucketName: 'videos');
+      final urlResult = await supabaseService.upload(file: file, userId: userId, bucketName: 'videos');
 
       if (urlResult is Failure<String, Exception>) {
         final exception = urlResult.error; // Extract the actual exception
@@ -205,8 +197,7 @@ class VideoRepository {
           file,
         );
 
-        final thumbnailUrl = await supabaseService.upload(
-            file: thumbnailFile, userId: userId, bucketName: 'thumbnails');
+        final thumbnailUrl = await supabaseService.upload(file: thumbnailFile, userId: userId, bucketName: 'thumbnails');
 
         if (thumbnailUrl is Failure<String, Exception>) {
           return Failure<String, Exception>(thumbnailUrl as Exception);
@@ -251,7 +242,6 @@ class VideoRepository {
 // }
 
 Future<File> _getVideoThumbnail(File file) async {
-  final thumbnailFile = await VideoCompress.getFileThumbnail(file.path,
-      quality: 100, position: -1);
+  final thumbnailFile = await VideoCompress.getFileThumbnail(file.path, quality: 100, position: -1);
   return thumbnailFile;
 }

@@ -12,8 +12,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../components/buttons/primary_button.dart';
 import '../../../core/styles/color_pallete.dart';
-import '../../../data/repository/auth_repository/auth_repository_provider.dart';
 import '../../../gen/assets.gen.dart';
+import '../../auth/services/auth_services.dart';
 import '../widgets/profile_achievements_card.dart';
 import '../widgets/profile_interaction_card.dart';
 import '../widgets/profile_moments_card.dart';
@@ -39,7 +39,7 @@ class ViewUserProfile extends HookWidget {
     return Consumer(builder: (context, ref, _) {
       WidgetsBinding.instance.addPostFrameCallback(
         (_) async {
-          user.value = await ref.watch(authServiceProvider).getCurrentUser();
+          user.value = AuthServices().currentUser!;
           userId.value = user.value?.id ?? '';
           viewMode.value = user.value?.id == id;
         },
@@ -96,19 +96,16 @@ class ViewUserProfile extends HookWidget {
                       Consumer(
                         builder: (context, ref, _) {
                           final followedState = ref.read(
-                            fetchFollowedUserNotifierProvider
-                                .call(userId.value),
+                            fetchFollowedUserNotifierProvider.call(userId.value),
                           );
 
-                          final List<Follow> followedUsers =
-                              followedState.maybeWhen(
+                          final List<Follow> followedUsers = followedState.maybeWhen(
                             orElse: () => [],
                             data: (data) => data ?? [],
                           );
 
                           return Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 16.0),
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
                             child: Column(
                               children: [
                                 Row(
@@ -116,31 +113,21 @@ class ViewUserProfile extends HookWidget {
                                     PrimaryButton(
                                       isLoading: ref
                                           .watch(
-                                            fetchFollowedUserNotifierProvider
-                                                .call(userId.value),
+                                            fetchFollowedUserNotifierProvider.call(userId.value),
                                           )
                                           .isLoading,
-                                      backgroundColor: followedUsers.any(
-                                              (follow) =>
-                                                  follow.followingId == id)
-                                          ? Colors.grey
-                                          : ColorPallete.magenta,
-                                      label: followedUsers.any((follow) =>
-                                              follow.followingId == id)
-                                          ? 'Unfollow'
-                                          : 'Follow',
+                                      backgroundColor: followedUsers.any((follow) => follow.followingId == id) ? Colors.grey : ColorPallete.magenta,
+                                      label: followedUsers.any((follow) => follow.followingId == id) ? 'Unfollow' : 'Follow',
                                       onPressed: () async {
                                         await ref
-                                            .read(followUserNotifierProvider
-                                                .notifier)
+                                            .read(followUserNotifierProvider.notifier)
                                             .onFollowUser(
                                               followerId: userId.value,
                                               followingId: id,
                                             )
                                             .whenComplete(
                                               () => ref.refresh(
-                                                fetchFollowedUserNotifierProvider
-                                                    .call(userId.value),
+                                                fetchFollowedUserNotifierProvider.call(userId.value),
                                               ),
                                             );
                                       },

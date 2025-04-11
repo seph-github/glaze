@@ -11,7 +11,6 @@ import 'package:glaze/feature/dashboard/views/dashboard_view.dart';
 import 'package:glaze/feature/profile/views/profile_user_form.dart';
 import 'package:glaze/feature/shops/views/shop_view.dart';
 import 'package:glaze/feature/profile/views/profile_view.dart';
-import 'package:glaze/data/repository/auth_repository/auth_repository_provider.dart';
 import 'package:glaze/data/repository/user_repository/user_repository.dart';
 import 'package:go_router/go_router.dart';
 import 'package:glaze/feature/auth/views/auth_view.dart';
@@ -20,11 +19,13 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../config/enum/profile_type.dart';
+import '../../feature/auth/providers/auth_state_change_provider.dart';
+import '../../feature/auth/services/auth_services.dart';
 import '../../feature/challenges/views/challenges_view.dart';
 import '../../feature/home/views/home_view.dart';
 import '../../feature/moments/views/moments_view.dart';
 import '../../feature/onboarding/views/onboarding_view.dart';
-import '../../feature/profile/views/profile_recruiter_form.dart';
+import '../../feature/profile/views/profile_completion_form.dart';
 import '../../feature/profile/views/view_user_profile.dart';
 import '../../feature/splash/providers/splash_provider.dart';
 import '../../feature/splash/views/splash_view.dart';
@@ -43,12 +44,9 @@ final profileNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'profile');
 @Riverpod(keepAlive: true)
 GoRouter router(Ref ref) {
   FutureOr<String?> redirect(BuildContext context, GoRouterState state) async {
-    final User? user = await ref.read(authServiceProvider).getCurrentUser();
-    final UserModel? profile =
-        await ref.read(userRepositoryProvider).fetchUser(id: user?.id);
-    final RecruiterProfileModel? recruiterProfile = await ref
-        .read(userRepositoryProvider)
-        .fetchRecruiterProfile(id: user?.id);
+    final User? user = AuthServices().currentUser;
+    final UserModel? profile = await ref.read(userRepositoryProvider).fetchUser(id: user?.id);
+    final RecruiterProfileModel? recruiterProfile = await ref.read(userRepositoryProvider).fetchRecruiterProfile(id: user?.id);
 
     final String currentPath = state.matchedLocation;
     final bool hasSplashCompleted = ref.read(splashProvider).completeSplash;
@@ -65,28 +63,21 @@ GoRouter router(Ref ref) {
       return const AuthRoute().location;
     }
 
-    // Step 3: Check user role and redirect accordingly
-    if (profile?.role == ProfileType.recruiter.value &&
-        profile?.isOnboardingCompleted == false &&
-        recruiterProfile?.isProfileCompleted == false) {
-      return ProfileRecruiterFormRoute(id: user.id).location;
-    } else if (profile?.role == ProfileType.recruiter.value &&
-        profile?.isOnboardingCompleted == false &&
-        recruiterProfile?.isProfileCompleted == true) {
+    // Step 3: Check user role and r  edirect accordingly
+    if (profile?.role == ProfileType.recruiter.value && profile?.isOnboardingCompleted == false && recruiterProfile?.isProfileCompleted == false) {
+      return ProfileCompletionFormRoute(id: user.id, role: profile?.role ?? '').location;
+    } else if (profile?.role == ProfileType.recruiter.value && profile?.isOnboardingCompleted == false && recruiterProfile?.isProfileCompleted == true) {
       return OnboardingRoute(id: user.id).location;
-    } else if (profile?.role == ProfileType.user.value &&
-        profile?.isOnboardingCompleted == false) {
+    } else if (profile?.role == ProfileType.user.value && profile?.isOnboardingCompleted == false) {
       return OnboardingRoute(id: user.id).location;
     }
 
     // Step 4: Default to home/dashboard if the user is authenticated
-    if (currentPath == const SplashRoute().location &&
-        (profile?.role == 'recruiter' || profile?.role == 'user') &&
-        profile?.isOnboardingCompleted == true) {
-      return (ProfileRecruiterFormRoute(id: user.id).location);
+    if (currentPath == const SplashRoute().location && (profile?.role == 'recruiter' || profile?.role == 'user') && profile?.isOnboardingCompleted == true) {
+      return const HomeRoute().location;
     }
 
-    if (currentPath == ProfileRecruiterFormRoute(id: user.id).location) {
+    if (currentPath == const HomeRoute().location) {
       return null;
     }
 
@@ -102,12 +93,15 @@ GoRouter router(Ref ref) {
   );
 
   ref.listen(
-    authStateChangesProvider,
+    authStateChangeProvider,
     (previous, next) async {
       if (next is AsyncError) {
         router.go(const AuthRoute().location);
       }
-      if (next case AsyncData(value: final auth)) {
+      if (next
+          case AsyncData(
+            value: final auth
+          )) {
         switch (auth.event) {
           case AuthChangeEvent.initialSession:
             log('initialSession');
@@ -341,8 +335,7 @@ class GeneralSettingsRoute extends GoRouteData {
   const GeneralSettingsRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      const GeneralSettingsView();
+  Widget build(BuildContext context, GoRouterState state) => const GeneralSettingsView();
 }
 
 @TypedGoRoute<ChallengesRoute>(path: '/challenges')
@@ -350,8 +343,7 @@ class ChallengesRoute extends GoRouteData {
   const ChallengesRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      const ChallengesView();
+  Widget build(BuildContext context, GoRouterState state) => const ChallengesView();
 }
 
 @TypedGoRoute<OnboardingRoute>(path: '/onboarding/:id')
@@ -366,16 +358,20 @@ class OnboardingRoute extends GoRouteData {
       );
 }
 
-@TypedGoRoute<ProfileRecruiterFormRoute>(path: '/profile-recruiter-form/:id')
-class ProfileRecruiterFormRoute extends GoRouteData {
-  const ProfileRecruiterFormRoute({required this.id});
+@TypedGoRoute<ProfileCompletionFormRoute>(path: '/profile-recruiter-form/:id')
+class ProfileCompletionFormRoute extends GoRouteData {
+  const ProfileCompletionFormRoute({
+    required this.id,
+    required this.role,
+  });
 
   final String id;
+  final String role;
 
   @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      ProfileRecruiterForm(
+  Widget build(BuildContext context, GoRouterState state) => ProfileCompletionForm(
         userId: id,
+        role: role,
       );
 }
 
@@ -386,8 +382,13 @@ class ProfileUserFormRoute extends GoRouteData {
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
+    final extras = state.extra;
+
+    final UserModel? data = extras is UserModel ? extras : null;
+
     return ProfileUserForm(
       id: id,
+      data: data,
     );
   }
 }
