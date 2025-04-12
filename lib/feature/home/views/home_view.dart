@@ -55,7 +55,9 @@ class HomeView extends HookWidget {
         return LoadingLayout(
           isLoading: state.isLoading,
           child: RefreshIndicator(
-            onRefresh: () => ref.refresh(videoContentNotifierProvider.notifier).fetchVideoContents(),
+            onRefresh: () => ref
+                .refresh(videoContentNotifierProvider.notifier)
+                .fetchVideoContents(),
             color: Colors.white12,
             triggerMode: RefreshIndicatorTriggerMode.onEdge,
             child: AnimatedContainer(
@@ -66,7 +68,11 @@ class HomeView extends HookWidget {
                     currentIndex.value = index;
 
                     state.cachedVideoContent?.controllers?[0].play();
-                    for (int i = 0; i < (state.cachedVideoContent?.controllers?.length ?? 0); i++) {
+                    for (int i = 0;
+                        i <
+                            (state.cachedVideoContent?.controllers?.length ??
+                                0);
+                        i++) {
                       if (i != index) {
                         state.cachedVideoContent?.controllers?[i].pause();
                       } else {
@@ -84,16 +90,21 @@ class HomeView extends HookWidget {
                       canRequestFocus: true,
                       onFocusChange: (value) {
                         if (value) {
-                          state.cachedVideoContent?.controllers?[currentIndex.value].play();
+                          state.cachedVideoContent
+                              ?.controllers?[currentIndex.value]
+                              .play();
                         } else {
-                          state.cachedVideoContent?.controllers?[currentIndex.value].pause();
+                          state.cachedVideoContent
+                              ?.controllers?[currentIndex.value]
+                              .pause();
                         }
                       },
                       child: Stack(
                         alignment: Alignment.bottomCenter,
                         children: [
                           VideoPlayerView(
-                            controller: state.cachedVideoContent?.controllers?[index],
+                            controller:
+                                state.cachedVideoContent?.controllers?[index],
                           ),
                           Positioned(
                             bottom: 0,
@@ -102,14 +113,16 @@ class HomeView extends HookWidget {
                             child: HomeInteractiveCard(
                               key: PageStorageKey('HomeInteractiveCard_$index'),
                               onGlazeLongPress: () => toggleDonutOptions(true),
-                              onShareTap: () async => await _showShareOptions(context),
+                              onShareTap: () async =>
+                                  await _showShareOptions(context),
                               width: width,
                               height: height,
                               cachedVideos: state.cachedVideoContent,
                               index: index,
                             ),
                           ),
-                          if (showMoreDonutOptions.value || showShareButton.value)
+                          if (showMoreDonutOptions.value ||
+                              showShareButton.value)
                             GestureDetector(
                               onTap: () {
                                 toggleDonutOptions(false);
@@ -121,7 +134,8 @@ class HomeView extends HookWidget {
                                 color: Colors.black.withValues(alpha: 0.7),
                               ),
                             ),
-                          if (showMoreDonutOptions.value) _buildDonutOptions(context, width: width),
+                          if (showMoreDonutOptions.value)
+                            _buildDonutOptions(context, width: width),
                           // if (showShareButton.value)
                           //   buildShareOptions(context, width: width),
                         ],
@@ -234,22 +248,28 @@ class HomeView extends HookWidget {
                   spacing: 60.0,
                   children: [
                     ShareOptionButton(
-                      child: SvgPicture.asset(Assets.images.svg.copyLinkIcon.path),
+                      child:
+                          SvgPicture.asset(Assets.images.svg.copyLinkIcon.path),
                     ),
                     ShareOptionButton(
-                      child: SvgPicture.asset(Assets.images.svg.emailSocialMedia.path),
+                      child: SvgPicture.asset(
+                          Assets.images.svg.emailSocialMedia.path),
                     ),
                     ShareOptionButton(
-                      child: SvgPicture.asset(Assets.images.svg.twitterSocialMedia.path),
+                      child: SvgPicture.asset(
+                          Assets.images.svg.twitterSocialMedia.path),
                     ),
                     ShareOptionButton(
-                      child: SvgPicture.asset(Assets.images.svg.whatsappSocialMedia.path),
+                      child: SvgPicture.asset(
+                          Assets.images.svg.whatsappSocialMedia.path),
                     ),
                     ShareOptionButton(
-                      child: SvgPicture.asset(Assets.images.svg.snapchatSocialMedia.path),
+                      child: SvgPicture.asset(
+                          Assets.images.svg.snapchatSocialMedia.path),
                     ),
                     ShareOptionButton(
-                      child: SvgPicture.asset(Assets.images.svg.tikTokSocialMedia.path),
+                      child: SvgPicture.asset(
+                          Assets.images.svg.tikTokSocialMedia.path),
                     ),
                   ],
                 ),
@@ -263,32 +283,34 @@ class HomeView extends HookWidget {
   }
 }
 
-class _LoadingView extends StatelessWidget {
-  const _LoadingView();
+/*
+  class _LoadingView extends StatelessWidget {
+    const _LoadingView();
 
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: CircularProgressIndicator(
-          color: Colors.amber,
+    @override
+    Widget build(BuildContext context) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(
+            color: Colors.amber,
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
-}
 
-class _ErrorView extends StatelessWidget {
-  final String error;
+  class _ErrorView extends StatelessWidget {
+    final String error;
 
-  const _ErrorView({required this.error});
+    const _ErrorView({required this.error});
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Text(error),
-      ),
-    );
+    @override
+    Widget build(BuildContext context) {
+      return Scaffold(
+        body: Center(
+          child: Text(error),
+        ),
+      );
+    }
   }
-}
+*/

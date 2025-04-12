@@ -10,6 +10,8 @@ class LoadingLayout extends HookWidget {
     this.appBar,
     this.bottomNavigationBar,
     this.backgroundColor,
+    this.floatingActionButton,
+    this.floatingActionButtonLocation,
   });
 
   final Widget? child;
@@ -17,6 +19,8 @@ class LoadingLayout extends HookWidget {
   final PreferredSizeWidget? appBar;
   final Widget? bottomNavigationBar;
   final Color? backgroundColor;
+  final Widget? floatingActionButton;
+  final FloatingActionButtonLocation? floatingActionButtonLocation;
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +50,8 @@ class LoadingLayout extends HookWidget {
         ],
       ),
       bottomNavigationBar: bottomNavigationBar,
+      floatingActionButton: floatingActionButton,
+      floatingActionButtonLocation: floatingActionButtonLocation,
     );
   }
 }

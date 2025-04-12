@@ -7,7 +7,9 @@ import '../../../config/enum/profile_type.dart';
 class AuthServices {
   final SupabaseClient _supabase = Supabase.instance.client;
 
-  User? get currentUser => _supabase.auth.currentUser;
+  User? get currentUser {
+    return _supabase.auth.currentUser;
+  }
 
   Future<AuthResponse> signInWithEmailPassword({
     required String email,
@@ -55,7 +57,8 @@ class AuthServices {
 
   Future<AuthResponse> anonymousSignin() async {
     try {
-      final AuthResponse authResponse = await _supabase.auth.signInAnonymously();
+      final AuthResponse authResponse =
+          await _supabase.auth.signInAnonymously();
 
       // final int tempUserId = createRandomNumber();
 

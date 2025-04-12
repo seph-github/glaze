@@ -15,9 +15,9 @@ import 'package:glaze/feature/profile/widgets/interest_choice_chip.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../components/buttons/focus_button.dart';
+// import '../../../components/buttons/focus_button.dart';
 import '../../../components/inputs/input_field.dart';
-import '../../../components/modals/glaze_modals.dart';
+// import '../../../components/modals/glaze_modals.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../data/models/category/category_model.dart';
 import '../../../data/repository/category/category_repository.dart';
@@ -41,11 +41,15 @@ class ProfileUserForm extends HookWidget {
     final imageUrl = useState<String?>(null);
     File? file;
 
-    TextEditingController? fullnameController = TextEditingController(text: data?.fullName);
-    TextEditingController? emailController = TextEditingController(text: data?.email);
-    TextEditingController? phoneController = TextEditingController(text: data?.phoneNumber);
+    TextEditingController? fullnameController =
+        TextEditingController(text: data?.fullName);
+    TextEditingController? emailController =
+        TextEditingController(text: data?.email);
+    TextEditingController? phoneController =
+        TextEditingController(text: data?.phoneNumber);
     TextEditingController? organizationController = TextEditingController();
-    TextEditingController? interestController = TextEditingController(text: data?.interests?.join(', '));
+    // TextEditingController? interestController =
+    //     TextEditingController(text: data?.interests?.join(', '));
     final categories = useState<List<CategoryModel>>([]);
     final updatedSelectedInterests = useState<List<String>>([]);
 
@@ -57,15 +61,16 @@ class ProfileUserForm extends HookWidget {
         WidgetsBinding.instance.addPostFrameCallback(
           (_) async {
             if (categories.value.isEmpty) {
-              categories.value = await ref.read(categoryRepositoryProvider).fetchCategories();
+              categories.value =
+                  await ref.read(categoryRepositoryProvider).fetchCategories();
 
               print('initialized interest: ${updatedSelectedInterests.value}');
             }
-            selectedInterests = ref.read(recruiterInterestsNotifierProvider.notifier).initializeInterestsList(data?.interests ?? []);
+            selectedInterests = ref
+                .read(recruiterInterestsNotifierProvider.notifier)
+                .initializeInterestsList(data?.interests ?? []);
           },
         );
-
-        void handleUpdateInterest() {}
 
         return LoadingLayout(
           appBar: AppBar(
@@ -126,8 +131,14 @@ class ProfileUserForm extends HookWidget {
                               : null,
                         ),
                         TextButton(
-                          child: Text(ref.watch(filePickerNotifierProvider).value != null ? 'Change Photo' : 'Pick Photo'),
-                          onPressed: () => ref.read(filePickerNotifierProvider.notifier).pickFile(type: FileType.image),
+                          child: Text(
+                              ref.watch(filePickerNotifierProvider).value !=
+                                      null
+                                  ? 'Change Photo'
+                                  : 'Pick Photo'),
+                          onPressed: () => ref
+                              .read(filePickerNotifierProvider.notifier)
+                              .pickFile(type: FileType.image),
                         )
                       ],
                     ),

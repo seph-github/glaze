@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:glaze/feature/challenges/widgets/challenges_card.dart';
 
 class ChallengesView extends StatelessWidget {
   const ChallengesView({super.key});
@@ -26,8 +25,8 @@ class ChallengesView extends StatelessWidget {
                   ?.copyWith(color: Colors.grey),
             ),
             const Gap(10),
-            const ChallengesCard(),
-            const ChallengesCard(),
+            // const ChallengesCard(),
+            // const ChallengesCard(),
           ],
         ),
       ),

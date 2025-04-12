@@ -22,7 +22,7 @@ abstract class VideoContentState with _$VideoContentState {
     @Default(null) CachedVideoContent? cachedVideoContent,
     @Default([]) List<VideoContent> videoContents,
     @Default(false) bool isLoading,
-    Exception? error,
+    @Default(null) Exception? error,
   }) = _VideoContentState;
 
   const VideoContentState._();
@@ -40,9 +40,9 @@ class VideoContentNotifier extends _$VideoContentNotifier {
     state = state.copyWith(isLoading: true);
     try {
       final videoContents = await VideoContentServices().fetchVideoContents();
-      print('Fetched video contents notifier: $videoContents');
       if (videoContents.isEmpty) {
-        state = state.copyWith(isLoading: false, error: Exception('No video contents found'));
+        state = state.copyWith(
+            isLoading: false, error: Exception('No video contents found'));
         return;
       }
 
@@ -59,16 +59,20 @@ class VideoContentNotifier extends _$VideoContentNotifier {
           )
           .toList();
 
-      final List<CacheManager> cacheManager = config.map((cache) => CacheManager(cache)).toList();
+      final List<CacheManager> cacheManager =
+          config.map((cache) => CacheManager(cache)).toList();
 
-      final List<VideoPlayerController> controllers = List.generate(cacheManager.length, (index) => VideoPlayerController.file(File('')), growable: true);
+      final List<VideoPlayerController> controllers = List.generate(
+          cacheManager.length, (index) => VideoPlayerController.file(File('')),
+          growable: true);
 
       for (int index = 0; index < cacheManager.length; index++) {
         final List<File> files = List.generate(
           cacheManager.length,
           (index) => File(''),
         );
-        files[index] = await cacheManager[index].getSingleFile(videoContents[index].videoUrl);
+        files[index] = await cacheManager[index]
+            .getSingleFile(videoContents[index].videoUrl);
 
         files[index] = await _ensureMp4Extension(files[index]);
         files[index] = await _moveToTemporaryDirectory(files[index]);
@@ -85,7 +89,10 @@ class VideoContentNotifier extends _$VideoContentNotifier {
         }
       }
 
-      state = state.copyWith(cachedVideoContent: CachedVideoContent(videoContents: videoContents, controllers: controllers), isLoading: false);
+      state = state.copyWith(
+          cachedVideoContent: CachedVideoContent(
+              videoContents: videoContents, controllers: controllers),
+          isLoading: false);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: Exception(e));
     }

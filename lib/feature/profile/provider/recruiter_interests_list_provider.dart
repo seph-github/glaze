@@ -16,17 +16,16 @@ class RecruiterInterestsNotifier extends _$RecruiterInterestsNotifier {
     return state;
   }
 
-  void addToInterestList(String value) {
+  List<String> addToInterestList(String value) {
     if (state.contains(value)) {
       // Remove the interest if it already exists
       state = state.where((item) => item != value).toList();
     } else {
       // Add the interest if it doesn't exist
-      state = [
-        ...state,
-        value
-      ];
+      state = [...state, value];
     }
+
+    return state;
   }
 
   void updateInterestsList(List<String> interests, String? value) {

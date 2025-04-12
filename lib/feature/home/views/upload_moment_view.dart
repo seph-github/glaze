@@ -8,18 +8,13 @@ import '../../../components/buttons/primary_button.dart';
 import '../../../components/drop_downs/custom_drop_down_menu.dart';
 import '../../../components/inputs/input_field.dart';
 import '../../../data/repository/file_picker/file_picker_provider.dart';
-import '../../../data/repository/video_repository/video_repository.dart';
 
 class UploadMoment extends HookWidget {
   UploadMoment({
     super.key,
   });
 
-  final List<String> options = [
-    'Option 1',
-    'Option 2',
-    'Option 3'
-  ];
+  final List<String> options = ['Option 1', 'Option 2', 'Option 3'];
   @override
   Widget build(BuildContext context) {
     final TextEditingController titleController = useTextEditingController();
@@ -62,7 +57,9 @@ class UploadMoment extends HookWidget {
                 height: 16.0,
               ),
               FocusButton(
-                onTap: () async => ref.read(filePickerNotifierProvider.notifier).pickFile(type: FileType.video),
+                onTap: () async => ref
+                    .read(filePickerNotifierProvider.notifier)
+                    .pickFile(type: FileType.video),
                 helper: const Text('Maximum file size: 100MB'),
                 child: Row(
                   children: [
@@ -71,7 +68,9 @@ class UploadMoment extends HookWidget {
                       width: 16.0,
                     ),
                     Text(
-                      state == null ? '' : 'File to be upload size ${(state.lengthSync() / 1024).toStringAsFixed(2)}',
+                      state == null
+                          ? ''
+                          : 'File to be upload size ${(state.lengthSync() / 1024).toStringAsFixed(2)}',
                     ),
                   ],
                 ),
@@ -93,7 +92,6 @@ class UploadMoment extends HookWidget {
                   //     .fetchVideos()
                   //     .then((_) => context.mounted ? context.pop() : null);
                 },
-                isLoading: ref.watch(videoUploadNotifierProvider).isLoading,
               ),
             ],
           ),

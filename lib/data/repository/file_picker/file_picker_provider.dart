@@ -13,13 +13,13 @@ class FilePickerNotifier extends _$FilePickerNotifier {
   Future<File?> build() async => null;
 
   Future<File?> pickFile({FileType? type}) async {
-    final pickedFile = await FilePicker.platform.pickFiles(type: type ?? FileType.any);
+    final pickedFile =
+        await FilePicker.platform.pickFiles(type: type ?? FileType.any);
 
     if (pickedFile == null) {
       return null;
     }
 
-    print('Picked file: ${pickedFile.files.single.path}');
     return File(pickedFile.files.single.path!);
   }
 }
@@ -63,5 +63,8 @@ Future<bool> _requestPermissions() async {
       break;
   }
 
-  return (permissionStatus == PermissionStatus.limited || permissionStatus == PermissionStatus.provisional || permissionStatus == PermissionStatus.restricted || permissionStatus == PermissionStatus.granted);
+  return (permissionStatus == PermissionStatus.limited ||
+      permissionStatus == PermissionStatus.provisional ||
+      permissionStatus == PermissionStatus.restricted ||
+      permissionStatus == PermissionStatus.granted);
 }

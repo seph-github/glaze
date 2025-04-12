@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
+import 'package:glaze/feature/moments/views/moments_live_challenges_tabview.dart';
 import 'package:glaze/feature/moments/views/moments_videos_tabview.dart';
 import 'package:glaze/feature/moments/widgets/search_field.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
@@ -24,7 +25,7 @@ class MomentsView extends ConsumerWidget {
     final List<Widget> tabViews = [
       const MomentsVideosTabview(),
       const UnderConstruction(),
-      const UnderConstruction(),
+      const MomentsLiveChallengesTabview(),
       const UnderConstruction(),
     ];
 

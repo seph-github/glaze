@@ -33,9 +33,10 @@ class UserNotifier extends _$UserNotifier {
         () async {
           final user = AuthServices().currentUser;
 
-          final UserModel? userModel = await ref.watch(userRepositoryProvider).fetchUser(
-                id: user?.id,
-              );
+          final UserModel? userModel =
+              await ref.watch(userRepositoryProvider).fetchUser(
+                    id: user?.id,
+                  );
 
           return userModel;
         },
@@ -60,9 +61,10 @@ class GetUserProfileNotifier extends _$GetUserProfileNotifier {
       state = const AsyncLoading();
       state = await AsyncValue.guard(
         () async {
-          final userModel = await ref.watch(userRepositoryProvider).fetchUsersProfile(
-                id: id,
-              );
+          final userModel =
+              await ref.watch(userRepositoryProvider).fetchUsersProfile(
+                    id: id,
+                  );
 
           return userModel;
         },
@@ -79,7 +81,8 @@ class GetUserProfileNotifier extends _$GetUserProfileNotifier {
 @riverpod
 class ProfileCompletionNotifier extends _$ProfileCompletionNotifier {
   @override
-  FutureOr<Result<String, Exception>> build() async => const Success<String, Exception>('');
+  FutureOr<Result<String, Exception>> build() async =>
+      const Success<String, Exception>('');
 
   Future<Result<String, Exception>> updateRecruiterProfile({
     required String userId,
@@ -94,7 +97,9 @@ class ProfileCompletionNotifier extends _$ProfileCompletionNotifier {
     try {
       state = const AsyncLoading();
 
-      final RecruiterProfileModel? recruiterProfile = await ref.read(userRepositoryProvider).fetchRecruiterProfile(id: userId);
+      final RecruiterProfileModel? recruiterProfile = await ref
+          .read(userRepositoryProvider)
+          .fetchRecruiterProfile(id: userId);
 
       if (recruiterProfile == null) {
         return Failure<String, Exception>(
@@ -130,9 +135,11 @@ class ProfileCompletionNotifier extends _$ProfileCompletionNotifier {
 @riverpod
 class RecruiterProfileNotifier extends _$RecruiterProfileNotifier {
   @override
-  FutureOr<RecruiterProfileModel?> build(String id) => fetchRecruiterProfile(id: id);
+  FutureOr<RecruiterProfileModel?> build(String id) =>
+      fetchRecruiterProfile(id: id);
 
-  Future<RecruiterProfileModel> fetchRecruiterProfile({required String id}) async {
+  Future<RecruiterProfileModel> fetchRecruiterProfile(
+      {required String id}) async {
     try {
       state = const AsyncLoading();
       state = await AsyncValue.guard(
@@ -161,9 +168,7 @@ class UserRepository {
 
       final response = await supabaseService.withReturnValuesRpc(
         fn: 'find_user_by_id',
-        params: {
-          'params_user_id': id
-        },
+        params: {'params_user_id': id},
       );
 
       return UserModel.fromJson(response.first);
@@ -175,9 +180,8 @@ class UserRepository {
 
   Future<UserModel?> fetchUsersProfile({String? id}) async {
     try {
-      final response = await supabaseService.withReturnValuesRpc(fn: 'find_user_by_id', params: {
-        'params_user_id': id
-      });
+      final response = await supabaseService.withReturnValuesRpc(
+          fn: 'find_user_by_id', params: {'params_user_id': id});
 
       return UserModel.fromJson(response.first);
     } catch (e) {
@@ -248,7 +252,8 @@ class UserRepository {
         if (identificationUrlResult is Success<String, Exception>) {
           recruiterIdUrl = identificationUrlResult.value;
         } else {
-          final exception = identificationUrlResult as Failure<String, Exception>;
+          final exception =
+              identificationUrlResult as Failure<String, Exception>;
           return Failure<String, Exception>(exception.error);
         }
       }
