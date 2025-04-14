@@ -70,8 +70,7 @@ class AuthServices {
     }
   }
 
-  Future<AuthResponse> verifyPhone(String phone,
-      {required String token}) async {
+  Future<AuthResponse> verifyPhone({required String phone, required String token}) async {
     try {
       final AuthResponse authtResponse = await _supabase.auth.verifyOTP(
         token: token,
@@ -88,8 +87,7 @@ class AuthServices {
 
   Future<AuthResponse> anonymousSignin() async {
     try {
-      final AuthResponse authResponse =
-          await _supabase.auth.signInAnonymously();
+      final AuthResponse authResponse = await _supabase.auth.signInAnonymously();
 
       // final int tempUserId = createRandomNumber();
 

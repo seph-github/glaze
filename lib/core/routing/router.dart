@@ -19,6 +19,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../feature/auth/providers/auth_state_change_provider.dart';
 import '../../feature/auth/services/auth_services.dart';
 import '../../feature/auth/views/auth_phone_sign_in.dart';
+import '../../feature/auth/views/auth_verify_phone.dart';
 import '../../feature/challenges/views/challenges_view.dart';
 import '../../feature/home/views/home_view.dart';
 import '../../feature/moments/views/moments_view.dart';
@@ -45,8 +46,7 @@ final profileNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'profile');
 GoRouter router(Ref ref) {
   FutureOr<String?> redirect(BuildContext context, GoRouterState state) async {
     final User? user = AuthServices().currentUser;
-    final Profile? profile =
-        await ProfileServices().fetchUserProfile(user?.id ?? '');
+    final Profile? profile = await ProfileServices().fetchUserProfile(user?.id ?? '');
 
     final String currentPath = state.matchedLocation;
     final bool hasSplashCompleted = ref.read(splashProvider).completeSplash;
@@ -65,10 +65,8 @@ GoRouter router(Ref ref) {
       return const AuthRoute().location;
     }
 
-    if (currentPath == const HomeRoute().location &&
-        profile?.isCompletedProfile == false) {
-      return ProfileCompletionFormRoute(id: user.id, role: profile?.role ?? '')
-          .location;
+    if (currentPath == const HomeRoute().location && profile?.isCompletedProfile == false) {
+      return ProfileCompletionFormRoute(id: user.id, role: profile?.role ?? '').location;
     }
 
     // If the user is already on HomeRoute and the profile is complete, no redirection is needed.
@@ -88,7 +86,10 @@ GoRouter router(Ref ref) {
       if (next is AsyncError) {
         router.go(const AuthRoute().location);
       }
-      if (next case AsyncData(value: final auth)) {
+      if (next
+          case AsyncData(
+            value: final auth
+          )) {
         switch (auth.event) {
           case AuthChangeEvent.initialSession:
             log('initialSession');
@@ -249,6 +250,7 @@ class HomeRoute extends GoRouteData {
   path: '/auth',
   routes: [
     TypedGoRoute<AuthPhoneSignInRoute>(path: 'phone-sign-in'),
+    TypedGoRoute<AuthVerifyPhoneRoute>(path: 'verify-phone'),
   ],
 )
 class AuthRoute extends GoRouteData {
@@ -266,6 +268,29 @@ class AuthPhoneSignInRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const AuthPhoneSignIn();
+  }
+}
+
+class AuthVerifyPhoneRoute extends GoRouteData {
+  const AuthVerifyPhoneRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    final extras = state.extra;
+    final Map<String, String>? data = extras is Map<String, String> ? extras : null;
+    final String phoneNumber = data?['phone'] ?? '';
+    final String dialCode = data?['dialCode'] ?? '';
+    log('AuthVerifyPhoneRoute: phoneNumber: $phoneNumber, dialCode: $dialCode');
+    if (phoneNumber.isEmpty || dialCode.isEmpty) {
+      return const Placeholder();
+    }
+
+    final String phoneNumberWithDialCode = '$dialCode$phoneNumber';
+    log('AuthVerifyPhoneRoute: phoneNumberWithDialCode: $phoneNumberWithDialCode');
+
+    return AuthVerifyPhone(
+      phoneNumber: phoneNumberWithDialCode,
+    );
   }
 }
 
@@ -321,8 +346,7 @@ class GeneralSettingsRoute extends GoRouteData {
   const GeneralSettingsRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      const GeneralSettingsView();
+  Widget build(BuildContext context, GoRouterState state) => const GeneralSettingsView();
 }
 
 @TypedGoRoute<ChallengesRoute>(path: '/challenges')
@@ -330,8 +354,7 @@ class ChallengesRoute extends GoRouteData {
   const ChallengesRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      const ChallengesView();
+  Widget build(BuildContext context, GoRouterState state) => const ChallengesView();
 }
 
 @TypedGoRoute<OnboardingRoute>(path: '/onboarding/:id')
@@ -357,8 +380,7 @@ class ProfileCompletionFormRoute extends GoRouteData {
   final String role;
 
   @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      ProfileCompletionForm(
+  Widget build(BuildContext context, GoRouterState state) => ProfileCompletionForm(
         userId: id,
         role: role,
       );

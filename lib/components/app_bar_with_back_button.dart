@@ -7,12 +7,10 @@ import 'package:go_router/go_router.dart';
 import '../gen/assets.gen.dart';
 
 class AppBarWithBackButton extends HookWidget implements PreferredSizeWidget {
-  const AppBarWithBackButton({
-    super.key,
-    this.actions,
-  });
+  const AppBarWithBackButton({super.key, this.actions, this.onBackButtonPressed});
 
   final List<Widget>? actions;
+  final VoidCallback? onBackButtonPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -29,9 +27,10 @@ class AppBarWithBackButton extends HookWidget implements PreferredSizeWidget {
           backgroundColor: ColorPallete.inputFilledColor,
           shape: const CircleBorder(),
         ),
-        onPressed: () {
-          router.pop();
-        },
+        onPressed: onBackButtonPressed ??
+            () {
+              router.pop();
+            },
       ),
       actions: actions,
     );

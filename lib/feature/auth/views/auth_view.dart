@@ -32,7 +32,10 @@ class AuthView extends HookConsumerWidget {
     final passwordController = useTextEditingController();
     final usernameController = useTextEditingController();
 
-    final toggleItems = useState<List<String>>(['Email', 'Phone']);
+    final toggleItems = useState<List<String>>([
+      'Email',
+      'Phone'
+    ]);
     // final itemsValue = useState<List<bool>>([true, false]);
     final selectedIndex = useState<int>(0);
     final isLogin = useState<bool>(true);
@@ -96,8 +99,7 @@ class AuthView extends HookConsumerWidget {
 
     useEffect(
       () {
-        hasCompletedInitialAppUse.value =
-            ref.read(initialAppUseProvider).completedInitialAppUse;
+        hasCompletedInitialAppUse.value = ref.read(initialAppUseProvider).completedInitialAppUse;
 
         return null;
       },
@@ -258,24 +260,16 @@ class AuthView extends HookConsumerWidget {
                   ),
                 const Gap(30),
                 PrimaryButton(
-                  onPressed: (agreedToTermsAndCon.value &&
-                              usernameController.text.isNotEmpty &&
-                              (emailController.text.isNotEmpty ||
-                                  phoneController.text.isNotEmpty) &&
-                              phoneController.text.isNotEmpty &&
-                              passwordController.text.isNotEmpty) ||
-                          isLogin.value
-                      ? () => onSubmit()
-                      : null,
+                  onPressed: (agreedToTermsAndCon.value && usernameController.text.isNotEmpty && (emailController.text.isNotEmpty || phoneController.text.isNotEmpty) && phoneController.text.isNotEmpty && passwordController.text.isNotEmpty) || isLogin.value ? () => onSubmit() : null,
                   label: isLogin.value ? 'Login' : 'Sign Up',
                 ),
                 const Gap(20),
                 AuthSSOWidget(),
                 const Gap(20),
-                if (!hasCompletedInitialAppUse.value && isLogin.value)
+                if (isLogin.value)
                   PrimaryButton(
                     onPressed: () {
-                      context.push(const AuthPhoneSignInRoute().location);
+                      context.go(const AuthPhoneSignInRoute().location);
                     },
                     label: 'Sign in with Phone',
                     backgroundColor: ColorPallete.primaryColor,
@@ -311,13 +305,8 @@ class AuthView extends HookConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      isLogin.value
-                          ? 'Don\'t have an account?'
-                          : 'Already have an account?',
-                      style: Theme.of(context)
-                          .textTheme
-                          .labelLarge
-                          ?.copyWith(color: Colors.grey),
+                      isLogin.value ? 'Don\'t have an account?' : 'Already have an account?',
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.grey),
                     ),
                     GestureDetector(
                       onTap: () {

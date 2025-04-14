@@ -13,6 +13,7 @@ abstract class AuthState with _$AuthState {
   const factory AuthState({
     @Default(null) AuthResponse? authResponse,
     @Default(false) bool isLoading,
+    @Default(false) bool otpSent,
     Exception? error,
   }) = _AuthState;
 
@@ -67,7 +68,20 @@ class AuthNotifier extends _$AuthNotifier {
     state = state.copyWith(isLoading: true);
     try {
       await AuthServices().signInWithPhone(phone);
-      state = state.copyWith(isLoading: false);
+      state = state.copyWith(isLoading: false, otpSent: true);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e as Exception);
+    }
+  }
+
+  Future<void> verifyPhone({required String phone, required String token}) async {
+    state = state.copyWith(isLoading: true);
+    try {
+      final authResponse = await AuthServices().verifyPhone(
+        phone: phone,
+        token: token,
+      );
+      state = state.copyWith(authResponse: authResponse, isLoading: false);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e as Exception);
     }
