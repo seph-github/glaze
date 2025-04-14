@@ -22,6 +22,25 @@ class InputField extends HookWidget {
         _inputAction = TextInputAction.next,
         maxLines = 1;
 
+  InputField.phone({
+    super.key,
+    this.label,
+    this.inputIcon,
+    this.hintText,
+    this.initialValue,
+    this.validator,
+    this.onChanged,
+    this.borderRadius,
+    this.helper,
+    this.filled = false,
+    TextEditingController? controller,
+    this.readOnly = false,
+  })  : obscureText = false,
+        controller = controller ?? TextEditingController(text: initialValue),
+        keyboardType = TextInputType.phone,
+        _inputAction = TextInputAction.next,
+        maxLines = 1;
+
   InputField.password({
     super.key,
     this.label,

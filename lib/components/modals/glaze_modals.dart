@@ -3,10 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/styles/color_pallete.dart';
 import '../../data/models/category/category_model.dart';
-import '../../feature/profile/provider/recruiter_interests_list_provider.dart';
+import '../../feature/profile/provider/profile_interests_list_provider.dart';
 
 class GlazeModal {
-  static Future<void> showInterestListModal(BuildContext context, List<CategoryModel> interests) {
+  static Future<void> showInterestListModal(
+      BuildContext context, List<CategoryModel> interests) {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -16,7 +17,8 @@ class GlazeModal {
         return StatefulBuilder(
           builder: (context, setState) => Consumer(
             builder: (context, ref, child) {
-              final selectedInterests = ref.watch(recruiterInterestsNotifierProvider);
+              final selectedInterests =
+                  ref.watch(profileInterestsNotifierProvider);
 
               return ListView.builder(
                 shrinkWrap: true,
@@ -34,7 +36,9 @@ class GlazeModal {
                     selected: isSelected,
                     selectedTileColor: ColorPallete.inputFilledColor,
                     onChanged: (value) {
-                      ref.read(recruiterInterestsNotifierProvider.notifier).addToInterestList(interestName);
+                      ref
+                          .read(profileInterestsNotifierProvider.notifier)
+                          .addToInterestList(interestName);
                       setState(() {});
                     },
                   );
@@ -47,7 +51,8 @@ class GlazeModal {
     );
   }
 
-  static Future<void> showPermissionDeniedModal(BuildContext context, String permissionName) {
+  static Future<void> showPermissionDeniedModal(
+      BuildContext context, String permissionName) {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,

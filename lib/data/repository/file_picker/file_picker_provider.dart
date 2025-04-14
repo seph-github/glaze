@@ -24,7 +24,7 @@ class FilePickerNotifier extends _$FilePickerNotifier {
   }
 }
 
-Future<bool> _requestPermissions() async {
+Future<bool> requestPermissions() async {
   final permissionStatus = await Permission.photos.status;
 
   switch (permissionStatus) {

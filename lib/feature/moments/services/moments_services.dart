@@ -7,6 +7,21 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class MomentsServices {
   final SupabaseClient _supabaseClient = Supabase.instance.client;
 
+  Future<List<Challenge>> fetchAllChallenges() async {
+    try {
+      final response = await _supabaseClient.from('challenges').select();
+      final raw = response as List<dynamic>;
+      final value = raw
+          .map((challenge) =>
+              Challenge.fromJson(challenge as Map<String, dynamic>))
+          .toList();
+      return value;
+    } catch (e) {
+      log('❌ MomentsServices.fetchAllChallenges: $e');
+      rethrow;
+    }
+  }
+
   Future<List<Challenge>> fetchUpcomingChallenges(String userId) async {
     try {
       // 1. Get all enrollments for the user

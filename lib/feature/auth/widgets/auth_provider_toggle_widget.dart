@@ -8,11 +8,13 @@ class AuthProviderToggleWidget extends StatelessWidget {
     required this.toggleItems,
     required this.itemsValue,
     required this.selectedIndex,
+    required this.onTap,
   });
 
   final ValueNotifier<List<String>> toggleItems;
   final ValueNotifier<List<bool>> itemsValue;
   final ValueNotifier<int> selectedIndex;
+  final Function(int) onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -29,14 +31,7 @@ class AuthProviderToggleWidget extends StatelessWidget {
             .map(
               (item) => Expanded(
                 child: GestureDetector(
-                  onTap: () {
-                    if (item == 'Email') {
-                      itemsValue.value = [true, false];
-                    } else {
-                      itemsValue.value = [false, true];
-                    }
-                    selectedIndex.value = toggleItems.value.indexOf(item);
-                  },
+                  onTap: () => onTap(toggleItems.value.indexOf(item)),
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(62.0),

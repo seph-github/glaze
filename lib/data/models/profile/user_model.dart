@@ -3,7 +3,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:glaze/data/models/glaze/glaze_model.dart';
 
-import '../video/videos.dart';
+import '../../../feature/home/models/videos.dart';
 
 part 'user_model.freezed.dart';
 part 'user_model.g.dart';
@@ -33,5 +33,6 @@ class UserModel with _$UserModel {
     @JsonKey(name: 'is_onboarding_completed') bool? isOnboardingCompleted,
   }) = _UserModel;
 
-  factory UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
+  factory UserModel.fromJson(Map<String, dynamic> json) =>
+      _$UserModelFromJson(json);
 }

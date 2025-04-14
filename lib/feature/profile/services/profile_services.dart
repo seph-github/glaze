@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:glaze/feature/profile/models/recruiter_profile.dart';
@@ -22,8 +23,31 @@ class ProfileServices {
 
       final raw = response as List<dynamic>;
 
+      // log('ProfileServices.fetchUserProfile: $raw');
+
       return Profile.fromJson(raw.first);
     } catch (e) {
+      log('ProfileServices.fetchUserProfile: $e');
+      rethrow;
+    }
+  }
+
+  Future<Profile?> viewUserProfile(String id) async {
+    try {
+      if (id.isEmpty) return null;
+
+      final response = await _supabaseClient.rpc(
+        'find_user_by_id',
+        params: {'params_user_id': id},
+      );
+
+      final raw = response as List<dynamic>;
+
+      // log('ProfileServices.fetchUserProfile: $raw');
+
+      return Profile.fromJson(raw.first);
+    } catch (e) {
+      log('ProfileServices.fetchUserProfile: $e');
       rethrow;
     }
   }
@@ -42,6 +66,7 @@ class ProfileServices {
 
       return RecruiterProfile.fromJson(response);
     } catch (e) {
+      log('ProfileServices.fetchRecruiterProfile: $e');
       rethrow;
     }
   }
@@ -60,6 +85,7 @@ class ProfileServices {
           )
           .eq(column, id);
     } catch (e) {
+      log('ProfileServices.setFlagsCompleted: $e');
       rethrow;
     }
   }
@@ -118,7 +144,7 @@ class ProfileServices {
 
       await _supabaseClient.from('profiles').update(profileEntity).eq('id', id);
     } catch (e) {
-      print('ProfileServices.updateProfile: $e');
+      log('ProfileServices.updateProfile: $e');
       rethrow;
     }
   }

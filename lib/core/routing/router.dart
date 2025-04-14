@@ -5,13 +5,11 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:glaze/data/models/profile/user_model.dart';
 import 'package:glaze/feature/dashboard/views/dashboard_view.dart';
 import 'package:glaze/feature/profile/provider/profile_provider.dart';
-import 'package:glaze/feature/profile/views/profile_user_form.dart';
+import 'package:glaze/feature/profile/views/profile_edit_form.dart';
 import 'package:glaze/feature/shops/views/shop_view.dart';
 import 'package:glaze/feature/profile/views/profile_view.dart';
-import 'package:glaze/data/repository/user_repository/user_repository.dart';
 import 'package:go_router/go_router.dart';
 import 'package:glaze/feature/auth/views/auth_view.dart';
 
@@ -20,6 +18,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../feature/auth/providers/auth_state_change_provider.dart';
 import '../../feature/auth/services/auth_services.dart';
+import '../../feature/auth/views/auth_phone_sign_in.dart';
 import '../../feature/challenges/views/challenges_view.dart';
 import '../../feature/home/views/home_view.dart';
 import '../../feature/moments/views/moments_view.dart';
@@ -51,14 +50,18 @@ GoRouter router(Ref ref) {
 
     final String currentPath = state.matchedLocation;
     final bool hasSplashCompleted = ref.read(splashProvider).completeSplash;
-    log('profile: $profile');
-    log('router redirect: $currentPath, user: ${user != null}, role: ${profile?.role}, splash completed: $hasSplashCompleted');
+
+    log('router redirect: $currentPath, user: ${user != null}, role: ${profile?.role}, completed profile: ${profile?.isCompletedProfile}, splash completed: $hasSplashCompleted');
 
     if (!hasSplashCompleted) {
       return const SplashRoute().location;
     }
 
     if (user == null) {
+      // Allow access to /auth and /auth/phone-sign-in without redirecting back to /auth
+      if (currentPath.startsWith(const AuthRoute().location)) {
+        return null;
+      }
       return const AuthRoute().location;
     }
 
@@ -68,21 +71,12 @@ GoRouter router(Ref ref) {
           .location;
     }
 
-    if (currentPath == const SplashRoute().location &&
-        profile?.isCompletedProfile == true) {
-      return const HomeRoute().location;
-    }
-
-    if (currentPath == const HomeRoute().location) {
-      return null;
-    }
-
+    // If the user is already on HomeRoute and the profile is complete, no redirection is needed.
     return null;
   }
 
   final router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: const SplashRoute().location,
     debugLogDiagnostics: true,
     routes: $appRoutes,
     redirect: redirect,
@@ -109,7 +103,7 @@ GoRouter router(Ref ref) {
             break;
           case AuthChangeEvent.signedOut:
             log('signedOut');
-            ref.invalidate(userNotifierProvider);
+            ref.invalidate(profileNotifierProvider);
             router.go(const AuthRoute().location);
             break;
           case AuthChangeEvent.tokenRefreshed:
@@ -251,28 +245,27 @@ class HomeRoute extends GoRouteData {
   Widget build(BuildContext context, GoRouterState state) => const HomeView();
 }
 
-@TypedGoRoute<AuthRoute>(path: '/auth')
+@TypedGoRoute<AuthRoute>(
+  path: '/auth',
+  routes: [
+    TypedGoRoute<AuthPhoneSignInRoute>(path: 'phone-sign-in'),
+  ],
+)
 class AuthRoute extends GoRouteData {
   const AuthRoute();
 
-  // final String? redirectUri;
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const AuthView();
+  }
+}
+
+class AuthPhoneSignInRoute extends GoRouteData {
+  const AuthPhoneSignInRoute();
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    // return Consumer(
-    //   builder: (context, ref, child) {
-    //     User? isSignedIn;
-    //     ref.watch(authServiceProvider).getCurrentUser().then(
-    //           (value) async => isSignedIn = value,
-    //         );
-    //     if (isSignedIn != null) {
-    //       WidgetsBinding.instance.addPostFrameCallback((_) {
-    //         context.go('/');
-    //       });
-    //     }
-    return const AuthView();
-    // },
-    // );
+    return const AuthPhoneSignIn();
   }
 }
 
@@ -371,18 +364,18 @@ class ProfileCompletionFormRoute extends GoRouteData {
       );
 }
 
-@TypedGoRoute<ProfileUserFormRoute>(path: '/user-profile/:id')
-class ProfileUserFormRoute extends GoRouteData {
-  const ProfileUserFormRoute({required this.id});
+@TypedGoRoute<ProfileEditFormRoute>(path: '/user-profile/:id')
+class ProfileEditFormRoute extends GoRouteData {
+  const ProfileEditFormRoute({required this.id});
   final String id;
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
     final extras = state.extra;
 
-    final UserModel? data = extras is UserModel ? extras : null;
+    final Profile? data = extras is Profile ? extras : null;
 
-    return ProfileUserForm(
+    return ProfileEditForm(
       id: id,
       data: data,
     );

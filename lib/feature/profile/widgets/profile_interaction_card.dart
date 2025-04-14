@@ -28,7 +28,7 @@ class ProfileInteractionCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                followers.toString(),
+                following.toString(),
                 style: const TextStyle(
                   fontSize: 16.0,
                   fontWeight: FontWeight.bold,
@@ -54,7 +54,7 @@ class ProfileInteractionCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                following.toString(),
+                followers.toString(),
                 style: const TextStyle(
                   fontSize: 16.0,
                   fontWeight: FontWeight.bold,

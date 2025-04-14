@@ -12,6 +12,7 @@ part 'moments_provider.g.dart';
 @freezed
 abstract class MomentsState with _$MomentsState {
   const factory MomentsState({
+    @Default([]) List<Challenge> challenges,
     @Default([]) List<Challenge> upcomingChallenges,
     @Default(false) bool isLoading,
     @Default(null) Exception? error,
@@ -22,17 +23,28 @@ abstract class MomentsState with _$MomentsState {
 class MomentsNotifier extends _$MomentsNotifier {
   @override
   MomentsState build() {
-    Future.microtask(() async => await getUpcomingChallenges());
+    // Future.microtask(() async => await getUpcomingChallenges());
     return const MomentsState();
+  }
+
+  Future<void> getChallenges() async {
+    state = state.copyWith(isLoading: true);
+    try {
+      final challenges = await MomentsServices().fetchAllChallenges();
+      state = state.copyWith(challenges: challenges, isLoading: false);
+    } catch (e) {
+      state = state.copyWith(error: Exception(e), isLoading: false);
+    }
   }
 
   Future<void> getUpcomingChallenges() async {
     state = state.copyWith(isLoading: true);
     try {
       final User? user = AuthServices().currentUser;
-      final challenges =
+      final upcomingChallenges =
           await MomentsServices().fetchUpcomingChallenges(user!.id);
-      state = state.copyWith(upcomingChallenges: challenges, isLoading: false);
+      state = state.copyWith(
+          upcomingChallenges: upcomingChallenges, isLoading: false);
     } catch (e) {
       state = state.copyWith(error: Exception(e), isLoading: false);
     }

@@ -1,4 +1,5 @@
-import 'dart:math';
+import 'dart:developer';
+import 'dart:math' as math;
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -31,8 +32,9 @@ class AuthServices {
     }
   }
 
-  Future<AuthResponse> signUpWithEmailPassword({
-    required String email,
+  Future<AuthResponse> signUp({
+    String? email,
+    String? phone,
     required String password,
     required String username,
     ProfileType? profileType,
@@ -40,17 +42,46 @@ class AuthServices {
     try {
       final AuthResponse authResponse = await _supabase.auth.signUp(
         email: email,
+        phone: phone,
         password: password,
         data: {
           'username': username,
           'role': profileType?.value,
         },
+        channel: OtpChannel.sms,
       );
 
       return authResponse;
     } on AuthApiException catch (e) {
       return throw AuthApiException(e.toString());
     } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> signInWithPhone(String phone) async {
+    try {
+      await _supabase.auth.signInWithOtp(
+        phone: phone,
+      );
+    } on Exception catch (e) {
+      log('error signing in using phone: $e');
+      rethrow;
+    }
+  }
+
+  Future<AuthResponse> verifyPhone(String phone,
+      {required String token}) async {
+    try {
+      final AuthResponse authtResponse = await _supabase.auth.verifyOTP(
+        token: token,
+        phone: phone,
+        type: OtpType.sms,
+      );
+
+      return authtResponse;
+    } on Exception catch (e) {
+      log('error verifying phone: $e');
       rethrow;
     }
   }
@@ -93,7 +124,7 @@ class AuthServices {
   }
 
   int createRandomNumber() {
-    final random = Random();
+    final random = math.Random();
     return random.nextInt(90000000) + 10000000;
   }
 }

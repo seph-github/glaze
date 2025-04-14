@@ -3,10 +3,8 @@ import 'dart:io';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:glaze/feature/profile/services/profile_services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../config/enum/profile_type.dart';
-import '../../auth/services/auth_services.dart';
 import '../models/profile.dart';
 import '../models/recruiter_profile.dart';
 
@@ -18,6 +16,7 @@ abstract class ProfileState with _$ProfileState {
   const factory ProfileState({
     @Default('') String response,
     @Default(null) Profile? profile,
+    @Default(null) Profile? viewUserProfile,
     @Default(null) RecruiterProfile? recruiterProfile,
     @Default(false) bool isLoading,
     @Default(null) Exception? error,
@@ -30,18 +29,14 @@ abstract class ProfileState with _$ProfileState {
 class ProfileNotifier extends _$ProfileNotifier {
   @override
   ProfileState build() {
-    Future.microtask(() async {
-      await fetchProfile();
-    });
-
     return const ProfileState();
   }
 
-  Future<void> fetchProfile() async {
+  Future<void> fetchProfile(String id) async {
     state = state.copyWith(isLoading: true);
     try {
-      final User user = AuthServices().currentUser!;
-      final profile = await ProfileServices().fetchUserProfile(user.id);
+      // final User user = AuthServices().currentUser!;
+      final profile = await ProfileServices().fetchUserProfile(id);
 
       if (profile == null) {
         state = state.copyWith(
@@ -52,6 +47,27 @@ class ProfileNotifier extends _$ProfileNotifier {
 
       state = state.copyWith(
         profile: profile,
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: Exception(e));
+    }
+  }
+
+  Future<void> viewUserProfile(String id) async {
+    state = state.copyWith(isLoading: true);
+    try {
+      final profile = await ProfileServices().viewUserProfile(id);
+
+      if (profile == null) {
+        state = state.copyWith(
+          isLoading: false,
+          error: Exception('No profile'),
+        );
+      }
+
+      state = state.copyWith(
+        viewUserProfile: profile,
         isLoading: false,
       );
     } catch (e) {

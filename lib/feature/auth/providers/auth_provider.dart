@@ -38,26 +38,36 @@ class AuthNotifier extends _$AuthNotifier {
       );
       state = state.copyWith(authResponse: authResponse, isLoading: false);
     } catch (e) {
-      print('Error signing in riverpod: $e');
       state = state.copyWith(isLoading: false, error: e as Exception);
     }
   }
 
-  Future<void> signUpWithEmailPassword({
-    required String email,
+  Future<void> signUp({
+    String? email,
+    String? phone,
     required String password,
     required String username,
     ProfileType? profileType,
   }) async {
     state = state.copyWith(isLoading: true);
     try {
-      final authResponse = await AuthServices().signUpWithEmailPassword(
+      final authResponse = await AuthServices().signUp(
         email: email,
         password: password,
         username: username,
         profileType: profileType,
       );
       state = state.copyWith(authResponse: authResponse, isLoading: false);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e as Exception);
+    }
+  }
+
+  Future<void> signInWithPhone(String phone) async {
+    state = state.copyWith(isLoading: true);
+    try {
+      await AuthServices().signInWithPhone(phone);
+      state = state.copyWith(isLoading: false);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e as Exception);
     }

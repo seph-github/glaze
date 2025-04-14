@@ -1,51 +1,61 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/components/snack_bar/custom_snack_bar.dart';
 import 'package:glaze/feature/auth/providers/auth_provider.dart';
+// import 'package:glaze/feature/auth/views/auth_phone_sign_in.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../components/buttons/primary_button.dart';
 import '../../../components/inputs/input_field.dart';
 import '../../../config/enum/profile_type.dart';
+import '../../../core/routing/router.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../gen/assets.gen.dart';
+import '../../../providers/initial_app_use.dart';
 import '../widgets/auth_header.dart';
-import '../widgets/auth_provider_toggle_widget.dart';
+// import '../widgets/auth_provider_toggle_widget.dart';
 import '../widgets/auth_sso_widget.dart';
 
-class AuthView extends HookWidget {
+class AuthView extends HookConsumerWidget {
   const AuthView({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = GoRouter.of(context);
     final formKey = GlobalKey<FormState>();
-    final providerController = useTextEditingController();
+    final emailController = useTextEditingController();
+    final phoneController = useTextEditingController();
     final passwordController = useTextEditingController();
     final usernameController = useTextEditingController();
-    final toggleItems = useState<List<String>>([
-      'Email',
-      'Phone'
-    ]);
-    final itemsValue = useState<List<bool>>([
-      true,
-      false
-    ]);
+
+    final toggleItems = useState<List<String>>(['Email', 'Phone']);
+    // final itemsValue = useState<List<bool>>([true, false]);
     final selectedIndex = useState<int>(0);
     final isLogin = useState<bool>(true);
     final agreedToTermsAndCon = useState<bool>(false);
     final recruitingTalent = useState<bool>(false);
+    final hasCompletedInitialAppUse = useState<bool>(false);
 
-    Future<void> loginHandler(WidgetRef ref) async {
-      await ref.read(authNotifierProvider.notifier).signInWithEmailPassword(
-            email: providerController.text,
-            password: passwordController.text,
-          );
+    // Future<void> signInWithOtpHandler() async {
+    //   await ref.read(authNotifierProvider.notifier).signInWithOtp();
+    // }
+
+    Future<void> loginHandler() async {
+      if (toggleItems.value[selectedIndex.value] == 'Phone') {
+        // await signInWithOtpHandler();
+      } else {
+        await ref.read(authNotifierProvider.notifier).signInWithEmailPassword(
+              email: emailController.text,
+              password: passwordController.text,
+            );
+      }
     }
 
-    Future<void> signupHandler(WidgetRef ref) async {
+    Future<void> signupHandler() async {
       final ProfileType profileType;
       if (recruitingTalent.value) {
         profileType = ProfileType.recruiter;
@@ -53,22 +63,29 @@ class AuthView extends HookWidget {
         profileType = ProfileType.user;
       }
 
-      await ref.read(authNotifierProvider.notifier).signUpWithEmailPassword(
+      print('profileType: $profileType');
+      print('username: ${usernameController.text}');
+      print('email: ${emailController.text}');
+      print('phone: ${phoneController.text}');
+      print('password: ${passwordController.text}');
+
+      await ref.read(authNotifierProvider.notifier).signUp(
             username: usernameController.text.trim(),
-            email: providerController.text.trim(),
+            email: emailController.text.trim(),
+            phone: phoneController.text.trim(),
             password: passwordController.text.trim(),
             profileType: profileType,
           );
     }
 
-    Future<void> onSubmit(WidgetRef ref) async {
+    Future<void> onSubmit() async {
       if (formKey.currentState?.validate() ?? false) {
         formKey.currentState?.save();
 
         if (isLogin.value) {
-          loginHandler(ref);
+          loginHandler();
         } else {
-          signupHandler(ref);
+          signupHandler();
         }
       }
     }
@@ -77,174 +94,252 @@ class AuthView extends HookWidget {
       await ref.read(authNotifierProvider.notifier).anonymousSignin();
     }
 
-    return Consumer(
-      builder: (context, ref, _) {
-        ref.listen(
-          authNotifierProvider,
-          (prev, next) {
-            if (next.error != null && next.error != prev?.error) {
-              final errorMessage = next.error.toString();
+    useEffect(
+      () {
+        hasCompletedInitialAppUse.value =
+            ref.read(initialAppUseProvider).completedInitialAppUse;
 
-              CustomSnackBar.showSnackBar(context, message: errorMessage);
-            }
-          },
-        );
+        return null;
+      },
+      [],
+    );
 
-        return LoadingLayout(
-          isLoading: ref.watch(authNotifierProvider).isLoading,
-          child: SafeArea(
-            child: Form(
-              key: formKey,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: ListView(
-                  children: [
-                    const Gap(20),
-                    AuthHeader(isLogin: isLogin),
-                    const Gap(10),
-                    AuthProviderToggleWidget(
-                      toggleItems: toggleItems,
-                      itemsValue: itemsValue,
-                      selectedIndex: selectedIndex,
+    ref.listen(
+      authNotifierProvider,
+      (prev, next) {
+        if (next.error != null && next.error != prev?.error) {
+          final errorMessage = next.error.toString();
+
+          CustomSnackBar.showSnackBar(context, message: errorMessage);
+        }
+      },
+    );
+
+    final state = ref.watch(authNotifierProvider);
+
+    String? validateEmail(String? value) {
+      if (value == null || value.isEmpty) {
+        return 'Please enter your email';
+      }
+      final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+      if (!emailRegex.hasMatch(value)) {
+        return 'Please enter a valid email';
+      }
+      return null;
+    }
+
+    // String? validatePhone(String? value) {
+    //   if (value == null || value.isEmpty) {
+    //     return 'Please enter your phone number';
+    //   } else if (value.length < 10) {
+    //     return 'Please enter a valid phone number';
+    //   }
+    //   // Add phone validation logic here if needed
+    //   return null;
+    // }
+
+    Widget buildLoginItems() {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          InputField.email(
+            inputIcon: SvgPicture.asset(Assets.images.svg.emailIcon.path),
+            hintText: toggleItems.value[0],
+            controller: emailController,
+            validator: validateEmail,
+          ),
+          const Gap(16),
+          InputField.password(
+            inputIcon: SvgPicture.asset(Assets.images.svg.passwordIcon.path),
+            hintText: 'Enter your password',
+            controller: passwordController,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter your password';
+              }
+              if (value.length < 6) {
+                return 'Password must be at least 6 characters long';
+              }
+              return null;
+            },
+          ),
+        ],
+      );
+    }
+
+    Widget buildSignupItems() {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          InputField.text(
+            inputIcon: SvgPicture.asset(Assets.images.svg.profileIcon.path),
+            hintText: 'Choose a username',
+            controller: usernameController,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter a username';
+              } else if (value.length < 3) {
+                return 'Username must be at least 3 characters long';
+              } else if (value.length > 20) {
+                return 'Username must be less than 20 characters long';
+              } else if (RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
+                return null;
+              } else {
+                return 'Username can only contain letters, numbers, and underscores';
+              }
+            },
+          ),
+          const Gap(16),
+          InputField.email(
+            inputIcon: SvgPicture.asset(Assets.images.svg.emailIcon.path),
+            hintText: toggleItems.value[0],
+            controller: emailController,
+            validator: validateEmail,
+          ),
+          const Gap(16),
+          InputField.password(
+            inputIcon: SvgPicture.asset(Assets.images.svg.passwordIcon.path),
+            hintText: 'Enter your password',
+            controller: passwordController,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter your password';
+              }
+              if (value.length < 6) {
+                return 'Password must be at least 6 characters long';
+              }
+              return null;
+            },
+          ),
+        ],
+      );
+    }
+
+    return LoadingLayout(
+      isLoading: state.isLoading,
+      child: SafeArea(
+        child: Form(
+          key: formKey,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: ListView(
+              children: [
+                const Gap(20),
+                AuthHeader(
+                  isLogin: isLogin,
+                  isCompleteInitSetup: hasCompletedInitialAppUse,
+                ),
+                const Gap(30),
+                if (isLogin.value) buildLoginItems() else buildSignupItems(),
+                const Gap(16),
+                if (isLogin.value)
+                  GestureDetector(
+                    onTap: () {},
+                    child: const Align(
+                      alignment: Alignment.centerRight,
+                      child: Text('Forgot Password?'),
                     ),
-                    const Gap(20),
-                    if (!isLogin.value)
-                      InputField.text(
-                        inputIcon: SvgPicture.asset(Assets.images.svg.profileIcon.path),
-                        hintText: 'Choose a username',
-                        controller: usernameController,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter a username';
-                          } else if (value.length < 3) {
-                            return 'Username must be at least 3 characters long';
-                          } else if (value.length > 20) {
-                            return 'Username must be less than 20 characters long';
-                          } else if (RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
-                            return null;
-                          } else {
-                            return 'Username can only contain letters, numbers, and underscores';
-                          }
-                        },
-                      ),
-                    if (!isLogin.value) const Gap(20),
-                    InputField.email(
-                      inputIcon: toggleItems.value[selectedIndex.value] == 'Email' ? SvgPicture.asset(Assets.images.svg.emailIcon.path) : SvgPicture.asset(Assets.images.svg.phoneIcon.path),
-                      hintText: toggleItems.value[selectedIndex.value] == 'Email' ? 'Enter your email' : '+1234567890',
-                      controller: providerController,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your ${toggleItems.value[selectedIndex.value].toLowerCase()}';
-                        }
-                        final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-                        if (!emailRegex.hasMatch(value)) {
-                          return 'Please enter a valid email';
-                        }
-                        return null;
-                      },
-                    ),
-                    const Gap(16),
-                    InputField.password(
-                      inputIcon: SvgPicture.asset(Assets.images.svg.passwordIcon.path),
-                      hintText: 'Enter your password',
-                      controller: passwordController,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your password';
-                        }
-                        if (value.length < 6) {
-                          return 'Password must be at least 6 characters long';
-                        }
-                        return null;
-                      },
-                    ),
-                    const Gap(16),
-                    if (isLogin.value)
-                      GestureDetector(
-                        onTap: () {},
-                        child: const Align(
-                          alignment: Alignment.centerRight,
-                          child: Text('Forgot Password?'),
-                        ),
-                      ),
-                    if (!isLogin.value)
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Row(
-                          children: [
-                            Checkbox(
-                              value: agreedToTermsAndCon.value,
-                              onChanged: (value) {
-                                agreedToTermsAndCon.value = value ?? false;
-                              },
-                              checkColor: ColorPallete.backgroundColor,
-                            ),
-                            const Text('I agree to the terms and conditions'),
-                          ],
-                        ),
-                      ),
-                    const Gap(30),
-                    PrimaryButton(
-                      onPressed: (agreedToTermsAndCon.value && usernameController.text.isNotEmpty && providerController.text.isNotEmpty && passwordController.text.isNotEmpty) || isLogin.value ? () => onSubmit(ref) : null,
-                      label: isLogin.value ? 'Login' : 'Sign Up',
-                    ),
-                    const Gap(20),
-                    AuthSSOWidget(),
-                    const Gap(20),
-                    PrimaryButton(
-                      onPressed: () => onAnonymousSignin(ref),
-                      label: 'Continue Anonymously',
-                      backgroundColor: Colors.white12,
-                    ),
-                    const Gap(20),
-                    if (!isLogin.value)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Are You Recruiting Talent?',
-                            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                  fontWeight: FontWeight.w900,
-                                ),
-                          ),
-                          Switch.adaptive(
-                            value: recruitingTalent.value,
-                            onChanged: (value) {
-                              recruitingTalent.value = value;
-                            },
-                          ),
-                        ],
-                      ),
-                    const Gap(30),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                  ),
+                if (!isLogin.value)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Row(
                       children: [
-                        Text(
-                          isLogin.value ? 'Don\'t have an account?' : 'Already have an account?',
-                          style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.grey),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            isLogin.value = !isLogin.value;
-                            usernameController.clear();
-                            providerController.clear();
-                            passwordController.clear();
+                        Checkbox(
+                          value: agreedToTermsAndCon.value,
+                          onChanged: (value) {
+                            agreedToTermsAndCon.value = value ?? false;
                           },
-                          child: Text(
-                            isLogin.value ? ' Sign up' : ' Login',
-                            style: Theme.of(context).textTheme.labelLarge,
-                          ),
+                          checkColor: ColorPallete.backgroundColor,
                         ),
+                        const Text('I agree to the terms and conditions'),
                       ],
                     ),
-                    const Gap(30),
+                  ),
+                const Gap(30),
+                PrimaryButton(
+                  onPressed: (agreedToTermsAndCon.value &&
+                              usernameController.text.isNotEmpty &&
+                              (emailController.text.isNotEmpty ||
+                                  phoneController.text.isNotEmpty) &&
+                              phoneController.text.isNotEmpty &&
+                              passwordController.text.isNotEmpty) ||
+                          isLogin.value
+                      ? () => onSubmit()
+                      : null,
+                  label: isLogin.value ? 'Login' : 'Sign Up',
+                ),
+                const Gap(20),
+                AuthSSOWidget(),
+                const Gap(20),
+                if (!hasCompletedInitialAppUse.value && isLogin.value)
+                  PrimaryButton(
+                    onPressed: () {
+                      context.push(const AuthPhoneSignInRoute().location);
+                    },
+                    label: 'Sign in with Phone',
+                    backgroundColor: ColorPallete.primaryColor,
+                  ),
+                const Gap(20),
+                if (!hasCompletedInitialAppUse.value)
+                  PrimaryButton(
+                    onPressed: () => onAnonymousSignin(ref),
+                    label: 'Continue Anonymously',
+                    backgroundColor: Colors.white12,
+                  ),
+                const Gap(20),
+                if (!isLogin.value)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Are You Recruiting Talent?',
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                              fontWeight: FontWeight.w900,
+                            ),
+                      ),
+                      Switch.adaptive(
+                        value: recruitingTalent.value,
+                        onChanged: (value) {
+                          recruitingTalent.value = value;
+                        },
+                      ),
+                    ],
+                  ),
+                const Gap(30),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      isLogin.value
+                          ? 'Don\'t have an account?'
+                          : 'Already have an account?',
+                      style: Theme.of(context)
+                          .textTheme
+                          .labelLarge
+                          ?.copyWith(color: Colors.grey),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        isLogin.value = !isLogin.value;
+                        usernameController.clear();
+                        emailController.clear();
+                        phoneController.clear();
+                        passwordController.clear();
+                      },
+                      child: Text(
+                        isLogin.value ? ' Sign up' : ' Login',
+                        style: Theme.of(context).textTheme.labelLarge,
+                      ),
+                    ),
                   ],
                 ),
-              ),
+                const Gap(30),
+              ],
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

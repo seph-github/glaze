@@ -113,6 +113,7 @@ class HomeView extends HookWidget {
                             child: HomeInteractiveCard(
                               key: PageStorageKey('HomeInteractiveCard_$index'),
                               onGlazeLongPress: () => toggleDonutOptions(true),
+                              onGlazeTap: () {},
                               onShareTap: () async =>
                                   await _showShareOptions(context),
                               width: width,
