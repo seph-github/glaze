@@ -62,11 +62,10 @@ class ProfileCompletionForm extends HookConsumerWidget {
         Future.microtask(
           () async {
             final User? user = AuthServices().currentUser;
-            await ref
-                .read(profileNotifierProvider.notifier)
-                .fetchProfile(user!.id);
-            categories.value =
-                await ref.watch(categoryRepositoryProvider).fetchCategories();
+            await ref.read(profileNotifierProvider.notifier).fetchProfile(user!.id);
+            categories.value = await ref.watch(categoryRepositoryProvider).fetchCategories();
+            phoneController.text = state.profile?.phoneNumber ?? '';
+            emailController.text = state.profile?.email ?? '';
           },
         );
 
@@ -123,6 +122,7 @@ class ProfileCompletionForm extends HookConsumerWidget {
 
         await ref.read(profileNotifierProvider.notifier).updateProfile(
               userId,
+              email: emailController.text,
               fullName: fullnameController.text,
               phoneNumber: phoneController.text,
               interestList: interestList,
@@ -131,15 +131,8 @@ class ProfileCompletionForm extends HookConsumerWidget {
               identification: identification.value,
               role: ProfileType.values.byName(role),
             );
-        //     .then(
-        //   (_) async {
-        //     await router.push(OnboardingRoute(id: userId).location);
-        //   },
-        // );
       }
     }
-
-    print('selected interests: $interestList');
 
     return LoadingLayout(
       isLoading: state.isLoading,
@@ -164,8 +157,7 @@ class ProfileCompletionForm extends HookConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  if (role == ProfileType.recruiter.name)
-                    const RecruiterHeaderCard(),
+                  if (role == ProfileType.recruiter.name) const RecruiterHeaderCard(),
                   const Gap(16),
                   if (role == ProfileType.recruiter.name)
                     Text(
@@ -177,9 +169,7 @@ class ProfileCompletionForm extends HookConsumerWidget {
                   _UserProfileAvatar(
                     profileImage: profileImage.value,
                     onPressed: () async {
-                      profileImage.value = await ref
-                          .read(filePickerNotifierProvider.notifier)
-                          .pickFile(
+                      profileImage.value = await ref.read(filePickerNotifierProvider.notifier).pickFile(
                             type: FileType.image,
                           );
                     },
@@ -192,8 +182,7 @@ class ProfileCompletionForm extends HookConsumerWidget {
                   ),
                   InputField.text(
                     controller: fullnameController,
-                    inputIcon:
-                        SvgPicture.asset(Assets.images.svg.profileIcon.path),
+                    inputIcon: SvgPicture.asset(Assets.images.svg.profileIcon.path),
                     hintText: 'Full name',
                     filled: true,
                     validator: (value) {
@@ -208,8 +197,7 @@ class ProfileCompletionForm extends HookConsumerWidget {
                     controller: emailController,
                     initialValue: state.profile?.email ?? '',
                     readOnly: state.profile?.email != null,
-                    inputIcon:
-                        SvgPicture.asset(Assets.images.svg.emailIcon.path),
+                    inputIcon: SvgPicture.asset(Assets.images.svg.emailIcon.path),
                     hintText: 'Email address',
                     filled: true,
                     validator: (value) {
@@ -226,8 +214,7 @@ class ProfileCompletionForm extends HookConsumerWidget {
                     controller: phoneController,
                     initialValue: state.profile?.phoneNumber ?? '',
                     readOnly: state.profile?.phoneNumber != null,
-                    inputIcon:
-                        SvgPicture.asset(Assets.images.svg.phoneIcon.path),
+                    inputIcon: SvgPicture.asset(Assets.images.svg.phoneIcon.path),
                     keyboardType: TextInputType.phone,
                     hintText: 'Phone number',
                     filled: true,
@@ -248,8 +235,7 @@ class ProfileCompletionForm extends HookConsumerWidget {
                   if (role == ProfileType.recruiter.name)
                     InputField.text(
                       controller: organizationController,
-                      inputIcon: SvgPicture.asset(
-                          Assets.images.svg.organizationIcon.path),
+                      inputIcon: SvgPicture.asset(Assets.images.svg.organizationIcon.path),
                       hintText: 'Organization',
                       filled: true,
                       validator: (value) {
@@ -264,9 +250,7 @@ class ProfileCompletionForm extends HookConsumerWidget {
                     categories: categories.value,
                     selectedInterests: interestList,
                     onSelected: (value) {
-                      ref
-                          .read(profileInterestsNotifierProvider.notifier)
-                          .addToInterestList(value);
+                      ref.read(profileInterestsNotifierProvider.notifier).addToInterestList(value);
 
                       print('interestList: $interestList');
                     },
@@ -276,18 +260,14 @@ class ProfileCompletionForm extends HookConsumerWidget {
                     RecruiterIdentificationCard(
                       imageFile: identification.value,
                       onTap: () async {
-                        identification.value = await ref
-                            .read(filePickerNotifierProvider.notifier)
-                            .pickFile(type: FileType.image);
+                        identification.value = await ref.read(filePickerNotifierProvider.notifier).pickFile(type: FileType.image);
                       },
                       onClear: () {
                         identification.value = null;
                       },
                     ),
                   PrimaryButton(
-                    label: role == ProfileType.recruiter.name
-                        ? 'Submit Verification'
-                        : 'Save',
+                    label: role == ProfileType.recruiter.name ? 'Submit Verification' : 'Save',
                     onPressed: handleSubmit,
                   ),
                   const Gap(32),

@@ -18,7 +18,9 @@ class ProfileServices {
 
       final response = await _supabaseClient.rpc(
         'find_user_by_id',
-        params: {'params_user_id': id},
+        params: {
+          'params_user_id': id
+        },
       );
 
       final raw = response as List<dynamic>;
@@ -38,7 +40,9 @@ class ProfileServices {
 
       final response = await _supabaseClient.rpc(
         'find_user_by_id',
-        params: {'params_user_id': id},
+        params: {
+          'params_user_id': id
+        },
       );
 
       final raw = response as List<dynamic>;
@@ -56,11 +60,7 @@ class ProfileServices {
     try {
       if (id.isEmpty) return null;
 
-      final response = await _supabaseClient
-          .from('recruiters')
-          .select()
-          .eq('user_id', id)
-          .maybeSingle(); // Use maybeSingle to handle cases where no rows are returned
+      final response = await _supabaseClient.from('recruiters').select().eq('user_id', id).maybeSingle(); // Use maybeSingle to handle cases where no rows are returned
 
       if (response == null) return null; // Handle null response gracefully
 
@@ -92,6 +92,7 @@ class ProfileServices {
 
   Future<void> updateProfile(
     String id, {
+    required String email,
     required String fullName,
     required String phoneNumber,
     required List<String> interestList,
@@ -136,10 +137,7 @@ class ProfileServices {
           );
         }
 
-        await _supabaseClient
-            .from('reqruiters')
-            .update(recruiterEntity)
-            .eq('user_id', id);
+        await _supabaseClient.from('reqruiters').update(recruiterEntity).eq('user_id', id);
       }
 
       await _supabaseClient.from('profiles').update(profileEntity).eq('id', id);

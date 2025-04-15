@@ -37,9 +37,7 @@ class ProfileView extends HookConsumerWidget {
       () {
         Future.microtask(
           () async {
-            await ref
-                .read(profileNotifierProvider.notifier)
-                .fetchProfile(user?.id ?? '');
+            await ref.read(profileNotifierProvider.notifier).fetchProfile(user?.id ?? '');
           },
         );
         return null;
@@ -48,8 +46,6 @@ class ProfileView extends HookConsumerWidget {
     );
 
     final state = ref.watch(profileNotifierProvider);
-
-    print('profile shell state: $state');
 
     return LoadingLayout(
       isLoading: state.isLoading,
@@ -96,8 +92,7 @@ class ProfileView extends HookConsumerWidget {
         ],
       ),
       child: RefreshIndicator(
-        onRefresh: () =>
-            ref.read(profileNotifierProvider.notifier).fetchProfile(user!.id),
+        onRefresh: () => ref.read(profileNotifierProvider.notifier).fetchProfile(user!.id),
         child: SingleChildScrollView(
           child: SafeArea(
             child: Column(
@@ -166,13 +161,8 @@ class ProfileView extends HookConsumerWidget {
                   label: 'Log Out',
                   backgroundColor: Colors.transparent,
                   onPressed: () async {
-                    await ref
-                        .read(initialAppUseProvider)
-                        .setInitialAppUseComplete(true)
-                        .then(
-                          (_) async => await ref
-                              .read(authNotifierProvider.notifier)
-                              .signOut(),
+                    await ref.read(initialAppUseProvider).setInitialAppUseComplete(true).then(
+                          (_) async => await ref.read(authNotifierProvider.notifier).signOut(),
                         );
                   },
                 ),

@@ -78,8 +78,7 @@ class ProfileNotifier extends _$ProfileNotifier {
   Future<void> fetchRecruiterProfile(String id) async {
     state = state.copyWith(isLoading: true);
     try {
-      final recruiterProfile =
-          await ProfileServices().fetchRecruiterProfile(id);
+      final recruiterProfile = await ProfileServices().fetchRecruiterProfile(id);
       state = state.copyWith(
         recruiterProfile: recruiterProfile,
         isLoading: false,
@@ -111,6 +110,7 @@ class ProfileNotifier extends _$ProfileNotifier {
 
   Future<void> updateProfile(
     String id, {
+    required String email,
     required String fullName,
     required String phoneNumber,
     required List<String> interestList,
@@ -123,6 +123,7 @@ class ProfileNotifier extends _$ProfileNotifier {
     try {
       await ProfileServices().updateProfile(
         id,
+        email: email,
         fullName: fullName,
         phoneNumber: phoneNumber,
         interestList: interestList,
