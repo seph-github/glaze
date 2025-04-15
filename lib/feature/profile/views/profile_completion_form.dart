@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
@@ -13,7 +12,7 @@ import 'package:glaze/core/routing/router.dart';
 import 'package:glaze/core/styles/color_pallete.dart';
 import 'package:glaze/data/models/category/category_model.dart';
 import 'package:glaze/data/repository/category/category_repository.dart';
-import 'package:glaze/data/repository/file_picker/file_picker_provider.dart';
+import 'package:glaze/feature/camera/provider/content_picker_provider.dart';
 import 'package:glaze/feature/profile/provider/profile_provider.dart';
 import 'package:glaze/feature/profile/provider/profile_interests_list_provider.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
@@ -57,37 +56,28 @@ class ProfileCompletionForm extends HookConsumerWidget {
     final profileImage = useState<File?>(null);
     final interestList = ref.watch(profileInterestsNotifierProvider);
 
-    useEffect(
-      () {
-        Future.microtask(
-          () async {
-            final User? user = AuthServices().currentUser;
-            await ref.read(profileNotifierProvider.notifier).fetchProfile(user!.id);
-            categories.value = await ref.watch(categoryRepositoryProvider).fetchCategories();
-            phoneController.text = state.profile?.phoneNumber ?? '';
-            emailController.text = state.profile?.email ?? '';
-          },
-        );
+    ref.listen(
+      contentPickerNotifierProvider,
+      (prev, next) {
+        if (next.image != null) {
+          profileImage.value = File(next.image!.path);
+        }
 
-        return;
-
-        // return () {
-        //   fullnameController.dispose();
-        //   emailController.dispose();
-        //   phoneController.dispose();
-        //   organizationController.dispose();
-        //   categories.dispose();
-        //   identification.dispose();
-        //   profileImage.dispose();
-        //   interestList.dispose();
-        // };
+        if (next.identification != null) {
+          identification.value = File(next.identification!.path);
+        }
       },
-      [],
     );
 
     ref.listen(
       profileNotifierProvider,
       (prev, next) async {
+        if (next.profile != null && next.profile != prev?.profile) {
+          fullnameController.text = next.profile?.fullName ?? '';
+          emailController.text = next.profile?.email ?? '';
+          phoneController.text = next.profile?.phoneNumber ?? '';
+        }
+
         if (next.error != null && next.error != prev?.error) {
           final errorMessage = next.error.toString();
 
@@ -101,7 +91,7 @@ class ProfileCompletionForm extends HookConsumerWidget {
             content: next.response,
             onPressed: () async {
               ref.invalidate(profileInterestsNotifierProvider);
-              ref.invalidate(filePickerNotifierProvider);
+
               fullnameController.dispose();
               emailController.dispose();
               phoneController.dispose();
@@ -114,6 +104,22 @@ class ProfileCompletionForm extends HookConsumerWidget {
           );
         }
       },
+    );
+
+    useEffect(
+      () {
+        Future.microtask(
+          () async {
+            final User? user = AuthServices().currentUser;
+            await ref.read(profileNotifierProvider.notifier).fetchProfile(user!.id);
+
+            categories.value = await ref.watch(categoryRepositoryProvider).fetchCategories();
+          },
+        );
+
+        return;
+      },
+      [],
     );
 
     Future<void> handleSubmit() async {
@@ -169,9 +175,7 @@ class ProfileCompletionForm extends HookConsumerWidget {
                   _UserProfileAvatar(
                     profileImage: profileImage.value,
                     onPressed: () async {
-                      profileImage.value = await ref.read(filePickerNotifierProvider.notifier).pickFile(
-                            type: FileType.image,
-                          );
+                      await ref.read(contentPickerNotifierProvider.notifier).pickImages();
                     },
                   ),
                   Text(
@@ -182,6 +186,7 @@ class ProfileCompletionForm extends HookConsumerWidget {
                   ),
                   InputField.text(
                     controller: fullnameController,
+                    readOnly: state.profile?.fullName != null,
                     inputIcon: SvgPicture.asset(Assets.images.svg.profileIcon.path),
                     hintText: 'Full name',
                     filled: true,
@@ -195,7 +200,6 @@ class ProfileCompletionForm extends HookConsumerWidget {
                   const Gap(10),
                   InputField.email(
                     controller: emailController,
-                    initialValue: state.profile?.email ?? '',
                     readOnly: state.profile?.email != null,
                     inputIcon: SvgPicture.asset(Assets.images.svg.emailIcon.path),
                     hintText: 'Email address',
@@ -212,7 +216,6 @@ class ProfileCompletionForm extends HookConsumerWidget {
                   const Gap(10),
                   InputField.text(
                     controller: phoneController,
-                    initialValue: state.profile?.phoneNumber ?? '',
                     readOnly: state.profile?.phoneNumber != null,
                     inputIcon: SvgPicture.asset(Assets.images.svg.phoneIcon.path),
                     keyboardType: TextInputType.phone,
@@ -249,22 +252,14 @@ class ProfileCompletionForm extends HookConsumerWidget {
                   InterestChoiceChip(
                     categories: categories.value,
                     selectedInterests: interestList,
-                    onSelected: (value) {
-                      ref.read(profileInterestsNotifierProvider.notifier).addToInterestList(value);
-
-                      print('interestList: $interestList');
-                    },
+                    onSelected: (value) => ref.read(profileInterestsNotifierProvider.notifier).addToInterestList(value),
                   ),
                   const Gap(16),
                   if (role == ProfileType.recruiter.name)
                     RecruiterIdentificationCard(
                       imageFile: identification.value,
-                      onTap: () async {
-                        identification.value = await ref.read(filePickerNotifierProvider.notifier).pickFile(type: FileType.image);
-                      },
-                      onClear: () {
-                        identification.value = null;
-                      },
+                      onTap: () async => await ref.read(contentPickerNotifierProvider.notifier).pickIdentificationImage(),
+                      onClear: () => identification.value = null,
                     ),
                   PrimaryButton(
                     label: role == ProfileType.recruiter.name ? 'Submit Verification' : 'Save',

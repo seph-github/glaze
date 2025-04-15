@@ -4,7 +4,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/components/snack_bar/custom_snack_bar.dart';
 import 'package:glaze/feature/auth/providers/auth_provider.dart';
-// import 'package:glaze/feature/auth/views/auth_phone_sign_in.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -17,7 +16,6 @@ import '../../../core/styles/color_pallete.dart';
 import '../../../gen/assets.gen.dart';
 import '../../../providers/initial_app_use.dart';
 import '../widgets/auth_header.dart';
-// import '../widgets/auth_provider_toggle_widget.dart';
 import '../widgets/auth_sso_widget.dart';
 
 class AuthView extends HookConsumerWidget {
@@ -25,7 +23,6 @@ class AuthView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final router = GoRouter.of(context);
     final formKey = GlobalKey<FormState>();
     final emailController = useTextEditingController();
     final phoneController = useTextEditingController();
@@ -36,20 +33,15 @@ class AuthView extends HookConsumerWidget {
       'Email',
       'Phone'
     ]);
-    // final itemsValue = useState<List<bool>>([true, false]);
+
     final selectedIndex = useState<int>(0);
     final isLogin = useState<bool>(true);
     final agreedToTermsAndCon = useState<bool>(false);
     final recruitingTalent = useState<bool>(false);
     final hasCompletedInitialAppUse = useState<bool>(false);
 
-    // Future<void> signInWithOtpHandler() async {
-    //   await ref.read(authNotifierProvider.notifier).signInWithOtp();
-    // }
-
     Future<void> loginHandler() async {
       if (toggleItems.value[selectedIndex.value] == 'Phone') {
-        // await signInWithOtpHandler();
       } else {
         await ref.read(authNotifierProvider.notifier).signInWithEmailPassword(
               email: emailController.text,
@@ -65,12 +57,6 @@ class AuthView extends HookConsumerWidget {
       } else {
         profileType = ProfileType.user;
       }
-
-      print('profileType: $profileType');
-      print('username: ${usernameController.text}');
-      print('email: ${emailController.text}');
-      print('phone: ${phoneController.text}');
-      print('password: ${passwordController.text}');
 
       await ref.read(authNotifierProvider.notifier).signUp(
             username: usernameController.text.trim(),
@@ -129,16 +115,6 @@ class AuthView extends HookConsumerWidget {
       }
       return null;
     }
-
-    // String? validatePhone(String? value) {
-    //   if (value == null || value.isEmpty) {
-    //     return 'Please enter your phone number';
-    //   } else if (value.length < 10) {
-    //     return 'Please enter a valid phone number';
-    //   }
-    //   // Add phone validation logic here if needed
-    //   return null;
-    // }
 
     Widget buildLoginItems() {
       return Column(

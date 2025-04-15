@@ -47,7 +47,9 @@ class CustomDropDownMenu extends HookWidget {
       return () {
         controller?.removeListener(listener); // Remove the listener on cleanup
       };
-    }, [controller]); // Observe changes in the controller
+    }, [
+      controller
+    ]); // Observe changes in the controller
 
     return TextFormField(
       readOnly: true,

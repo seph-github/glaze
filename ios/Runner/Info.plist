@@ -40,13 +40,13 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Your custom message explaining why the app needs access to the camera.</string>
+	<string>We need access to your camera to let you capture photos and videos directly within the app.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Your custom message explaining why the app needs access to the microphone.</string>
+	<string>We use your microphone for audio recording while capturing videos.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>We need permission to save videos to your photo gallery.</string>
+	<string>We need permission to save captured videos and photos to your photo library.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>We need access to your photo library to view saved videos.</string>
+	<string>We need access to your photo library so you can select and upload media from your device.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIFileSharingEnabled</key>

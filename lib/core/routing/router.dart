@@ -99,13 +99,13 @@ GoRouter router(Ref ref) {
             break;
           case AuthChangeEvent.signedIn:
             log('signedIn');
-            router.go(const HomeRoute().location);
+            router.pushReplacement(const HomeRoute().location);
             // ref.watch(userNotifierProvider);
             break;
           case AuthChangeEvent.signedOut:
             log('signedOut');
             ref.invalidate(profileNotifierProvider);
-            router.go(const AuthRoute().location);
+            router.pushReplacement(const AuthRoute().location);
             break;
           case AuthChangeEvent.tokenRefreshed:
             log('tokenRefreshed');

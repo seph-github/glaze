@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
@@ -8,15 +7,14 @@ import 'package:gap/gap.dart';
 import 'package:glaze/components/buttons/primary_button.dart';
 import 'package:glaze/config/enum/profile_type.dart';
 import 'package:glaze/config/strings/string_extension.dart';
-import 'package:glaze/data/repository/file_picker/file_picker_provider.dart';
+import 'package:glaze/feature/camera/provider/content_picker_provider.dart';
+import 'package:glaze/feature/profile/provider/profile_provider.dart';
 import 'package:glaze/feature/profile/widgets/interest_choice_chip.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-// import '../../../components/buttons/focus_button.dart';
 import '../../../components/inputs/input_field.dart';
-// import '../../../components/modals/glaze_modals.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../data/models/category/category_model.dart';
 import '../../../data/repository/category/category_repository.dart';
@@ -33,15 +31,13 @@ class ProfileEditForm extends HookConsumerWidget {
 
   final String id;
   final Profile? data;
+
   @override
-  Widget build(
-    BuildContext context,
-    WidgetRef ref,
-  ) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final imageState = contentPickerNotifierProvider;
+
     final formKey = useMemoized(() => GlobalKey<FormState>());
     final router = GoRouter.of(context);
-    // final imageUrl = useState<String?>(null);
-    File? file;
 
     final fullnameController = useTextEditingController(text: data?.fullName);
     final emailController = useTextEditingController(text: data?.email);
@@ -49,19 +45,27 @@ class ProfileEditForm extends HookConsumerWidget {
     final organizationController = useTextEditingController();
     final categories = useState<List<CategoryModel>>([]);
     final updatedSelectedInterests = useState<List<String>>([]);
+    final currentImage = useState<String?>(data?.profileImageUrl);
+
+    ref.listen(
+      imageState,
+      (prev, next) {
+        if (next.image != null) {
+          currentImage.value = next.image?.path;
+        }
+      },
+    );
 
     useEffect(() {
       Future.microtask(() async {
-        categories.value =
-            await ref.read(categoryRepositoryProvider).fetchCategories();
+        categories.value = await ref.read(categoryRepositoryProvider).fetchCategories();
       });
       updatedSelectedInterests.value = data?.interests ?? [];
       return null;
     }, []);
 
-    file = ref.watch(filePickerNotifierProvider).value;
-
     return LoadingLayout(
+      isLoading: ref.watch(imageState).isLoading,
       appBar: AppBar(
         leading: IconButton(
           icon: SvgPicture.asset(
@@ -73,7 +77,7 @@ class ProfileEditForm extends HookConsumerWidget {
           ),
           onPressed: () {
             formKey.currentState?.reset();
-            ref.invalidate(filePickerNotifierProvider);
+            ref.invalidate(imageState);
             ref.invalidate(profileInterestsNotifierProvider);
             router.pop();
           },
@@ -99,34 +103,22 @@ class ProfileEditForm extends HookConsumerWidget {
                           width: 2,
                         ),
                         image: DecorationImage(
-                          image: data?.profileImageUrl != null
-                              ? NetworkImage(
-                                  data?.profileImageUrl ?? '',
-                                )
-                              : FileImage(
-                                  file ?? File(''),
-                                ),
+                          image: currentImage.value != null
+                              ? (currentImage.value!.startsWith('http'))
+                                  ? NetworkImage(
+                                      currentImage.value ?? '',
+                                    )
+                                  : FileImage(
+                                      File(currentImage.value ?? ''),
+                                    ) as ImageProvider
+                              : AssetImage(Assets.images.png.profilePlaceholder.path),
                           fit: BoxFit.cover,
                         ),
                       ),
-                      child: data?.profileImageUrl == null && file == null
-                          ? Transform.scale(
-                              scale: 0.75,
-                              child: SvgPicture.asset(
-                                Assets.images.svg.profileIcon.path,
-                                height: 10,
-                              ),
-                            )
-                          : null,
                     ),
                     TextButton(
-                      child: Text(
-                          ref.watch(filePickerNotifierProvider).value != null
-                              ? 'Change Photo'
-                              : 'Pick Photo'),
-                      onPressed: () => ref
-                          .read(filePickerNotifierProvider.notifier)
-                          .pickFile(type: FileType.image),
+                      child: Text(currentImage.value != null ? 'Change Photo' : 'Pick Photo'),
+                      onPressed: () async => await ref.read(imageState.notifier).pickImages(),
                     )
                   ],
                 ),
@@ -202,16 +194,15 @@ class ProfileEditForm extends HookConsumerWidget {
                   categories: categories.value,
                   selectedInterests: updatedSelectedInterests.value,
                   onSelected: (value) {
-                    updatedSelectedInterests.value = ref
-                        .read(profileInterestsNotifierProvider.notifier)
-                        .updateInterestsList(
-                            updatedSelectedInterests.value, value);
+                    updatedSelectedInterests.value = ref.read(profileInterestsNotifierProvider.notifier).updateInterestsList(updatedSelectedInterests.value, value);
                   },
                 ),
                 const Gap(32.0),
                 PrimaryButton(
                   label: 'Save',
-                  onPressed: () {},
+                  onPressed: () async {
+                    // await ref.read(profileNotifierProvider.notifier).updateProfile(id, email: , fullName: fullName, phoneNumber: phoneNumber, interestList: interestList, organization: organization, profileImage: profileImage, identification: identification, role: role)
+                  },
                 ),
                 const Gap(32.0),
               ],
