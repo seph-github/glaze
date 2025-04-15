@@ -24,10 +24,10 @@ class AuthServices {
 
       return authResponse;
     } on AuthApiException catch (e) {
-      print('error signing in: $e');
-      throw Exception('SignIn: $e');
+      rethrow;
+    } on AuthException catch (e) {
+      rethrow;
     } catch (e) {
-      print(e.toString());
       rethrow;
     }
   }
@@ -64,7 +64,7 @@ class AuthServices {
       await _supabase.auth.signInWithOtp(
         phone: phone,
       );
-    } on Exception catch (e) {
+    } catch (e) {
       log('error signing in using phone: $e');
       rethrow;
     }

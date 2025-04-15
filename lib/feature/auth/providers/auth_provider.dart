@@ -14,7 +14,7 @@ abstract class AuthState with _$AuthState {
     @Default(null) AuthResponse? authResponse,
     @Default(false) bool isLoading,
     @Default(false) bool otpSent,
-    Exception? error,
+    @Default(null) dynamic error,
   }) = _AuthState;
 
   const AuthState._();
@@ -25,6 +25,15 @@ class AuthNotifier extends _$AuthNotifier {
   @override
   AuthState build() {
     return const AuthState();
+  }
+
+  void setError(Exception error) {
+    state = state.copyWith(error: null);
+    state = state.copyWith(error: error, isLoading: false);
+  }
+
+  void clearError() {
+    state = state.copyWith(error: null);
   }
 
   Future<void> signInWithEmailPassword({
@@ -39,7 +48,7 @@ class AuthNotifier extends _$AuthNotifier {
       );
       state = state.copyWith(authResponse: authResponse, isLoading: false);
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e as Exception);
+      setError(e as Exception);
     }
   }
 
@@ -60,7 +69,7 @@ class AuthNotifier extends _$AuthNotifier {
       );
       state = state.copyWith(authResponse: authResponse, isLoading: false);
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e as Exception);
+      setError(e as Exception);
     }
   }
 
@@ -70,7 +79,7 @@ class AuthNotifier extends _$AuthNotifier {
       await AuthServices().signInWithPhone(phone);
       state = state.copyWith(isLoading: false, otpSent: true);
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e as Exception);
+      setError(e as Exception);
     }
   }
 
@@ -83,7 +92,7 @@ class AuthNotifier extends _$AuthNotifier {
       );
       state = state.copyWith(authResponse: authResponse, isLoading: false);
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e as Exception);
+      setError(e as Exception);
     }
   }
 
@@ -93,7 +102,7 @@ class AuthNotifier extends _$AuthNotifier {
       final authResponse = await AuthServices().anonymousSignin();
       state = state.copyWith(authResponse: authResponse, isLoading: false);
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e as Exception);
+      setError(e as Exception);
     }
   }
 
@@ -103,7 +112,7 @@ class AuthNotifier extends _$AuthNotifier {
       await AuthServices().signOut();
       state = state.copyWith(authResponse: null, isLoading: false);
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e as Exception);
+      setError(e as Exception);
     }
   }
 }

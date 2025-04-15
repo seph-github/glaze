@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
@@ -7,6 +9,7 @@ import 'package:glaze/feature/auth/providers/auth_provider.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../components/buttons/primary_button.dart';
 import '../../../components/inputs/input_field.dart';
@@ -95,10 +98,27 @@ class AuthView extends HookConsumerWidget {
     ref.listen(
       authNotifierProvider,
       (prev, next) {
-        if (next.error != null && next.error != prev?.error) {
-          final errorMessage = next.error.toString();
+        if (next.error != null && next.error != prev?.error && context.mounted) {
+          String errorMessage = 'An error occurred. Please try again.';
 
-          CustomSnackBar.showSnackBar(context, message: errorMessage);
+          print('Error object: ${next.error}');
+
+          // Check the type of the error
+          if (next.error is AuthApiException) {
+            final error = next.error as AuthApiException;
+            errorMessage = error.message;
+          } else if (next.error is AuthException) {
+            final error = next.error as AuthException;
+            errorMessage = error.message;
+          } else if (next.error is String) {
+            errorMessage = next.error;
+          }
+
+          // Show the error message in a SnackBar
+          CustomSnackBar.showSnackBar(
+            context,
+            message: errorMessage,
+          );
         }
       },
     );
