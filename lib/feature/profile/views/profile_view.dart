@@ -127,13 +127,10 @@ class ProfileView extends HookConsumerWidget {
                           Assets.images.svg.editProfileIcon.path,
                         ),
                         backgroundColor: ColorPallete.secondaryColor,
-                        onPressed: () {
-                          router.push(
-                            ProfileEditFormRoute(
-                              id: state.profile?.id ?? '',
-                            ).location,
-                            extra: state.profile,
-                          );
+                        onPressed: () async {
+                          await router.push(ProfileEditFormRoute(
+                            id: state.profile?.id ?? '',
+                          ).location);
                         },
                       ),
                       PrimaryButton(

@@ -12,15 +12,20 @@ class StorageServices {
   }) async {
     try {
       final String dirName = '$id/${file.path.split('/').last}';
-      final result =
-          await _storageClient.from(bucketName).upload(dirName, file);
+      final result = await _storageClient.from(bucketName).upload(dirName, file);
 
       final url = _storageClient.from(bucketName).getPublicUrl(result);
 
-      print('object url: $url');
       return _removeDuplicateWords(url);
+    } on PathNotFoundException catch (_) {
+      rethrow;
+    } on StorageException catch (_) {
+      rethrow;
+    } on PostgrestException catch (_) {
+      rethrow;
+    } on FileSystemException catch (_) {
+      rethrow;
     } catch (e) {
-      print('StorageServices.upload: $e');
       rethrow;
     }
   }

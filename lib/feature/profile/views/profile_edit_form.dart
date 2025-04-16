@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -11,42 +12,43 @@ import 'package:glaze/feature/camera/provider/content_picker_provider.dart';
 import 'package:glaze/feature/profile/provider/profile_provider.dart';
 import 'package:glaze/feature/profile/widgets/interest_choice_chip.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
+import 'package:glaze/utils/throw_error_exception_helper.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../../components/dialogs/dialogs.dart';
 import '../../../components/inputs/input_field.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../data/models/category/category_model.dart';
 import '../../../data/repository/category/category_repository.dart';
 import '../../../gen/assets.gen.dart';
-import '../models/profile.dart';
 import '../provider/profile_interests_list_provider.dart';
 
 class ProfileEditForm extends HookConsumerWidget {
   const ProfileEditForm({
     super.key,
     required this.id,
-    this.data,
+    // this.data,
   });
 
   final String id;
-  final Profile? data;
+  // final Profile? data;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(profileNotifierProvider);
     final imageState = contentPickerNotifierProvider;
 
     final formKey = useMemoized(() => GlobalKey<FormState>());
     final router = GoRouter.of(context);
 
-    final fullnameController = useTextEditingController(text: data?.fullName);
-    final emailController = useTextEditingController(text: data?.email);
-    final phoneController = useTextEditingController(text: data?.phoneNumber);
+    final fullnameController = useTextEditingController();
+    final emailController = useTextEditingController();
+    final phoneController = useTextEditingController();
     final organizationController = useTextEditingController();
     final categories = useState<List<CategoryModel>>([]);
     final updatedSelectedInterests = useState<List<String>>([]);
-    final currentImage = useState<String?>(data?.profileImageUrl);
-
+    final currentImage = useState<String?>(null);
     ref.listen(
       imageState,
       (prev, next) {
@@ -58,23 +60,56 @@ class ProfileEditForm extends HookConsumerWidget {
 
     ref.listen(
       profileNotifierProvider,
-      (prev, next) {
+      (prev, next) async {
         if (next.error != null && next.error != prev?.error) {
-          // TODO: Handle error state
+          throwSupabaseExceptionError(context, next);
+        }
+
+        if (next.response.isNotEmpty && next.response != prev?.response) {
+          await Dialogs.createContentDialog(
+            context,
+            title: 'Success',
+            content: 'Your Profile Has Been Updated',
+            onPressed: () async {
+              // Invalidate providers before popping
+              ref.invalidate(imageState);
+              ref.invalidate(profileInterestsNotifierProvider);
+
+              router.pop();
+            },
+          )
+              .then(
+                (_) async => await ref.refresh(profileNotifierProvider.notifier).fetchProfile(id),
+              )
+              .then(
+                (_) async => await Future.delayed(
+                  const Duration(milliseconds: 500),
+                  () => router.pop(),
+                ),
+              );
         }
       },
     );
 
     useEffect(() {
       Future.microtask(() async {
+        await ref.read(profileNotifierProvider.notifier).fetchProfile(id);
+        await ref.read(profileNotifierProvider.notifier).fetchRecruiterProfile(id);
         categories.value = await ref.read(categoryRepositoryProvider).fetchCategories();
       });
-      updatedSelectedInterests.value = data?.interests ?? [];
+      updatedSelectedInterests.value = state.profile?.interests ?? [];
+      fullnameController.text = state.profile?.fullName ?? '';
+      emailController.text = state.profile?.email ?? '';
+      phoneController.text = state.profile?.phoneNumber ?? '';
+      currentImage.value = state.profile?.profileImageUrl;
+      organizationController.text = state.recruiterProfile?.organization ?? '';
       return null;
     }, []);
 
+    log('state $state');
+
     return LoadingLayout(
-      isLoading: ref.watch(imageState).isLoading,
+      isLoading: ref.watch(imageState).isLoading || state.isLoading,
       appBar: AppBar(
         leading: IconButton(
           icon: SvgPicture.asset(
@@ -120,7 +155,9 @@ class ProfileEditForm extends HookConsumerWidget {
                                   : FileImage(
                                       File(currentImage.value ?? ''),
                                     ) as ImageProvider
-                              : AssetImage(Assets.images.png.profilePlaceholder.path),
+                              : AssetImage(
+                                  Assets.images.png.profilePlaceholder.path,
+                                ),
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -149,6 +186,7 @@ class ProfileEditForm extends HookConsumerWidget {
                 const Gap(10),
                 InputField.email(
                   controller: emailController,
+                  readOnly: state.profile?.email != null,
                   inputIcon: SvgPicture.asset(
                     Assets.images.svg.emailIcon.path,
                   ),
@@ -166,6 +204,7 @@ class ProfileEditForm extends HookConsumerWidget {
                 const Gap(10),
                 InputField.text(
                   controller: phoneController,
+                  readOnly: state.profile?.phoneNumber != null,
                   inputIcon: SvgPicture.asset(
                     Assets.images.svg.phoneIcon.path,
                   ),
@@ -178,7 +217,7 @@ class ProfileEditForm extends HookConsumerWidget {
                     return null;
                   },
                 ),
-                if (data?.role == ProfileType.recruiter.name)
+                if (state.profile?.role == ProfileType.recruiter.name)
                   Column(
                     children: [
                       const Gap(10),
@@ -210,15 +249,15 @@ class ProfileEditForm extends HookConsumerWidget {
                 PrimaryButton(
                   label: 'Save',
                   onPressed: () async {
+                    final isProfileImageChanged = currentImage.value != state.profile?.profileImageUrl;
+
                     await ref.read(profileNotifierProvider.notifier).updateProfile(
                           id: id,
                           email: emailController.text.trim(),
                           fullName: fullnameController.text.trim(),
                           phoneNumber: phoneController.text.trim(),
                           interestList: updatedSelectedInterests.value,
-                          profileImage: currentImage.value != null ? File(currentImage.value!) : null,
-                          role: ProfileType.values.firstWhere((element) => element.name == data?.role),
-                          organization: organizationController.text.trim(),
+                          profileImage: isProfileImageChanged && currentImage.value != null ? File(currentImage.value!) : null,
                         );
                   },
                 ),

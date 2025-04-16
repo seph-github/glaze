@@ -1,18 +1,16 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:glaze/core/styles/color_pallete.dart';
 
 class Dialogs {
-  static Future<void> createContentDialog(BuildContext context,
-      {required String title,
-      required String content,
-      VoidCallback? onPressed}) async {
+  static Future<void> createContentDialog(BuildContext context, {required String title, required String content, VoidCallback? onPressed}) async {
     return await showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog.adaptive(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.0),
-          ),
+        return CupertinoAlertDialog(
+          // shape: RoundedRectangleBorder(
+          //   borderRadius: BorderRadius.circular(16.0),
+          // ),
           title: Text(
             title,
           ),
@@ -30,8 +28,7 @@ class Dialogs {
     );
   }
 
-  static Future<void> showBottomDialog(BuildContext context,
-      {required Widget child}) async {
+  static Future<void> showBottomDialog(BuildContext context, {required Widget child}) async {
     return await showModalBottomSheet(
       context: context,
       builder: (context) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:glaze/gen/assets.gen.dart';
 import 'package:lottie/lottie.dart';
 
 class LoadingLayout extends HookWidget {
@@ -42,7 +43,7 @@ class LoadingLayout extends HookWidget {
                 height: 100,
                 width: 100,
                 child: Lottie.asset(
-                  'assets/lotties/donut_sprinkled.json',
+                  Assets.lotties.donutLoading.path,
                 ),
               ),
             ),

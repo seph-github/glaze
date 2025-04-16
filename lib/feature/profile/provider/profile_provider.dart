@@ -133,6 +133,7 @@ class ProfileNotifier extends _$ProfileNotifier {
       );
       state = state.copyWith(response: 'Created profile', isLoading: false);
     } catch (e) {
+      print('Error updating profile: $e');
       state = state.copyWith(isLoading: false, error: Exception(e));
     }
   }

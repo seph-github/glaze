@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:glaze/feature/profile/entity/profile_entity.dart';
@@ -29,7 +30,11 @@ class ProfileServices {
       // log('ProfileServices.fetchUserProfile: $raw');
 
       return Profile.fromJson(raw.first);
+    } on PostgrestException catch (e) {
+      log('Error fetching user profile: ${e.message}');
+      rethrow;
     } catch (e) {
+      log('Error fetching user profile: $e');
       rethrow;
     }
   }
@@ -50,7 +55,11 @@ class ProfileServices {
       // log('ProfileServices.fetchUserProfile: $raw');
 
       return Profile.fromJson(raw.first);
+    } on PostgrestException catch (e) {
+      log('Error fetching user profile: ${e.message}');
+      rethrow;
     } catch (e) {
+      log('Error fetching user profile: $e');
       rethrow;
     }
   }
@@ -64,7 +73,11 @@ class ProfileServices {
       if (response == null) return null; // Handle null response gracefully
 
       return RecruiterProfile.fromJson(response);
+    } on PostgrestException catch (e) {
+      log('Error fetching recruiter profile: ${e.message}');
+      rethrow;
     } catch (e) {
+      log('Error fetching recruiter profile: $e');
       rethrow;
     }
   }
@@ -82,7 +95,11 @@ class ProfileServices {
             data ?? {},
           )
           .eq(column, id);
+    } on PostgrestException catch (e) {
+      log('Error setting flags completed: ${e.message}');
+      rethrow;
     } catch (e) {
+      log('Error setting flags completed: $e');
       rethrow;
     }
   }
@@ -151,7 +168,20 @@ class ProfileServices {
             profileEntity.toMap(),
           )
           .eq('id', id);
+    } on PostgrestException catch (e) {
+      log('Error updating profile: ${e.message}');
+      rethrow;
+    } on StorageException catch (e) {
+      log('Error uploading file: ${e.message}');
+      rethrow;
+    } on PathNotFoundException {
+      log('Error: Path not found');
+      rethrow;
+    } on FileSystemException catch (e) {
+      log('Error: File system exception - ${e.message}');
+      rethrow;
     } catch (e) {
+      log('Error updating profile: $e');
       rethrow;
     }
   }

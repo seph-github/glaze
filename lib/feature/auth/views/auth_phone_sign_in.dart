@@ -12,7 +12,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../core/routing/router.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../gen/assets.gen.dart';
-import '../../../utils/throw_Auth_exception_error.dart';
+import '../../../utils/throw_error_exception_helper.dart';
 
 class AuthPhoneSignIn extends HookConsumerWidget {
   const AuthPhoneSignIn({super.key});

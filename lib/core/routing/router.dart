@@ -386,20 +386,15 @@ class ProfileCompletionFormRoute extends GoRouteData {
       );
 }
 
-@TypedGoRoute<ProfileEditFormRoute>(path: '/user-profile/:id')
+@TypedGoRoute<ProfileEditFormRoute>(path: '/edit-profile/:id')
 class ProfileEditFormRoute extends GoRouteData {
   const ProfileEditFormRoute({required this.id});
   final String id;
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    final extras = state.extra;
-
-    final Profile? data = extras is Profile ? extras : null;
-
     return ProfileEditForm(
       id: id,
-      data: data,
     );
   }
 }
