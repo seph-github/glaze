@@ -22,15 +22,18 @@ class PhoneNumberInput extends HookWidget {
     super.key,
     this.dialCodeController,
     this.phoneController,
+    this.validator,
+    this.focusNode,
   });
 
   final TextEditingController? dialCodeController;
   final TextEditingController? phoneController;
+  final String? Function(String?)? validator;
+  final FocusNode? focusNode;
 
   @override
   Widget build(BuildContext context) {
     final countryCodes = useState<List<CountryCode>>([]);
-    final phonePickerFocusNode = FocusNode();
 
     useEffect(
       () {
@@ -55,7 +58,7 @@ class PhoneNumberInput extends HookWidget {
       controller: phoneController,
       keyboardType: TextInputType.phone,
       textInputAction: TextInputAction.next,
-      focusNode: phonePickerFocusNode,
+      focusNode: focusNode,
       decoration: InputDecoration(
         labelText: 'Phone Number',
         hintText: 'Enter your phone number',
@@ -77,53 +80,87 @@ class PhoneNumberInput extends HookWidget {
               border: InputBorder.none,
             ),
             onTap: () async {
-              FocusScope.of(context).requestFocus(phonePickerFocusNode);
-
-              return showCupertinoModalPopup(
-                context: context,
-                builder: (context) {
-                  return Container(
-                    color: Colors.white,
-                    height: MediaQuery.sizeOf(context).height * 0.3,
-                    child: CupertinoPicker.builder(
-                      itemExtent: 50,
-                      onSelectedItemChanged: (index) {
-                        dialCodeController?.text = countryCodes.value[index].dialCode;
-                      },
-                      itemBuilder: (context, index) {
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              countryCodes.value[index].name,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                color: Colors.black,
-                              ),
-                            ),
-                            const Gap(16.0),
-                            Text(
-                              countryCodes.value[index].dialCode,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                      childCount: countryCodes.value.length,
-                    ),
-                  );
-                },
+              await showDialCodeModal(
+                context,
+                countryCodes: countryCodes,
               );
             },
+            onTapOutside: (_) => FocusScope.of(context).unfocus(),
           ),
         ),
       ),
       maxLength: 15,
       maxLines: 1,
       readOnly: false,
+      validator: validator,
+      onTapOutside: (_) => focusNode?.unfocus(),
+    );
+  }
+
+  Future<void> showDialCodeModal(BuildContext context, {required ValueNotifier<List<CountryCode>> countryCodes}) async {
+    return await showCupertinoModalPopup(
+      context: context,
+      builder: (context) {
+        return Container(
+          height: 300,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+          ),
+          child: Column(
+            children: [
+              Align(
+                alignment: Alignment.centerRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 16.0, top: 16.0),
+                  child: TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.blue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text('Done'),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: CupertinoPicker.builder(
+                  itemExtent: 50,
+                  onSelectedItemChanged: (index) {
+                    dialCodeController?.text = countryCodes.value[index].dialCode;
+                  },
+                  itemBuilder: (context, index) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          countryCodes.value[index].name,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            color: Colors.black,
+                          ),
+                        ),
+                        const Gap(16.0),
+                        Text(
+                          countryCodes.value[index].dialCode,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                  childCount: countryCodes.value.length,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

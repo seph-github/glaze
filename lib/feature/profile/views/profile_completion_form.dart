@@ -127,7 +127,7 @@ class ProfileCompletionForm extends HookConsumerWidget {
         formKey.currentState?.save();
 
         await ref.read(profileNotifierProvider.notifier).updateProfile(
-              userId,
+              id: userId,
               email: emailController.text,
               fullName: fullnameController.text,
               phoneNumber: phoneController.text,

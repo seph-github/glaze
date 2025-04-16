@@ -1,11 +1,12 @@
-import 'dart:developer';
 import 'dart:io';
 
+import 'package:glaze/feature/profile/entity/profile_entity.dart';
 import 'package:glaze/feature/profile/models/recruiter_profile.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../config/enum/profile_type.dart';
 import '../../../core/services/storage_services.dart';
+import '../entity/recruiter_profile_entity.dart';
 import '../models/profile.dart';
 
 class ProfileServices {
@@ -29,7 +30,6 @@ class ProfileServices {
 
       return Profile.fromJson(raw.first);
     } catch (e) {
-      log('ProfileServices.fetchUserProfile: $e');
       rethrow;
     }
   }
@@ -51,7 +51,6 @@ class ProfileServices {
 
       return Profile.fromJson(raw.first);
     } catch (e) {
-      log('ProfileServices.fetchUserProfile: $e');
       rethrow;
     }
   }
@@ -66,7 +65,6 @@ class ProfileServices {
 
       return RecruiterProfile.fromJson(response);
     } catch (e) {
-      log('ProfileServices.fetchRecruiterProfile: $e');
       rethrow;
     }
   }
@@ -85,21 +83,20 @@ class ProfileServices {
           )
           .eq(column, id);
     } catch (e) {
-      log('ProfileServices.setFlagsCompleted: $e');
       rethrow;
     }
   }
 
-  Future<void> updateProfile(
-    String id, {
-    required String email,
-    required String fullName,
-    required String phoneNumber,
-    required List<String> interestList,
-    required String organization,
-    required File? profileImage,
-    required File? identification,
-    required ProfileType role,
+  Future<void> updateProfile({
+    required String id,
+    String? email,
+    String? fullName,
+    String? phoneNumber,
+    List<String>? interestList,
+    String? organization,
+    File? profileImage,
+    File? identification,
+    ProfileType? role,
   }) async {
     try {
       String? identificationUrl;
@@ -113,20 +110,23 @@ class ProfileServices {
         );
       }
 
-      final profileEntity = {
-        'full_name': fullName,
-        'phone_number': phoneNumber,
-        'interests': interestList,
-        'profile_image_url': profileImageUrl,
-        'updated_at': DateTime.now().toIso8601String(),
-        'is_completed_profile': true,
-      }..removeWhere((key, value) => value == null);
+      final ProfileEntity profileEntity = ProfileEntity(
+        id: id,
+        fullName: fullName,
+        phoneNumber: phoneNumber,
+        email: email,
+        profileImageUrl: profileImageUrl,
+        updatedAt: DateTime.now(),
+        isCompletedProfile: true,
+        interests: interestList,
+      );
 
-      final recruiterEntity = {
-        'organization': organization,
-        'identification_url': identificationUrl,
-        'updated_at': DateTime.now().toIso8601String(),
-      }..removeWhere((key, value) => value == null);
+      final RecruiterProfileEntity recruiterProfileEntity = RecruiterProfileEntity(
+        id: id,
+        organization: organization,
+        identificationUrl: identificationUrl,
+        updatedAt: DateTime.now(),
+      );
 
       if (role == ProfileType.recruiter) {
         if (identification != null) {
@@ -137,12 +137,21 @@ class ProfileServices {
           );
         }
 
-        await _supabaseClient.from('reqruiters').update(recruiterEntity).eq('user_id', id);
+        await _supabaseClient
+            .from('recruiters')
+            .update(
+              recruiterProfileEntity.toMap(),
+            )
+            .eq('user_id', id);
       }
 
-      await _supabaseClient.from('profiles').update(profileEntity).eq('id', id);
+      await _supabaseClient
+          .from('profiles')
+          .update(
+            profileEntity.toMap(),
+          )
+          .eq('id', id);
     } catch (e) {
-      log('ProfileServices.updateProfile: $e');
       rethrow;
     }
   }

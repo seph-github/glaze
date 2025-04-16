@@ -4,16 +4,15 @@ import 'package:gap/gap.dart';
 import 'package:glaze/components/app_bar_with_back_button.dart';
 import 'package:glaze/components/buttons/primary_button.dart';
 import 'package:glaze/components/inputs/phone_number_input.dart';
-import 'package:glaze/components/snack_bar/custom_snack_bar.dart';
 import 'package:glaze/feature/auth/providers/auth_provider.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
+import 'package:glaze/utils/common_reg_exp.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:supabase/supabase.dart';
-
 import '../../../core/routing/router.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../gen/assets.gen.dart';
+import '../../../utils/throw_Auth_exception_error.dart';
 
 class AuthPhoneSignIn extends HookConsumerWidget {
   const AuthPhoneSignIn({super.key});
@@ -22,6 +21,8 @@ class AuthPhoneSignIn extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(authNotifierProvider);
     final router = GoRouter.of(context);
+    final GlobalKey<FormState> formKey = useMemoized(() => GlobalKey<FormState>());
+    final FocusNode phonePickerFocusNode = FocusNode();
 
     final phoneController = useTextEditingController();
 
@@ -30,13 +31,8 @@ class AuthPhoneSignIn extends HookConsumerWidget {
     ref.listen(
       authNotifierProvider,
       (prev, next) {
-        if (next.error != null && next.error is AuthException) {
-          final errorMessage = next.error as AuthException;
-
-          CustomSnackBar.showSnackBar(
-            context,
-            message: errorMessage.message,
-          );
+        if (next.error != null && next.error != prev?.error) {
+          throwAuthExceptionError(context, next);
         }
 
         if (next.otpSent) {
@@ -102,19 +98,39 @@ class AuthPhoneSignIn extends HookConsumerWidget {
                       ),
                 ),
                 const Gap(16.0),
-                PhoneNumberInput(
-                  phoneController: phoneController,
-                  dialCodeController: dialCodeController,
+                Form(
+                  key: formKey,
+                  child: PhoneNumberInput(
+                    phoneController: phoneController,
+                    focusNode: phonePickerFocusNode,
+                    dialCodeController: dialCodeController,
+                    validator: (value) {
+                      final phoneRegex = phoneNumberRegExp;
+                      if (!phoneRegex.hasMatch(value!)) {
+                        return 'Please enter a valid phone number';
+                      }
+
+                      return null;
+                    },
+                  ),
                 ),
                 const Gap(32.0),
                 PrimaryButton(
                   label: 'Send OTP',
                   onPressed: () {
-                    final phoneNumber = dialCodeController.text.trim() + phoneController.text.trim();
+                    phonePickerFocusNode.unfocus();
 
-                    ref.read(authNotifierProvider.notifier).signInWithPhone(
-                          phoneNumber,
-                        );
+                    if (formKey.currentState?.validate() == true) {
+                      formKey.currentState?.save();
+
+                      final phoneNumber = dialCodeController.text.trim() + phoneController.text.trim();
+
+                      ref.read(authNotifierProvider.notifier).signInWithPhone(
+                            phoneNumber,
+                          );
+                    } else {
+                      return;
+                    }
                   },
                 ),
               ],

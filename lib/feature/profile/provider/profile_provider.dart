@@ -35,7 +35,6 @@ class ProfileNotifier extends _$ProfileNotifier {
   Future<void> fetchProfile(String id) async {
     state = state.copyWith(isLoading: true);
     try {
-      // final User user = AuthServices().currentUser!;
       final profile = await ProfileServices().fetchUserProfile(id);
 
       if (profile == null) {
@@ -108,21 +107,21 @@ class ProfileNotifier extends _$ProfileNotifier {
     }
   }
 
-  Future<void> updateProfile(
-    String id, {
-    required String email,
-    required String fullName,
-    required String phoneNumber,
-    required List<String> interestList,
-    required String organization,
-    required File? profileImage,
-    required File? identification,
-    required ProfileType role,
+  Future<void> updateProfile({
+    required String id,
+    String? email,
+    String? fullName,
+    String? phoneNumber,
+    List<String>? interestList,
+    String? organization,
+    File? profileImage,
+    File? identification,
+    ProfileType? role,
   }) async {
     state = state.copyWith(isLoading: true);
     try {
       await ProfileServices().updateProfile(
-        id,
+        id: id,
         email: email,
         fullName: fullName,
         phoneNumber: phoneNumber,

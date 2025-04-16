@@ -32,6 +32,11 @@ class AuthNotifier extends _$AuthNotifier {
     state = state.copyWith(error: error, isLoading: false);
   }
 
+  void setPhoneSentError(Exception error) {
+    state = state.copyWith(error: null);
+    state = state.copyWith(error: error, isLoading: false, otpSent: false);
+  }
+
   void clearError() {
     state = state.copyWith(error: null);
   }
@@ -113,6 +118,16 @@ class AuthNotifier extends _$AuthNotifier {
       state = state.copyWith(authResponse: null, isLoading: false);
     } catch (e) {
       setError(e as Exception);
+    }
+  }
+
+  Future<void> resetPassword(String email) async {
+    state = state.copyWith(isLoading: true);
+    try {
+      await AuthServices().resetPassword(email);
+      state = state.copyWith(isLoading: false, otpSent: true);
+    } catch (e) {
+      setPhoneSentError(e as Exception);
     }
   }
 }

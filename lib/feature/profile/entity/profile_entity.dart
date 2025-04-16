@@ -4,20 +4,20 @@ class ProfileEntity {
   final String? email;
   final String? profileImageUrl;
   final String? bio;
-  final int totalGlazes;
-  final int totalUploads;
+  final int? totalGlazes;
+  final int? totalUploads;
   final Map<String, dynamic>? badges;
   final DateTime? createdAt;
   final String? provider;
-  final int totalFollowers;
-  final int totalFollowing;
+  final int? totalFollowers;
+  final int? totalFollowing;
   final String? usernameId;
   final String? role;
   final String? phoneNumber;
-  final bool isOnboardingCompleted;
+  final bool? isOnboardingCompleted;
   final String? fullName;
   final List<String>? interests;
-  final bool isCompletedProfile;
+  final bool? isCompletedProfile;
   final DateTime? updatedAt;
 
   ProfileEntity({
@@ -26,20 +26,20 @@ class ProfileEntity {
     this.email,
     this.profileImageUrl,
     this.bio,
-    this.totalGlazes = 0,
-    this.totalUploads = 0,
+    this.totalGlazes,
+    this.totalUploads,
     this.badges,
     this.createdAt,
-    this.provider = 'NULL',
-    this.totalFollowers = 0,
-    this.totalFollowing = 0,
+    this.provider,
+    this.totalFollowers,
+    this.totalFollowing,
     this.usernameId,
     this.role,
     this.phoneNumber,
-    this.isOnboardingCompleted = false,
+    this.isOnboardingCompleted,
     this.fullName,
     this.interests,
-    this.isCompletedProfile = false,
+    this.isCompletedProfile,
     this.updatedAt,
   });
 

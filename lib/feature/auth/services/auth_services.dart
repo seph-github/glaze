@@ -1,6 +1,3 @@
-import 'dart:developer';
-import 'dart:math' as math;
-
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../config/enum/profile_type.dart';
@@ -23,9 +20,9 @@ class AuthServices {
       );
 
       return authResponse;
-    } on AuthApiException catch (e) {
+    } on AuthApiException catch (_) {
       rethrow;
-    } on AuthException catch (e) {
+    } on AuthException catch (_) {
       rethrow;
     } catch (e) {
       rethrow;
@@ -52,8 +49,10 @@ class AuthServices {
       );
 
       return authResponse;
-    } on AuthApiException catch (e) {
-      return throw AuthApiException(e.toString());
+    } on AuthApiException catch (_) {
+      rethrow;
+    } on AuthException catch (_) {
+      rethrow;
     } catch (e) {
       rethrow;
     }
@@ -64,8 +63,11 @@ class AuthServices {
       await _supabase.auth.signInWithOtp(
         phone: phone,
       );
+    } on AuthApiException catch (_) {
+      rethrow;
+    } on AuthException catch (_) {
+      rethrow;
     } catch (e) {
-      log('error signing in using phone: $e');
       rethrow;
     }
   }
@@ -79,8 +81,11 @@ class AuthServices {
       );
 
       return authtResponse;
-    } on Exception catch (e) {
-      log('error verifying phone: $e');
+    } on AuthApiException catch (_) {
+      rethrow;
+    } on AuthException catch (_) {
+      rethrow;
+    } catch (_) {
       rethrow;
     }
   }
@@ -100,8 +105,10 @@ class AuthServices {
       // );
 
       return authResponse;
-    } on AuthApiException catch (e) {
-      throw AuthApiException(e.toString());
+    } on AuthApiException catch (_) {
+      rethrow;
+    } on AuthException catch (_) {
+      rethrow;
     } catch (e) {
       rethrow;
     }
@@ -110,8 +117,22 @@ class AuthServices {
   Future<void> signOut() async {
     try {
       await _supabase.auth.signOut();
-    } on AuthApiException catch (e) {
-      throw Exception('SignOut: $e');
+    } on AuthApiException catch (_) {
+      rethrow;
+    } on AuthException catch (_) {
+      rethrow;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> resetPassword(String email) async {
+    try {
+      await _supabase.auth.resetPasswordForEmail(email);
+    } on AuthApiException catch (_) {
+      rethrow;
+    } on AuthException catch (_) {
+      rethrow;
     } catch (e) {
       rethrow;
     }
@@ -119,10 +140,5 @@ class AuthServices {
 
   Stream<AuthState> onAuthStateChange() {
     return _supabase.auth.onAuthStateChange;
-  }
-
-  int createRandomNumber() {
-    final random = math.Random();
-    return random.nextInt(90000000) + 10000000;
   }
 }

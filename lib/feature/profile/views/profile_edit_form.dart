@@ -56,6 +56,15 @@ class ProfileEditForm extends HookConsumerWidget {
       },
     );
 
+    ref.listen(
+      profileNotifierProvider,
+      (prev, next) {
+        if (next.error != null && next.error != prev?.error) {
+          // TODO: Handle error state
+        }
+      },
+    );
+
     useEffect(() {
       Future.microtask(() async {
         categories.value = await ref.read(categoryRepositoryProvider).fetchCategories();
@@ -201,7 +210,16 @@ class ProfileEditForm extends HookConsumerWidget {
                 PrimaryButton(
                   label: 'Save',
                   onPressed: () async {
-                    // await ref.read(profileNotifierProvider.notifier).updateProfile(id, email: , fullName: fullName, phoneNumber: phoneNumber, interestList: interestList, organization: organization, profileImage: profileImage, identification: identification, role: role)
+                    await ref.read(profileNotifierProvider.notifier).updateProfile(
+                          id: id,
+                          email: emailController.text.trim(),
+                          fullName: fullnameController.text.trim(),
+                          phoneNumber: phoneController.text.trim(),
+                          interestList: updatedSelectedInterests.value,
+                          profileImage: currentImage.value != null ? File(currentImage.value!) : null,
+                          role: ProfileType.values.firstWhere((element) => element.name == data?.role),
+                          organization: organizationController.text.trim(),
+                        );
                   },
                 ),
                 const Gap(32.0),
