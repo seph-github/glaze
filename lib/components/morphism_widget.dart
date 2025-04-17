@@ -12,6 +12,7 @@ class MorphismWidget extends StatelessWidget {
     this.onTap,
     this.onDoubleTap,
     this.onLongPress,
+    this.color,
   })  : width = size ?? 60,
         height = size ?? 60;
 
@@ -24,6 +25,7 @@ class MorphismWidget extends StatelessWidget {
     this.onTap,
     this.onDoubleTap,
     this.onLongPress,
+    this.color,
     this.shape = BoxShape.rectangle,
   })  : width = width ?? double.infinity,
         height = height ?? 50;
@@ -36,11 +38,11 @@ class MorphismWidget extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onDoubleTap;
   final VoidCallback? onLongPress;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
-    final BorderRadiusGeometry? borderRadiusGeometry =
-        shape == BoxShape.circle ? null : BorderRadius.circular(radius);
+    final BorderRadiusGeometry? borderRadiusGeometry = shape == BoxShape.circle ? null : BorderRadius.circular(radius);
 
     Widget? widget = BackdropFilter(
       filter: ImageFilter.blur(
@@ -53,20 +55,21 @@ class MorphismWidget extends StatelessWidget {
         decoration: BoxDecoration(
           shape: shape!,
           borderRadius: borderRadiusGeometry,
-          color: Colors.white
-              .withValues(alpha: 0.1), // Semi-transparent glass color
+          color: color ?? Colors.white.withValues(alpha: 0.1), // Semi-transparent glass color
           border: Border.all(
-            color: Colors.white.withValues(alpha: 0.9), // Light border
+            color: color ?? Colors.white.withValues(alpha: 0.9), // Light border
             width: 0.01,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.white.withValues(alpha: 0.9), // Shadow effect
-              blurRadius: 30,
-              spreadRadius: 2,
-              blurStyle: BlurStyle.outer,
-            ),
-          ],
+          boxShadow: color != null
+              ? null
+              : [
+                  BoxShadow(
+                    color: Colors.white.withValues(alpha: 0.9), // Shadow effect
+                    blurRadius: 30,
+                    spreadRadius: 2,
+                    blurStyle: BlurStyle.outer,
+                  ),
+                ],
         ),
         child: Stack(
           alignment: Alignment.topCenter,
@@ -89,14 +92,16 @@ class MorphismWidget extends StatelessWidget {
                   ],
                 ),
                 */
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: height != null && width != null ? 3 : 0,
-                    color: Colors.black12,
-                    spreadRadius: height != null && width != null ? 10 : 0,
-                    blurStyle: BlurStyle.inner,
-                  ),
-                ],
+                boxShadow: color != null
+                    ? null
+                    : [
+                        BoxShadow(
+                          blurRadius: height != null && width != null ? 3 : 0,
+                          color: Colors.black12,
+                          spreadRadius: height != null && width != null ? 10 : 0,
+                          blurStyle: BlurStyle.inner,
+                        ),
+                      ],
               ),
             ),
             if (child != null)

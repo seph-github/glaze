@@ -1,25 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/components/morphism_widget.dart';
+import 'package:glaze/feature/home/models/glaze.dart';
+import 'package:glaze/feature/home/provider/glaze_provider.dart';
 import 'package:glaze/feature/home/provider/video_content_provider.dart';
 import 'package:glaze/feature/home/views/video_player_view.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
 import 'package:glaze/gen/assets.gen.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../components/snack_bar/custom_snack_bar.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../widgets/home_interactive_card.dart';
 import '../widgets/share_option_button.dart';
 
-class HomeView extends HookWidget {
+class HomeView extends HookConsumerWidget {
   const HomeView({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(videoContentNotifierProvider);
+
     final controller = usePageController();
     final size = MediaQuery.sizeOf(context);
     final double height = size.height;
@@ -28,6 +32,7 @@ class HomeView extends HookWidget {
     final showShareButton = useState<bool>(false);
     final focusNode = useFocusNode();
     final currentIndex = useState<int>(0);
+    final userGlazes = useState<List<Glaze>>([]);
 
     void toggleDonutOptions(bool value) {
       showMoreDonutOptions.value = value;
@@ -37,116 +42,120 @@ class HomeView extends HookWidget {
       showShareButton.value = value;
     }
 
-    return Consumer(
-      builder: (context, ref, child) {
-        ref.listen(
-          videoContentNotifierProvider,
-          (prev, next) {
-            if (next.error != null && next.error != prev?.error) {
-              final errorMessage = next.error.toString();
+    ref.listen(
+      videoContentNotifierProvider,
+      (prev, next) {
+        if (next.error != null && next.error != prev?.error) {
+          final errorMessage = next.error.toString();
 
-              CustomSnackBar.showSnackBar(context, message: errorMessage);
-            }
-          },
-        );
+          CustomSnackBar.showSnackBar(context, message: errorMessage);
+        }
+      },
+    );
 
-        final state = ref.watch(videoContentNotifierProvider);
+    ref.listen(
+      glazeNotifierProvider,
+      (prev, next) {
+        userGlazes.value = next.glazes ?? [];
+      },
+    );
 
-        return LoadingLayout(
-          isLoading: state.isLoading,
-          child: RefreshIndicator(
-            onRefresh: () => ref
-                .refresh(videoContentNotifierProvider.notifier)
-                .fetchVideoContents(),
-            color: Colors.white12,
-            triggerMode: RefreshIndicatorTriggerMode.onEdge,
-            child: AnimatedContainer(
-                duration: const Duration(milliseconds: 500),
-                child: PageView.builder(
-                  controller: controller,
-                  onPageChanged: (index) {
-                    currentIndex.value = index;
+    useEffect(() {
+      Future.microtask(
+        () async => await ref.read(glazeNotifierProvider.notifier).fetchUserGlazes(),
+      );
+      userGlazes.value = ref.watch(glazeNotifierProvider).glazes ?? [];
+      return;
+    }, []);
 
-                    state.cachedVideoContent?.controllers?[0].play();
-                    for (int i = 0;
-                        i <
-                            (state.cachedVideoContent?.controllers?.length ??
-                                0);
-                        i++) {
-                      if (i != index) {
-                        state.cachedVideoContent?.controllers?[i].pause();
-                      } else {
-                        state.cachedVideoContent?.controllers?[i].play();
-                      }
+    return LoadingLayout(
+      isLoading: state.isLoading,
+      child: RefreshIndicator(
+        onRefresh: () => ref.refresh(videoContentNotifierProvider.notifier).fetchVideoContents(),
+        color: Colors.white12,
+        triggerMode: RefreshIndicatorTriggerMode.onEdge,
+        child: AnimatedContainer(
+            duration: const Duration(milliseconds: 500),
+            child: PageView.builder(
+              controller: controller,
+              onPageChanged: (index) {
+                currentIndex.value = index;
+
+                state.cachedVideoContent?.controllers?[0].play();
+                for (int i = 0; i < (state.cachedVideoContent?.controllers?.length ?? 0); i++) {
+                  if (i != index) {
+                    state.cachedVideoContent?.controllers?[i].pause();
+                  } else {
+                    state.cachedVideoContent?.controllers?[i].play();
+                  }
+                }
+              },
+              itemCount: state.cachedVideoContent?.controllers?.length ?? 0,
+              scrollDirection: Axis.vertical,
+              physics: const AlwaysScrollableScrollPhysics(),
+              itemBuilder: (context, index) {
+                return Focus(
+                  focusNode: focusNode,
+                  autofocus: focusNode.hasFocus,
+                  canRequestFocus: true,
+                  onFocusChange: (value) {
+                    if (value) {
+                      state.cachedVideoContent?.controllers?[currentIndex.value].play();
+                    } else {
+                      state.cachedVideoContent?.controllers?[currentIndex.value].pause();
                     }
                   },
-                  itemCount: state.cachedVideoContent?.controllers?.length ?? 0,
-                  scrollDirection: Axis.vertical,
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    return Focus(
-                      focusNode: focusNode,
-                      autofocus: focusNode.hasFocus,
-                      canRequestFocus: true,
-                      onFocusChange: (value) {
-                        if (value) {
-                          state.cachedVideoContent
-                              ?.controllers?[currentIndex.value]
-                              .play();
-                        } else {
-                          state.cachedVideoContent
-                              ?.controllers?[currentIndex.value]
-                              .pause();
-                        }
-                      },
-                      child: Stack(
-                        alignment: Alignment.bottomCenter,
-                        children: [
-                          VideoPlayerView(
-                            controller:
-                                state.cachedVideoContent?.controllers?[index],
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            child: HomeInteractiveCard(
-                              key: PageStorageKey('HomeInteractiveCard_$index'),
-                              onGlazeLongPress: () => toggleDonutOptions(true),
-                              onGlazeTap: () {},
-                              onShareTap: () async =>
-                                  await _showShareOptions(context),
-                              width: width,
-                              height: height,
-                              cachedVideos: state.cachedVideoContent,
-                              index: index,
-                            ),
-                          ),
-                          if (showMoreDonutOptions.value ||
-                              showShareButton.value)
-                            GestureDetector(
-                              onTap: () {
-                                toggleDonutOptions(false);
-                                toggleShareButton(false);
-                              },
-                              child: Container(
-                                height: double.infinity,
-                                width: double.infinity,
-                                color: Colors.black.withValues(alpha: 0.7),
-                              ),
-                            ),
-                          if (showMoreDonutOptions.value)
-                            _buildDonutOptions(context, width: width),
-                          // if (showShareButton.value)
-                          //   buildShareOptions(context, width: width),
-                        ],
+                  child: Stack(
+                    alignment: Alignment.bottomCenter,
+                    children: [
+                      VideoPlayerView(
+                        controller: state.cachedVideoContent?.controllers?[index],
                       ),
-                    );
-                  },
-                )),
-          ),
-        );
-      },
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: HomeInteractiveCard(
+                          key: PageStorageKey('HomeInteractiveCard_$index'),
+                          onGlazeLongPress: () => toggleDonutOptions(true),
+                          isGlazed: userGlazes.value.any(
+                            (glaze) {
+                              return glaze.videoId == state.cachedVideoContent?.videoContents?[index].videoId;
+                            },
+                          ),
+                          onGlazeTap: () async {
+                            await ref.read(glazeNotifierProvider.notifier).onGlazed(videoId: state.cachedVideoContent?.videoContents?[index].videoId ?? '').then(
+                                  (_) => ref.refresh(glazeNotifierProvider.notifier).fetchUserGlazes(),
+                                );
+                          },
+                          onShareTap: () async => await _showShareOptions(context),
+                          width: width,
+                          height: height,
+                          cachedVideos: state.cachedVideoContent,
+                          index: index,
+                        ),
+                      ),
+                      if (showMoreDonutOptions.value || showShareButton.value)
+                        GestureDetector(
+                          onTap: () {
+                            toggleDonutOptions(false);
+                            toggleShareButton(false);
+                          },
+                          child: Container(
+                            height: double.infinity,
+                            width: double.infinity,
+                            color: Colors.black.withValues(alpha: 0.7),
+                          ),
+                        ),
+                      if (showMoreDonutOptions.value) _buildDonutOptions(context, width: width),
+                      // if (showShareButton.value)
+                      //   buildShareOptions(context, width: width),
+                    ],
+                  ),
+                );
+              },
+            )),
+      ),
     );
   }
 
@@ -249,28 +258,22 @@ class HomeView extends HookWidget {
                   spacing: 60.0,
                   children: [
                     ShareOptionButton(
-                      child:
-                          SvgPicture.asset(Assets.images.svg.copyLinkIcon.path),
+                      child: SvgPicture.asset(Assets.images.svg.copyLinkIcon.path),
                     ),
                     ShareOptionButton(
-                      child: SvgPicture.asset(
-                          Assets.images.svg.emailSocialMedia.path),
+                      child: SvgPicture.asset(Assets.images.svg.emailSocialMedia.path),
                     ),
                     ShareOptionButton(
-                      child: SvgPicture.asset(
-                          Assets.images.svg.twitterSocialMedia.path),
+                      child: SvgPicture.asset(Assets.images.svg.twitterSocialMedia.path),
                     ),
                     ShareOptionButton(
-                      child: SvgPicture.asset(
-                          Assets.images.svg.whatsappSocialMedia.path),
+                      child: SvgPicture.asset(Assets.images.svg.whatsappSocialMedia.path),
                     ),
                     ShareOptionButton(
-                      child: SvgPicture.asset(
-                          Assets.images.svg.snapchatSocialMedia.path),
+                      child: SvgPicture.asset(Assets.images.svg.snapchatSocialMedia.path),
                     ),
                     ShareOptionButton(
-                      child: SvgPicture.asset(
-                          Assets.images.svg.tikTokSocialMedia.path),
+                      child: SvgPicture.asset(Assets.images.svg.tikTokSocialMedia.path),
                     ),
                   ],
                 ),

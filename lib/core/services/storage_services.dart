@@ -13,7 +13,7 @@ class StorageServices {
   }) async {
     try {
       final String sanitizedFileName = fileName.replaceAll(' ', '_').toLowerCase();
-      final String dirName = '$id/$sanitizedFileName}';
+      final String dirName = '$id/$sanitizedFileName/${file.path.split('/').last}';
       final result = await _storageClient.from(bucketName).upload(dirName, file);
 
       final url = _storageClient.from(bucketName).getPublicUrl(result);

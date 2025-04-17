@@ -7,11 +7,11 @@ import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/components/buttons/primary_button.dart';
 import 'package:glaze/config/enum/profile_type.dart';
-import 'package:glaze/config/strings/string_extension.dart';
 import 'package:glaze/feature/camera/provider/content_picker_provider.dart';
 import 'package:glaze/feature/profile/provider/profile_provider.dart';
 import 'package:glaze/feature/profile/widgets/interest_choice_chip.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
+import 'package:glaze/utils/form_validators.dart';
 import 'package:glaze/utils/throw_error_exception_helper.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -184,12 +184,7 @@ class ProfileEditForm extends HookConsumerWidget {
                   ),
                   hintText: 'Username',
                   filled: true,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your full name';
-                    }
-                    return null;
-                  },
+                  validator: validateUsername,
                 ),
                 InputField.text(
                   controller: fullnameController,
@@ -198,12 +193,7 @@ class ProfileEditForm extends HookConsumerWidget {
                   ),
                   hintText: 'Full name',
                   filled: true,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your full name';
-                    }
-                    return null;
-                  },
+                  validator: validateFullname,
                 ),
                 const Gap(10),
                 InputField.email(
@@ -214,14 +204,7 @@ class ProfileEditForm extends HookConsumerWidget {
                   ),
                   hintText: 'Email address',
                   filled: true,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your email address';
-                    } else if (!value.isValidEmail()) {
-                      return 'Please enter a valid email address';
-                    }
-                    return null;
-                  },
+                  validator: validateEmail,
                 ),
                 const Gap(10),
                 InputField.text(
@@ -232,12 +215,7 @@ class ProfileEditForm extends HookConsumerWidget {
                   ),
                   hintText: 'Phone number',
                   filled: true,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your phone number';
-                    }
-                    return null;
-                  },
+                  // validator: validatePhone,
                 ),
                 if (state.profile?.role == ProfileType.recruiter.name)
                   Column(
@@ -250,12 +228,7 @@ class ProfileEditForm extends HookConsumerWidget {
                         ),
                         hintText: 'Organization',
                         filled: true,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your organization';
-                          }
-                          return null;
-                        },
+                        validator: validateOrganization,
                       ),
                     ],
                   ),
@@ -271,17 +244,21 @@ class ProfileEditForm extends HookConsumerWidget {
                 PrimaryButton(
                   label: 'Save',
                   onPressed: () async {
-                    final isProfileImageChanged = currentImage.value != state.profile?.profileImageUrl;
+                    if (formKey.currentState?.validate() ?? false) {
+                      formKey.currentState?.save();
 
-                    await ref.read(profileNotifierProvider.notifier).updateProfile(
-                          id: id,
-                          username: usernameController.text.trim(),
-                          email: emailController.text.trim(),
-                          fullName: fullnameController.text.trim(),
-                          phoneNumber: phoneController.text.trim(),
-                          interestList: updatedSelectedInterests.value,
-                          profileImage: isProfileImageChanged && currentImage.value != null ? File(currentImage.value!) : null,
-                        );
+                      final isProfileImageChanged = currentImage.value != state.profile?.profileImageUrl;
+
+                      await ref.read(profileNotifierProvider.notifier).updateProfile(
+                            id: id,
+                            username: usernameController.text.trim(),
+                            email: emailController.text.trim(),
+                            fullName: fullnameController.text.trim(),
+                            phoneNumber: phoneController.text.trim(),
+                            interestList: updatedSelectedInterests.value,
+                            profileImage: isProfileImageChanged && currentImage.value != null ? File(currentImage.value!) : null,
+                          );
+                    }
                   },
                 ),
                 const Gap(32.0),

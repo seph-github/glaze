@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
@@ -61,14 +60,9 @@ class DashboardView extends HookWidget {
 Future<void> _showBottomSheet(BuildContext context) async {
   await showCupertinoModalPopup(
     context: context,
-    // backgroundColor: Colors.transparent,
-    // isScrollControlled: true,
-    // isDismissible: false,
-    // useSafeArea: true,
     builder: (context) {
-      // ignore: prefer_const_constructors
-      return SafeArea(
-        child: const CupertinoPopupSurface(
+      return const SafeArea(
+        child: CupertinoPopupSurface(
           child: UploadMomentsCard(),
         ),
       );

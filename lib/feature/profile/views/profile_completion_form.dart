@@ -7,7 +7,6 @@ import 'package:gap/gap.dart';
 
 import 'package:glaze/components/inputs/input_field.dart';
 import 'package:glaze/config/enum/profile_type.dart';
-import 'package:glaze/config/strings/string_extension.dart';
 import 'package:glaze/core/routing/router.dart';
 import 'package:glaze/core/styles/color_pallete.dart';
 import 'package:glaze/data/models/category/category_model.dart';
@@ -16,6 +15,7 @@ import 'package:glaze/feature/camera/provider/content_picker_provider.dart';
 import 'package:glaze/feature/profile/provider/profile_provider.dart';
 import 'package:glaze/feature/profile/provider/profile_interests_list_provider.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
+import 'package:glaze/utils/form_validators.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -190,12 +190,7 @@ class ProfileCompletionForm extends HookConsumerWidget {
                     inputIcon: SvgPicture.asset(Assets.images.svg.profileIcon.path),
                     hintText: 'Full name',
                     filled: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your full name';
-                      }
-                      return null;
-                    },
+                    validator: validateFullname,
                   ),
                   const Gap(10),
                   InputField.email(
@@ -204,14 +199,7 @@ class ProfileCompletionForm extends HookConsumerWidget {
                     inputIcon: SvgPicture.asset(Assets.images.svg.emailIcon.path),
                     hintText: 'Email address',
                     filled: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your email address';
-                      } else if (!value.isValidEmail()) {
-                        return 'Please enter a valid email address';
-                      }
-                      return null;
-                    },
+                    validator: validateEmail,
                   ),
                   const Gap(10),
                   InputField.text(
@@ -221,18 +209,7 @@ class ProfileCompletionForm extends HookConsumerWidget {
                     keyboardType: TextInputType.phone,
                     hintText: 'Phone number',
                     filled: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your phone number';
-                      }
-                      if (value.length < 10) {
-                        return 'Please enter a valid phone number';
-                      }
-                      if (value.length > 15) {
-                        return 'Please enter a valid phone number';
-                      }
-                      return null;
-                    },
+                    validator: validatePhone,
                   ),
                   const Gap(10),
                   if (role == ProfileType.recruiter.name)
@@ -241,12 +218,7 @@ class ProfileCompletionForm extends HookConsumerWidget {
                       inputIcon: SvgPicture.asset(Assets.images.svg.organizationIcon.path),
                       hintText: 'Organization',
                       filled: true,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your organization';
-                        }
-                        return null;
-                      },
+                      validator: validateOrganization,
                     ),
                   const Gap(16),
                   InterestChoiceChip(

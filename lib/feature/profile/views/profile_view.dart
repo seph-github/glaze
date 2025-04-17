@@ -15,6 +15,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../config/enum/profile_type.dart';
 import '../../../core/routing/router.dart';
 import '../../../gen/assets.gen.dart';
 import '../../auth/services/auth_services.dart';
@@ -56,19 +57,20 @@ class ProfileView extends HookConsumerWidget {
               fontFamily: FontFamily.hitAndRun,
             ),
         actions: [
-          InkWell(
-            onTap: () {},
-            child: Container(
-              width: 46.0,
-              height: width,
-              padding: const EdgeInsets.all(12.0),
-              decoration: const BoxDecoration(
-                color: ColorPallete.secondaryColor,
-                shape: BoxShape.circle,
+          if (state.profile?.role == ProfileType.recruiter.name)
+            InkWell(
+              onTap: () {},
+              child: Container(
+                width: 46.0,
+                height: width,
+                padding: const EdgeInsets.all(12.0),
+                decoration: const BoxDecoration(
+                  color: ColorPallete.secondaryColor,
+                  shape: BoxShape.circle,
+                ),
+                child: SvgPicture.asset(Assets.images.svg.messageIcon.path),
               ),
-              child: SvgPicture.asset(Assets.images.svg.messageIcon.path),
             ),
-          ),
           const Gap(12.0),
           InkWell(
             borderRadius: BorderRadius.circular(64.0),

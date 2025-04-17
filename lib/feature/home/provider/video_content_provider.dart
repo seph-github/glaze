@@ -18,7 +18,7 @@ part 'video_content_provider.g.dart';
 @freezed
 abstract class VideoContentState with _$VideoContentState {
   const factory VideoContentState({
-    @Default('') String response,
+    @Default(null) String? response,
     @Default(null) CachedVideoContent? cachedVideoContent,
     @Default([]) List<VideoContent> videoContents,
     @Default(false) bool isLoading,
@@ -34,6 +34,11 @@ class VideoContentNotifier extends _$VideoContentNotifier {
   VideoContentState build() {
     Future.microtask(() async => await fetchVideoContents());
     return const VideoContentState();
+  }
+
+  void setNewResponse(String response) {
+    state = state.copyWith(isLoading: false, response: null);
+    state = state.copyWith(isLoading: false, response: response);
   }
 
   void setError(dynamic error) {
@@ -115,7 +120,7 @@ class VideoContentNotifier extends _$VideoContentNotifier {
         category: category,
       );
 
-      state = state.copyWith(isLoading: false, response: response);
+      setNewResponse(response);
     } catch (e) {
       setError(e);
     }

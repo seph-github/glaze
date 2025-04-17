@@ -43,7 +43,6 @@ class UploadMomentsCard extends HookConsumerWidget {
 
     final titleController = useTextEditingController();
     final captionController = useTextEditingController();
-    final publishAsController = useTextEditingController();
     final categoryController = useTextEditingController();
     final fileController = useTextEditingController();
 
@@ -67,12 +66,19 @@ class UploadMomentsCard extends HookConsumerWidget {
           final errorMessage = next.error.toString();
 
           CustomSnackBar.showSnackBar(context, message: errorMessage);
-        } else if (next.response.isNotEmpty && next.response != prev?.response) {
+        } else if (next.response != null && next.response != prev?.response) {
           Dialogs.createContentDialog(
             context,
             title: 'Success',
-            content: state.response,
+            content: state.response ?? '',
             onPressed: () async {
+              titleController.clear();
+              captionController.clear();
+              categoryController.clear();
+              fileController.clear();
+              file.value = null;
+              ref.invalidate(contentPickerNotifierProvider);
+
               router.pop();
             },
           );
@@ -91,7 +97,7 @@ class UploadMomentsCard extends HookConsumerWidget {
     );
 
     void onCancelUploadMoment() async {
-      if (titleController.text.isNotEmpty || captionController.text.isNotEmpty || categoryController.text.isNotEmpty || publishAsController.text.isNotEmpty || fileController.text.isNotEmpty || file.value != null) {
+      if (titleController.text.isNotEmpty || captionController.text.isNotEmpty || categoryController.text.isNotEmpty || fileController.text.isNotEmpty || file.value != null) {
         await showUploadMomentCard(context);
       } else {
         context.pop();
@@ -110,7 +116,9 @@ class UploadMomentsCard extends HookConsumerWidget {
                 ),
                 actions: [
                   CupertinoActionSheetAction(
-                    onPressed: () => context.pop(),
+                    onPressed: () {
+                      context.pop();
+                    },
                     child: const Text('Ok'),
                   ),
                 ],
@@ -136,11 +144,11 @@ class UploadMomentsCard extends HookConsumerWidget {
       child: Container(
         height: height,
         width: double.infinity,
-        padding: const EdgeInsets.only(
-          left: 16.0,
-          // top: 16.0,
-          right: 16.0,
-        ),
+        // padding: const EdgeInsets.only(
+        //   left: 16.0,
+        //   // top: 16.0,
+        //   right: 16.0,
+        // ),
         decoration: BoxDecoration(
           // borderRadius: BorderRadius.only(
           //   topLeft: Radius.circular(30.0),
@@ -152,162 +160,175 @@ class UploadMomentsCard extends HookConsumerWidget {
             fit: BoxFit.cover,
           ),
         ),
-        child: SingleChildScrollView(
-          child: Form(
-            key: formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                const Gap(16.0),
-                Align(
-                  alignment: Alignment.topRight,
-                  child: MorphismWidget.circle(
-                    onTap: onCancelUploadMoment,
-                    size: 28.0,
-                    child: SvgPicture.asset(Assets.images.svg.closeIcon.path),
-                  ),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
+              child: Align(
+                alignment: Alignment.topRight,
+                child: MorphismWidget.circle(
+                  onTap: onCancelUploadMoment,
+                  size: 28.0,
+                  child: SvgPicture.asset(Assets.images.svg.closeIcon.path),
                 ),
-                MorphismWidget.circle(
-                  size: 64.0,
-                  child: SvgPicture.asset(Assets.images.svg.uploadIcon.path),
-                ),
-                Text(
-                  'Upload Your Moment',
-                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                        fontWeight: FontWeight.w900,
-                      ),
-                ),
-                Text(
-                  'Share your talent with the community!',
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: ColorPallete.hintTextColor,
-                      ),
-                ),
-                const Gap(16.0),
-                InputField.text(
-                  controller: titleController,
-                  hintText: 'Enter video title',
-                  helper: Text(
-                    '* up to 50 characters',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: ColorPallete.hintTextColor,
-                        ),
-                  ),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Please enter video title';
-                    }
-                    return null;
-                  },
-                ),
-                const Gap(10.0),
-                InputField.paragraph(
-                  controller: captionController,
-                  maxLines: 5,
-                  hintText: 'Write video caption',
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Please enter video caption';
-                    }
-                    return null;
-                  },
-                ),
-                const Gap(26.0),
-                InputField(
-                  hintText: 'Category',
-                  controller: categoryController,
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Please add a category';
-                    }
-                    return null;
-                  },
-                  readOnly: true,
-                  onTap: () async {
-                    await showCategoryModalPopup(context, categoryState, categoryController);
-                  },
-                ),
-                if (fileState.video != null)
-                  Column(
-                    children: [
-                      const Gap(26.0),
-                      Stack(
-                        alignment: Alignment.topRight,
+              ),
+            ),
+            const Divider(),
+            Expanded(
+              child: Form(
+                key: formKey,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: ListView(
+                    children: <Widget>[
+                      const Gap(16.0),
+                      Column(
                         children: [
-                          FutureBuilder<File>(
-                            future: thumbnailFuture,
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                return const CircularProgressIndicator(); // Show loading indicator
-                              } else if (snapshot.hasData) {
-                                return AspectRatio(
-                                  aspectRatio: 16 / 9,
-                                  child: Container(
-                                    clipBehavior: Clip.hardEdge,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Colors.white, // Border color
-                                        width: 0.5, // Border width
-                                      ),
-                                      borderRadius: BorderRadius.circular(16.0), // Rounded corners
-                                      image: DecorationImage(
-                                        image: FileImage(snapshot.data!), // Use the thumbnail as a background
-                                        fit: BoxFit.cover, // Adjust the image to cover the container
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              } else {
-                                return const Text('No thumbnail available'); // Fallback message
-                              }
-                            },
-                          ),
-                          Positioned(
-                            right: 8,
-                            top: 8,
-                            child: IconButton.filled(
-                              onPressed: () => ref.invalidate(contentPickerNotifierProvider),
-                              visualDensity: const VisualDensity(horizontal: -3, vertical: -2),
-                              focusColor: ColorPallete.primaryColor,
-                              color: ColorPallete.primaryColor,
-                              icon: SvgPicture.asset(Assets.images.svg.closeIcon.path),
-                            ),
+                          MorphismWidget.circle(
+                            size: 64.0,
+                            child: SvgPicture.asset(Assets.images.svg.uploadIcon.path),
                           ),
                         ],
                       ),
+                      Text(
+                        'Upload Your Moment',
+                        style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                              fontWeight: FontWeight.w900,
+                            ),
+                      ),
+                      Text(
+                        'Share your talent with the community!',
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                              color: ColorPallete.hintTextColor,
+                            ),
+                      ),
+                      const Gap(16.0),
+                      InputField.text(
+                        controller: titleController,
+                        hintText: 'Enter video title',
+                        helper: Text(
+                          '* up to 50 characters',
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                color: ColorPallete.hintTextColor,
+                              ),
+                        ),
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Please enter video title';
+                          }
+                          return null;
+                        },
+                      ),
+                      const Gap(10.0),
+                      InputField.paragraph(
+                        controller: captionController,
+                        maxLines: 5,
+                        hintText: 'Write video caption',
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Please enter video caption';
+                          }
+                          return null;
+                        },
+                      ),
+                      const Gap(26.0),
+                      InputField(
+                        hintText: 'Category',
+                        controller: categoryController,
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Please add a category';
+                          }
+                          return null;
+                        },
+                        readOnly: true,
+                        onTap: () async {
+                          await showCategoryModalPopup(context, categoryState, categoryController);
+                        },
+                      ),
+                      if (fileState.video != null)
+                        Column(
+                          children: [
+                            const Gap(26.0),
+                            Stack(
+                              alignment: Alignment.topRight,
+                              children: [
+                                FutureBuilder<File>(
+                                  future: thumbnailFuture,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState == ConnectionState.waiting) {
+                                      return const CircularProgressIndicator(); // Show loading indicator
+                                    } else if (snapshot.hasData) {
+                                      return AspectRatio(
+                                        aspectRatio: 16 / 9,
+                                        child: Container(
+                                          clipBehavior: Clip.hardEdge,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color: Colors.white, // Border color
+                                              width: 0.5, // Border width
+                                            ),
+                                            borderRadius: BorderRadius.circular(16.0), // Rounded corners
+                                            image: DecorationImage(
+                                              image: FileImage(snapshot.data!), // Use the thumbnail as a background
+                                              fit: BoxFit.cover, // Adjust the image to cover the container
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    } else {
+                                      return const Text('No thumbnail available'); // Fallback message
+                                    }
+                                  },
+                                ),
+                                Positioned(
+                                  right: 8,
+                                  top: 8,
+                                  child: IconButton.filled(
+                                    onPressed: () => ref.invalidate(contentPickerNotifierProvider),
+                                    visualDensity: const VisualDensity(horizontal: -3, vertical: -2),
+                                    focusColor: ColorPallete.primaryColor,
+                                    color: ColorPallete.primaryColor,
+                                    icon: SvgPicture.asset(Assets.images.svg.closeIcon.path),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      const Gap(26.0),
+                      FocusButton(
+                        controller: fileController,
+                        validator: (value) {
+                          if (file.value == null) {
+                            return 'Please choose file';
+                          } else {}
+
+                          final fileSize = File(file.value?.path ?? '').lengthSync();
+                          if (fileSize > 100 * 1024 * 1024) {
+                            // Check if file size exceeds 100MB
+                            return 'File size must not exceed 100MB';
+                          }
+                          return null;
+                        },
+                        onTap: () async => await onImageSource(context, ref),
+                        child: const Center(
+                          child: Text('Choose a Moment'),
+                        ),
+                      ),
+                      const Gap(26.0),
+                      PrimaryButton(
+                        label: 'Upload Moment',
+                        onPressed: onSubmit,
+                        // onPressed: () {},
+                      ),
+                      const Gap(26.0),
                     ],
                   ),
-                const Gap(26.0),
-                FocusButton(
-                  controller: fileController,
-                  validator: (value) {
-                    if (file.value == null) {
-                      return 'Please choose file';
-                    } else {}
-
-                    final fileSize = File(file.value?.path ?? '').lengthSync();
-                    if (fileSize > 100 * 1024 * 1024) {
-                      // Check if file size exceeds 100MB
-                      return 'File size must not exceed 100MB';
-                    }
-                    return null;
-                  },
-                  onTap: () async => await onImageSource(context, ref),
-                  child: const Center(
-                    child: Text('Choose a Moment'),
-                  ),
                 ),
-                const Gap(26.0),
-                PrimaryButton(
-                  label: 'Upload Moment',
-                  onPressed: onSubmit,
-                  // onPressed: () {},
-                ),
-                const Gap(26.0),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -325,6 +346,7 @@ Future<void> onImageSource(BuildContext ctx, WidgetRef ref) async {
           isDefaultAction: false,
           onPressed: () async {
             await ref.read(contentPickerNotifierProvider.notifier).pickVideos();
+
             if (ctx.mounted) {
               ctx.pop();
             }
@@ -337,6 +359,10 @@ Future<void> onImageSource(BuildContext ctx, WidgetRef ref) async {
             await ref.read(contentPickerNotifierProvider.notifier).takeVideo(
                   prefferedCameraDevice: CameraDevice.rear,
                 );
+
+            if (ctx.mounted) {
+              ctx.pop();
+            }
           },
           child: const Text('Camera'),
         ),

@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/feature/auth/providers/auth_provider.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
+import 'package:glaze/utils/form_validators.dart';
 import 'package:glaze/utils/throw_error_exception_helper.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -103,17 +104,6 @@ class AuthView extends HookConsumerWidget {
 
     final state = ref.watch(authNotifierProvider);
 
-    String? validateEmail(String? value) {
-      if (value == null || value.isEmpty) {
-        return 'Please enter your email';
-      }
-      final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-      if (!emailRegex.hasMatch(value)) {
-        return 'Please enter a valid email';
-      }
-      return null;
-    }
-
     Widget buildLoginItems() {
       return Column(
         mainAxisSize: MainAxisSize.min,
@@ -129,15 +119,7 @@ class AuthView extends HookConsumerWidget {
             inputIcon: SvgPicture.asset(Assets.images.svg.passwordIcon.path),
             hintText: 'Enter your password',
             controller: passwordController,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your password';
-              }
-              if (value.length < 6) {
-                return 'Password must be at least 6 characters long';
-              }
-              return null;
-            },
+            validator: validatePassword,
           ),
         ],
       );
@@ -151,19 +133,7 @@ class AuthView extends HookConsumerWidget {
             inputIcon: SvgPicture.asset(Assets.images.svg.profileIcon.path),
             hintText: 'Choose a username',
             controller: usernameController,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter a username';
-              } else if (value.length < 3) {
-                return 'Username must be at least 3 characters long';
-              } else if (value.length > 20) {
-                return 'Username must be less than 20 characters long';
-              } else if (RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
-                return null;
-              } else {
-                return 'Username can only contain letters, numbers, and underscores';
-              }
-            },
+            validator: validateUsername,
           ),
           const Gap(16),
           InputField.email(
@@ -177,15 +147,7 @@ class AuthView extends HookConsumerWidget {
             inputIcon: SvgPicture.asset(Assets.images.svg.passwordIcon.path),
             hintText: 'Enter your password',
             controller: passwordController,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your password';
-              }
-              if (value.length < 6) {
-                return 'Password must be at least 6 characters long';
-              }
-              return null;
-            },
+            validator: validatePassword,
           ),
         ],
       );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
+import 'package:glaze/core/styles/color_pallete.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../components/morphism_widget.dart';
@@ -18,11 +19,13 @@ class HomeInteractiveCard extends StatelessWidget {
     this.onGlazeLongPress,
     this.onShareTap,
     this.onShareLongPress,
+    this.isGlazed = false,
   });
 
   final int index;
   final double width;
   final double height;
+  final bool isGlazed;
 
   final CachedVideoContent? cachedVideos;
   final VoidCallback? onGlazeTap;
@@ -94,6 +97,7 @@ class HomeInteractiveCard extends StatelessWidget {
           Column(
             children: <Widget>[
               MorphismWidget.circle(
+                color: isGlazed ? ColorPallete.primaryColor : null,
                 onTap: onGlazeTap,
                 onLongPress: onGlazeLongPress,
                 size: 45.0,

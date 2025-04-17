@@ -6,7 +6,7 @@ import 'package:glaze/components/buttons/primary_button.dart';
 import 'package:glaze/components/inputs/phone_number_input.dart';
 import 'package:glaze/feature/auth/providers/auth_provider.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
-import 'package:glaze/utils/common_reg_exp.dart';
+import 'package:glaze/utils/form_validators.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../core/routing/router.dart';
@@ -104,14 +104,7 @@ class AuthPhoneSignIn extends HookConsumerWidget {
                     phoneController: phoneController,
                     focusNode: phonePickerFocusNode,
                     dialCodeController: dialCodeController,
-                    validator: (value) {
-                      final phoneRegex = phoneNumberRegExp;
-                      if (!phoneRegex.hasMatch(value!)) {
-                        return 'Please enter a valid phone number';
-                      }
-
-                      return null;
-                    },
+                    validator: validatePhone,
                   ),
                 ),
                 const Gap(32.0),
