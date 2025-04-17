@@ -46,6 +46,7 @@ class ProfileEditForm extends HookConsumerWidget {
     final emailController = useTextEditingController();
     final phoneController = useTextEditingController();
     final organizationController = useTextEditingController();
+    final usernameController = useTextEditingController();
     final categories = useState<List<CategoryModel>>([]);
     final updatedSelectedInterests = useState<List<String>>([]);
     final currentImage = useState<String?>(null);
@@ -103,6 +104,7 @@ class ProfileEditForm extends HookConsumerWidget {
       phoneController.text = state.profile?.phoneNumber ?? '';
       currentImage.value = state.profile?.profileImageUrl;
       organizationController.text = state.recruiterProfile?.organization ?? '';
+      usernameController.text = state.profile?.username ?? '';
       return null;
     }, []);
 
@@ -169,6 +171,26 @@ class ProfileEditForm extends HookConsumerWidget {
                   ],
                 ),
                 const Gap(10),
+                Text(
+                  'Edit Personal Details',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                ),
+                InputField.text(
+                  controller: usernameController,
+                  inputIcon: SvgPicture.asset(
+                    Assets.images.svg.profileIcon.path,
+                  ),
+                  hintText: 'Username',
+                  filled: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your full name';
+                    }
+                    return null;
+                  },
+                ),
                 InputField.text(
                   controller: fullnameController,
                   inputIcon: SvgPicture.asset(
@@ -253,6 +275,7 @@ class ProfileEditForm extends HookConsumerWidget {
 
                     await ref.read(profileNotifierProvider.notifier).updateProfile(
                           id: id,
+                          username: usernameController.text.trim(),
                           email: emailController.text.trim(),
                           fullName: fullnameController.text.trim(),
                           phoneNumber: phoneController.text.trim(),

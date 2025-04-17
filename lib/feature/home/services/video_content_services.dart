@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:glaze/feature/home/entity/video_content_entity.dart';
 import 'package:glaze/feature/home/models/video_content.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:video_compress/video_compress.dart';
 
 import '../../../core/services/storage_services.dart';
 
@@ -16,9 +15,7 @@ class VideoContentServices {
 
       final rawList = response as List<dynamic>; // explicitly cast
 
-      final value = rawList
-          .map((video) => VideoContent.fromJson(video as Map<String, dynamic>))
-          .toList();
+      final value = rawList.map((video) => VideoContent.fromJson(video as Map<String, dynamic>)).toList();
 
       value.sort((a, b) => b.createdAt!.compareTo(a.createdAt!));
       return value;
@@ -33,20 +30,23 @@ class VideoContentServices {
     required String title,
     required String caption,
     required String category,
+    required File thumbnail,
   }) async {
     try {
       final videoUrl = await StorageServices().upload(
         id: userId,
         bucketName: 'videos',
         file: file,
+        fileName: title,
       );
 
-      final thumbnailFile = await _getVideoThumbnail(file);
+      // final thumbnailFile = await getVideoThumbnail(file);
 
       final thumbnailUrl = await StorageServices().upload(
         id: userId,
         bucketName: 'thumbnails',
-        file: thumbnailFile,
+        file: thumbnail,
+        fileName: title,
       );
 
       final entity = VideoContentEntity(
@@ -66,11 +66,5 @@ class VideoContentServices {
     } catch (e) {
       rethrow;
     }
-  }
-
-  Future<File> _getVideoThumbnail(File file) async {
-    final thumbnailFile = await VideoCompress.getFileThumbnail(file.path,
-        quality: 100, position: -1);
-    return thumbnailFile;
   }
 }

@@ -3,6 +3,26 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:glaze/core/styles/color_pallete.dart';
 
 class InputField extends HookWidget {
+  InputField({
+    super.key,
+    this.label,
+    this.inputIcon,
+    this.hintText,
+    this.initialValue,
+    this.validator,
+    this.onChanged,
+    this.keyboardType = TextInputType.text,
+    this.readOnly = false,
+    this.borderRadius,
+    this.helper,
+    this.filled = false,
+    this.onTap,
+    TextEditingController? controller,
+  })  : controller = controller ?? TextEditingController(text: initialValue),
+        _inputAction = TextInputAction.next,
+        obscureText = false,
+        maxLines = 1;
+
   InputField.email({
     super.key,
     this.label,
@@ -14,6 +34,7 @@ class InputField extends HookWidget {
     this.borderRadius,
     this.helper,
     this.filled = false,
+    this.onTap,
     TextEditingController? controller,
     this.readOnly = false,
   })  : obscureText = false,
@@ -33,6 +54,7 @@ class InputField extends HookWidget {
     this.borderRadius,
     this.helper,
     this.filled = false,
+    this.onTap,
     TextEditingController? controller,
     this.readOnly = false,
   })  : obscureText = false,
@@ -54,6 +76,7 @@ class InputField extends HookWidget {
     this.borderRadius,
     this.helper,
     this.filled = false,
+    this.onTap,
   })  : obscureText = true,
         controller = controller ?? TextEditingController(text: initialValue),
         keyboardType = TextInputType.text,
@@ -73,6 +96,7 @@ class InputField extends HookWidget {
     this.borderRadius,
     this.helper,
     this.filled = false,
+    this.onTap,
     TextEditingController? controller,
   })  : controller = controller ?? TextEditingController(text: initialValue),
         _inputAction = TextInputAction.next,
@@ -93,6 +117,7 @@ class InputField extends HookWidget {
     this.helper,
     int? maxLines,
     this.filled = false,
+    this.onTap,
     TextEditingController? controller,
   })  : controller = controller ?? TextEditingController(text: initialValue),
         _inputAction = TextInputAction.next,
@@ -108,6 +133,7 @@ class InputField extends HookWidget {
   final TextInputAction _inputAction;
   final String? Function(String?)? validator;
   final void Function(String)? onChanged;
+  final void Function()? onTap;
   final int? maxLines;
   final bool readOnly;
   final double? borderRadius;
@@ -177,9 +203,7 @@ class InputField extends HookWidget {
             suffixIcon: obscureText
                 ? GestureDetector(
                     onTap: () => isObscured.value = !isObscured.value,
-                    child: isObscured.value
-                        ? const Icon(Icons.visibility)
-                        : const Icon(Icons.visibility_off),
+                    child: isObscured.value ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off),
                   )
                 : null,
             helper: helper,
@@ -194,6 +218,7 @@ class InputField extends HookWidget {
           },
           onTapOutside: (_) => FocusScope.of(context).unfocus(),
           onChanged: onChanged,
+          onTap: onTap,
         ),
       ],
     );
