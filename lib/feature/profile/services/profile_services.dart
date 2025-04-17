@@ -106,6 +106,7 @@ class ProfileServices {
 
   Future<void> updateProfile({
     required String id,
+    String? username,
     String? email,
     String? fullName,
     String? phoneNumber,
@@ -124,11 +125,13 @@ class ProfileServices {
           id: id,
           bucketName: 'profile-images',
           file: profileImage,
+          fileName: id,
         );
       }
 
       final ProfileEntity profileEntity = ProfileEntity(
         id: id,
+        username: username,
         fullName: fullName,
         phoneNumber: phoneNumber,
         email: email,
@@ -151,6 +154,7 @@ class ProfileServices {
             id: id,
             bucketName: 'recruiter-identification-images',
             file: identification,
+            fileName: id,
           );
         }
 

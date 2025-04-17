@@ -32,6 +32,11 @@ class ProfileNotifier extends _$ProfileNotifier {
     return const ProfileState();
   }
 
+  void setError(dynamic error) {
+    state = state.copyWith(error: null);
+    state = state.copyWith(error: error, isLoading: false);
+  }
+
   Future<void> fetchProfile(String id) async {
     state = state.copyWith(isLoading: true);
     try {
@@ -49,7 +54,7 @@ class ProfileNotifier extends _$ProfileNotifier {
         isLoading: false,
       );
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: Exception(e));
+      setError(e);
     }
   }
 
@@ -70,7 +75,7 @@ class ProfileNotifier extends _$ProfileNotifier {
         isLoading: false,
       );
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: Exception(e));
+      setError(e);
     }
   }
 
@@ -83,7 +88,7 @@ class ProfileNotifier extends _$ProfileNotifier {
         isLoading: false,
       );
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: Exception(e));
+      setError(e);
     }
   }
 
@@ -103,12 +108,13 @@ class ProfileNotifier extends _$ProfileNotifier {
       );
       state = state.copyWith(isLoading: false);
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: Exception(e));
+      setError(e);
     }
   }
 
   Future<void> updateProfile({
     required String id,
+    String? username,
     String? email,
     String? fullName,
     String? phoneNumber,
@@ -122,6 +128,7 @@ class ProfileNotifier extends _$ProfileNotifier {
     try {
       await ProfileServices().updateProfile(
         id: id,
+        username: username,
         email: email,
         fullName: fullName,
         phoneNumber: phoneNumber,
@@ -133,8 +140,7 @@ class ProfileNotifier extends _$ProfileNotifier {
       );
       state = state.copyWith(response: 'Created profile', isLoading: false);
     } catch (e) {
-      print('Error updating profile: $e');
-      state = state.copyWith(isLoading: false, error: Exception(e));
+      setError(e);
     }
   }
 }

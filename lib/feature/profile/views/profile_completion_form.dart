@@ -179,7 +179,7 @@ class ProfileCompletionForm extends HookConsumerWidget {
                     },
                   ),
                   Text(
-                    'Personal Information',
+                    'Personal Details',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w800,
                         ),

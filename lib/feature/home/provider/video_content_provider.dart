@@ -36,13 +36,17 @@ class VideoContentNotifier extends _$VideoContentNotifier {
     return const VideoContentState();
   }
 
+  void setError(dynamic error) {
+    state = state.copyWith(error: null);
+    state = state.copyWith(error: error, isLoading: false);
+  }
+
   Future<void> fetchVideoContents() async {
     state = state.copyWith(isLoading: true);
     try {
       final videoContents = await VideoContentServices().fetchVideoContents();
       if (videoContents.isEmpty) {
-        state = state.copyWith(
-            isLoading: false, error: Exception('No video contents found'));
+        state = state.copyWith(isLoading: false, error: Exception('No video contents found'));
         return;
       }
 
@@ -59,20 +63,16 @@ class VideoContentNotifier extends _$VideoContentNotifier {
           )
           .toList();
 
-      final List<CacheManager> cacheManager =
-          config.map((cache) => CacheManager(cache)).toList();
+      final List<CacheManager> cacheManager = config.map((cache) => CacheManager(cache)).toList();
 
-      final List<VideoPlayerController> controllers = List.generate(
-          cacheManager.length, (index) => VideoPlayerController.file(File('')),
-          growable: true);
+      final List<VideoPlayerController> controllers = List.generate(cacheManager.length, (index) => VideoPlayerController.file(File('')), growable: true);
 
       for (int index = 0; index < cacheManager.length; index++) {
         final List<File> files = List.generate(
           cacheManager.length,
           (index) => File(''),
         );
-        files[index] = await cacheManager[index]
-            .getSingleFile(videoContents[index].videoUrl);
+        files[index] = await cacheManager[index].getSingleFile(videoContents[index].videoUrl);
 
         files[index] = await _ensureMp4Extension(files[index]);
         files[index] = await _moveToTemporaryDirectory(files[index]);
@@ -89,17 +89,15 @@ class VideoContentNotifier extends _$VideoContentNotifier {
         }
       }
 
-      state = state.copyWith(
-          cachedVideoContent: CachedVideoContent(
-              videoContents: videoContents, controllers: controllers),
-          isLoading: false);
+      state = state.copyWith(cachedVideoContent: CachedVideoContent(videoContents: videoContents, controllers: controllers), isLoading: false);
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: Exception(e));
+      setError(e);
     }
   }
 
   Future<void> uploadVideoContent({
     required File file,
+    required File thumbnail,
     required String title,
     required String caption,
     required String category,
@@ -110,6 +108,7 @@ class VideoContentNotifier extends _$VideoContentNotifier {
 
       final response = await VideoContentServices().uploadVideoContent(
         file: file,
+        thumbnail: thumbnail,
         userId: user?.id ?? '',
         title: title,
         caption: caption,
@@ -118,7 +117,7 @@ class VideoContentNotifier extends _$VideoContentNotifier {
 
       state = state.copyWith(isLoading: false, response: response);
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e as Exception);
+      setError(e);
     }
   }
 
