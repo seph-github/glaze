@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/components/morphism_widget.dart';
+import 'package:glaze/feature/home/models/cached_video_content.dart';
 import 'package:glaze/feature/home/models/glaze.dart';
 import 'package:glaze/feature/home/provider/glaze_provider.dart';
 import 'package:glaze/feature/home/provider/video_content_provider.dart';
@@ -33,6 +34,17 @@ class HomeView extends HookConsumerWidget {
     final focusNode = useFocusNode();
     final currentIndex = useState<int>(0);
     final userGlazes = useState<List<Glaze>>([]);
+    final cachedVideos = useMemoized<CachedVideoContent>(
+      () {
+        // final cachedVideos = state.cachedVideoContent?.controllers;
+        // state.cachedVideoContent?.controllers?[0].initialize();
+        // state.cachedVideoContent?.controllers?[0].play();
+        return state.cachedVideoContent ?? const CachedVideoContent();
+      },
+      [
+        state.cachedVideoContent
+      ],
+    );
 
     void toggleDonutOptions(bool value) {
       showMoreDonutOptions.value = value;
@@ -60,13 +72,21 @@ class HomeView extends HookConsumerWidget {
       },
     );
 
-    useEffect(() {
-      Future.microtask(
-        () async => await ref.read(glazeNotifierProvider.notifier).fetchUserGlazes(),
-      );
-      userGlazes.value = ref.watch(glazeNotifierProvider).glazes ?? [];
-      return;
-    }, []);
+    useEffect(
+      () {
+        Future.microtask(
+          () async {
+            await ref.read(videoContentNotifierProvider.notifier).fetchVideoContents();
+            await ref.read(glazeNotifierProvider.notifier).fetchUserGlazes();
+
+            userGlazes.value = ref.watch(glazeNotifierProvider).glazes ?? [];
+          },
+        );
+
+        return null;
+      },
+      [],
+    );
 
     return LoadingLayout(
       isLoading: state.isLoading,
@@ -81,16 +101,15 @@ class HomeView extends HookConsumerWidget {
               onPageChanged: (index) {
                 currentIndex.value = index;
 
-                state.cachedVideoContent?.controllers?[0].play();
-                for (int i = 0; i < (state.cachedVideoContent?.controllers?.length ?? 0); i++) {
+                for (int i = 0; i < (cachedVideos.controllers?.length ?? 0); i++) {
                   if (i != index) {
-                    state.cachedVideoContent?.controllers?[i].pause();
+                    cachedVideos.controllers?[i].pause();
                   } else {
-                    state.cachedVideoContent?.controllers?[i].play();
+                    cachedVideos.controllers?[i].play();
                   }
                 }
               },
-              itemCount: state.cachedVideoContent?.controllers?.length ?? 0,
+              itemCount: cachedVideos.controllers?.length ?? 0,
               scrollDirection: Axis.vertical,
               physics: const AlwaysScrollableScrollPhysics(),
               itemBuilder: (context, index) {
@@ -100,16 +119,16 @@ class HomeView extends HookConsumerWidget {
                   canRequestFocus: true,
                   onFocusChange: (value) {
                     if (value) {
-                      state.cachedVideoContent?.controllers?[currentIndex.value].play();
+                      cachedVideos.controllers?[currentIndex.value].play();
                     } else {
-                      state.cachedVideoContent?.controllers?[currentIndex.value].pause();
+                      cachedVideos.controllers?[currentIndex.value].pause();
                     }
                   },
                   child: Stack(
                     alignment: Alignment.bottomCenter,
                     children: [
                       VideoPlayerView(
-                        controller: state.cachedVideoContent?.controllers?[index],
+                        controller: cachedVideos.controllers![index],
                       ),
                       Positioned(
                         bottom: 0,
@@ -120,11 +139,11 @@ class HomeView extends HookConsumerWidget {
                           onGlazeLongPress: () => toggleDonutOptions(true),
                           isGlazed: userGlazes.value.any(
                             (glaze) {
-                              return glaze.videoId == state.cachedVideoContent?.videoContents?[index].videoId;
+                              return glaze.videoId == cachedVideos.videoContents?[index].videoId;
                             },
                           ),
                           onGlazeTap: () async {
-                            await ref.read(glazeNotifierProvider.notifier).onGlazed(videoId: state.cachedVideoContent?.videoContents?[index].videoId ?? '').then(
+                            await ref.read(glazeNotifierProvider.notifier).onGlazed(videoId: cachedVideos.videoContents?[index].videoId ?? '').then(
                                   (_) => ref.refresh(glazeNotifierProvider.notifier).fetchUserGlazes(),
                                 );
                           },
@@ -286,35 +305,3 @@ class HomeView extends HookConsumerWidget {
     );
   }
 }
-
-/*
-  class _LoadingView extends StatelessWidget {
-    const _LoadingView();
-
-    @override
-    Widget build(BuildContext context) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(
-            color: Colors.amber,
-          ),
-        ),
-      );
-    }
-  }
-
-  class _ErrorView extends StatelessWidget {
-    final String error;
-
-    const _ErrorView({required this.error});
-
-    @override
-    Widget build(BuildContext context) {
-      return Scaffold(
-        body: Center(
-          child: Text(error),
-        ),
-      );
-    }
-  }
-*/

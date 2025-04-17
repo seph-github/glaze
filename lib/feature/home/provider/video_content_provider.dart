@@ -32,7 +32,7 @@ abstract class VideoContentState with _$VideoContentState {
 class VideoContentNotifier extends _$VideoContentNotifier {
   @override
   VideoContentState build() {
-    Future.microtask(() async => await fetchVideoContents());
+    // Future.microtask(() async => await fetchVideoContents());
     return const VideoContentState();
   }
 
