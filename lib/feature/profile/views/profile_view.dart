@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
+import 'package:glaze/components/app_bar_with_back_button.dart';
 
 import 'package:glaze/components/buttons/primary_button.dart';
 import 'package:glaze/core/styles/color_pallete.dart';
@@ -50,7 +51,8 @@ class ProfileView extends HookConsumerWidget {
 
     return LoadingLayout(
       isLoading: state.isLoading,
-      appBar: AppBar(
+      appBar: AppBarWithBackButton(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         centerTitle: false,
         title: const Text('Profile'),
         titleTextStyle: Theme.of(context).textTheme.headlineLarge?.copyWith(

@@ -5,6 +5,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:glaze/core/routing/observer/route_observer_provider.dart';
 import 'package:glaze/feature/dashboard/views/dashboard_view.dart';
 import 'package:glaze/feature/home/views/video_feed_view.dart';
 import 'package:glaze/feature/profile/provider/profile_provider.dart';
@@ -17,6 +18,7 @@ import 'package:glaze/feature/auth/views/auth_view.dart';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../config/enum/profile_type.dart';
 import '../../feature/auth/providers/auth_state_change_provider.dart';
@@ -45,6 +47,8 @@ final profileNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'profile');
 
 @Riverpod(keepAlive: true)
 GoRouter router(Ref ref) {
+  final routeObserver = ref.watch(routeObserverProvider);
+
   FutureOr<String?> redirect(BuildContext context, GoRouterState state) async {
     final User? user = AuthServices().currentUser;
     final Profile? profile = await ref.read(userProfileProvider.future);
@@ -52,14 +56,13 @@ GoRouter router(Ref ref) {
     final String currentPath = state.matchedLocation;
     final bool hasSplashCompleted = ref.read(splashProvider).completeSplash;
 
-    log('router redirect: $currentPath, user: ${user != null}, role: ${profile?.role}, completed profile: ${profile?.isCompletedProfile}, splash completed: $hasSplashCompleted');
+    // log('router redirect: $currentPath, user: ${user != null}, role: ${profile?.role}, completed profile: ${profile?.isCompletedProfile}, splash completed: $hasSplashCompleted');
 
     if (!hasSplashCompleted) {
       return const SplashRoute().location;
     }
 
     if (user == null) {
-      // Allow access to /auth and /auth/phone-sign-in without redirecting back to /auth
       if (currentPath.startsWith(const AuthRoute().location)) {
         return null;
       }
@@ -70,7 +73,6 @@ GoRouter router(Ref ref) {
       return ProfileCompletionFormRoute(id: user.id, role: profile?.role ?? ProfileType.user.value).location;
     }
 
-    // If the user is already on HomeRoute and the profile is complete, no redirection is needed.
     return null;
   }
 
@@ -79,6 +81,9 @@ GoRouter router(Ref ref) {
     debugLogDiagnostics: true,
     routes: $appRoutes,
     redirect: redirect,
+    observers: [
+      routeObserver
+    ],
   );
 
   ref.listen(
@@ -93,15 +98,12 @@ GoRouter router(Ref ref) {
           )) {
         switch (auth.event) {
           case AuthChangeEvent.initialSession:
-            log('initialSession user id ${next.value.session?.user.id ?? ''}');
-            ref.read(profileNotifierProvider.notifier).fetchProfile(next.value.session?.user.id ?? '');
             break;
           case AuthChangeEvent.passwordRecovery:
             log('passwordRecovery');
             break;
           case AuthChangeEvent.signedIn:
             log('signedIn');
-            ref.read(profileNotifierProvider.notifier).fetchProfile(next.value.session?.user.id ?? '');
             router.pushReplacement(const HomeRoute().location);
             break;
           case AuthChangeEvent.signedOut:
@@ -339,7 +341,13 @@ class ViewUserProfileRoute extends GoRouteData {
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return ViewUserProfile(id: id);
+    final Map<String, dynamic> extras = state.extra as Map<String, dynamic>;
+    final VideoPlayerController controller = extras['controller'];
+
+    return ViewUserProfile(
+      id: id,
+      controller: controller,
+    );
   }
 }
 

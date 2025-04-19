@@ -1,3 +1,5 @@
+// ignore_for_file: unused_element
+
 import 'dart:io';
 
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';

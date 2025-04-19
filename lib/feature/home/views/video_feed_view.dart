@@ -439,6 +439,7 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
                             child: HomeInteractiveCard(
                               key: PageStorageKey('HomeInteractiveCard_$index'),
                               onGlazeLongPress: () => toggleDonutOptions(true),
+                              controller: getController(videos.value[index].videoId),
                               isGlazed: userGlazes.value.any(
                                 (glaze) {
                                   return glaze.videoId == videos.value[index].videoId;

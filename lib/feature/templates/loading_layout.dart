@@ -29,6 +29,7 @@ class LoadingLayout extends HookWidget {
       backgroundColor: backgroundColor ?? Theme.of(context).colorScheme.surface,
       appBar: appBar,
       resizeToAvoidBottomInset: false,
+      extendBodyBehindAppBar: true,
       body: Stack(
         children: [
           if (child != null) child!,

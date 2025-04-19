@@ -4,6 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:glaze/core/styles/color_pallete.dart';
 import 'package:glaze/feature/home/models/video_content.dart';
 import 'package:go_router/go_router.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../../components/morphism_widget.dart';
 import '../../../core/routing/router.dart';
@@ -22,6 +23,7 @@ class HomeInteractiveCard extends StatelessWidget {
     this.onShareTap,
     this.onShareLongPress,
     this.isGlazed = false,
+    this.controller,
   });
 
   final int index;
@@ -35,6 +37,7 @@ class HomeInteractiveCard extends StatelessWidget {
   final VoidCallback? onGlazeLongPress;
   final VoidCallback? onShareTap;
   final VoidCallback? onShareLongPress;
+  final VideoPlayerController? controller;
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +74,7 @@ class HomeInteractiveCard extends StatelessWidget {
                   children: <Widget>[
                     SvgPicture.asset('assets/images/svg/Trophy Icon.svg'),
                     const Gap(10),
-                    const Text('Best Content'),
+                    Text(video?.category ?? ''),
                   ],
                 ),
               ),
@@ -81,13 +84,18 @@ class HomeInteractiveCard extends StatelessWidget {
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               ),
               GestureDetector(
-                onTap: () {
+                onTap: () async {
                   final userId = video?.userId;
-
-                  router.push(ViewUserProfileRoute(id: userId ?? '').location);
+                  await controller?.pause();
+                  router.push(
+                    ViewUserProfileRoute(id: userId ?? '').location,
+                    extra: {
+                      'controller': controller,
+                    },
+                  );
                 },
                 child: Text(
-                  'By @${video?.username}',
+                  'by @${video?.username}',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ),

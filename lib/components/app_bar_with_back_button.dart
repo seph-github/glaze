@@ -7,17 +7,30 @@ import 'package:go_router/go_router.dart';
 import '../gen/assets.gen.dart';
 
 class AppBarWithBackButton extends HookWidget implements PreferredSizeWidget {
-  const AppBarWithBackButton({super.key, this.actions, this.onBackButtonPressed});
+  const AppBarWithBackButton({
+    super.key,
+    this.actions,
+    this.onBackButtonPressed,
+    this.centerTitle = false,
+    this.title,
+    this.titleTextStyle,
+    this.backgroundColor,
+  });
 
   final List<Widget>? actions;
   final VoidCallback? onBackButtonPressed;
+  final bool? centerTitle;
+  final Widget? title;
+  final TextStyle? titleTextStyle;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
     final router = GoRouter.of(context);
 
     return AppBar(
-      backgroundColor: Colors.transparent,
+      backgroundColor: backgroundColor ?? Colors.transparent,
+      scrolledUnderElevation: 0,
       elevation: 0,
       leading: IconButton(
         icon: SvgPicture.asset(
@@ -32,6 +45,9 @@ class AppBarWithBackButton extends HookWidget implements PreferredSizeWidget {
               router.pop();
             },
       ),
+      centerTitle: centerTitle,
+      title: title,
+      titleTextStyle: titleTextStyle,
       actions: actions,
     );
   }

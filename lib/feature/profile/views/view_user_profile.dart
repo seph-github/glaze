@@ -7,8 +7,10 @@ import 'package:glaze/data/models/follows/follow.dart';
 import 'package:glaze/data/repository/follows_repository/follow_repository_provider.dart';
 import 'package:glaze/feature/profile/provider/profile_provider.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../../components/buttons/primary_button.dart';
 import '../../../core/styles/color_pallete.dart';
@@ -24,12 +26,15 @@ class ViewUserProfile extends HookConsumerWidget {
   const ViewUserProfile({
     super.key,
     required this.id,
+    this.controller,
   });
 
   final String id;
+  final VideoPlayerController? controller;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final GoRouter router = GoRouter.of(context);
     final size = MediaQuery.sizeOf(context);
     final width = size.width;
     final viewMode = useState<bool>(false);
@@ -49,11 +54,14 @@ class ViewUserProfile extends HookConsumerWidget {
 
     final state = ref.watch(profileNotifierProvider);
 
-    print('view profile state: $state');
-
     return LoadingLayout(
       isLoading: state.isLoading,
-      appBar: const AppBarWithBackButton(),
+      appBar: AppBarWithBackButton(
+        onBackButtonPressed: () async {
+          await controller?.play();
+          router.pop();
+        },
+      ),
       child: SingleChildScrollView(
         child: SafeArea(
           child: Column(
@@ -98,18 +106,11 @@ class ViewUserProfile extends HookConsumerWidget {
                               PrimaryButton(
                                 isLoading: ref
                                     .watch(
-                                      fetchFollowedUserNotifierProvider
-                                          .call(userId.value),
+                                      fetchFollowedUserNotifierProvider.call(userId.value),
                                     )
                                     .isLoading,
-                                backgroundColor: followedUsers.any(
-                                        (follow) => follow.followingId == id)
-                                    ? Colors.grey
-                                    : ColorPallete.magenta,
-                                label: followedUsers.any(
-                                        (follow) => follow.followingId == id)
-                                    ? 'Unfollow'
-                                    : 'Follow',
+                                backgroundColor: followedUsers.any((follow) => follow.followingId == id) ? Colors.grey : ColorPallete.magenta,
+                                label: followedUsers.any((follow) => follow.followingId == id) ? 'Unfollow' : 'Follow',
                                 onPressed: () async {
                                   await ref
                                       .read(followUserNotifierProvider.notifier)
@@ -119,8 +120,7 @@ class ViewUserProfile extends HookConsumerWidget {
                                       )
                                       .whenComplete(
                                         () => ref.refresh(
-                                          fetchFollowedUserNotifierProvider
-                                              .call(userId.value),
+                                          fetchFollowedUserNotifierProvider.call(userId.value),
                                         ),
                                       );
                                 },
