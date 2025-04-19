@@ -144,16 +144,7 @@ class UploadMomentsCard extends HookConsumerWidget {
       child: Container(
         height: height,
         width: double.infinity,
-        // padding: const EdgeInsets.only(
-        //   left: 16.0,
-        //   // top: 16.0,
-        //   right: 16.0,
-        // ),
         decoration: BoxDecoration(
-          // borderRadius: BorderRadius.only(
-          //   topLeft: Radius.circular(30.0),
-          //   topRight: Radius.circular(16.0),
-          // ),
           color: Colors.transparent,
           image: DecorationImage(
             image: AssetImage(Assets.images.png.glazeCardBackgroundR32.path),
@@ -365,6 +356,13 @@ Future<void> onImageSource(BuildContext ctx, WidgetRef ref) async {
             }
           },
           child: const Text('Camera'),
+        ),
+        CupertinoActionSheetAction(
+          isDefaultAction: true,
+          onPressed: () {
+            ctx.pop();
+          },
+          child: const Text('Cancel'),
         ),
       ],
     ),

@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glaze/feature/home/provider/video_content_provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shimmer/shimmer.dart';
 
 class MomentsVideosTabview extends StatelessWidget {
@@ -19,12 +19,10 @@ class MomentsVideosTabview extends StatelessWidget {
             childAspectRatio: 9 / 16,
           ),
           padding: const EdgeInsets.only(top: 8.0),
-          itemCount: state.cachedVideoContent?.videoContents?.length,
+          itemCount: state.videoContents.length,
           itemBuilder: (context, index) {
             return CachedNetworkImage(
-              imageUrl: state
-                      .cachedVideoContent?.videoContents?[index].thumbnailUrl ??
-                  '',
+              imageUrl: state.videoContents[index].thumbnailUrl,
               placeholder: (context, url) {
                 return Shimmer.fromColors(
                   baseColor: Colors.grey[300]!,

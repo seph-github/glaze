@@ -6,6 +6,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glaze/feature/dashboard/views/dashboard_view.dart';
+import 'package:glaze/feature/home/views/video_feed_view.dart';
 import 'package:glaze/feature/profile/provider/profile_provider.dart';
 import 'package:glaze/feature/profile/views/profile_edit_form.dart';
 import 'package:glaze/feature/shops/views/shop_view.dart';
@@ -21,7 +22,6 @@ import '../../feature/auth/services/auth_services.dart';
 import '../../feature/auth/views/auth_phone_sign_in.dart';
 import '../../feature/auth/views/auth_verify_phone.dart';
 import '../../feature/challenges/views/challenges_view.dart';
-import '../../feature/home/views/home_view.dart';
 import '../../feature/moments/views/moments_view.dart';
 import '../../feature/onboarding/views/onboarding_view.dart';
 import '../../feature/profile/models/profile.dart';
@@ -177,7 +177,7 @@ class HomeShellBranch extends StatefulShellBranchData {
     StatefulNavigationShell navigationShell,
   ) {
     return const NoTransitionPage(
-      child: HomeView(),
+      child: VideoFeedView(),
     );
   }
 }
@@ -243,7 +243,7 @@ class HomeRoute extends GoRouteData {
   const HomeRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => const HomeView();
+  Widget build(BuildContext context, GoRouterState state) => const VideoFeedView();
 }
 
 @TypedGoRoute<AuthRoute>(

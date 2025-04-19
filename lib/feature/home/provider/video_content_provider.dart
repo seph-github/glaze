@@ -32,71 +32,91 @@ abstract class VideoContentState with _$VideoContentState {
 class VideoContentNotifier extends _$VideoContentNotifier {
   @override
   VideoContentState build() {
-    // Future.microtask(() async => await fetchVideoContents());
+    Future.microtask(() async => await fetchVideoContents());
     return const VideoContentState();
   }
 
-  void setNewResponse(String response) {
+  void _setNewResponse(String response) {
     state = state.copyWith(isLoading: false, response: null);
     state = state.copyWith(isLoading: false, response: response);
   }
 
-  void setError(dynamic error) {
+  void _setError(dynamic error) {
     state = state.copyWith(error: null);
     state = state.copyWith(error: error, isLoading: false);
+  }
+
+  Future<List<dynamic>> _cachingVideos(List<VideoContent> videoContents) async {
+    List<Config> config = List.generate(
+      videoContents.length,
+      (index) => Config(
+        videoContents[index].videoUrl,
+        stalePeriod: const Duration(hours: 6),
+        maxNrOfCacheObjects: 20,
+      ),
+    )
+        .map(
+          (e) => e,
+        )
+        .toList();
+
+    final List<CacheManager> cacheManager = config.map((cache) => CacheManager(cache)).toList();
+
+    final List<VideoPlayerController> controllers = List.generate(cacheManager.length, (index) => VideoPlayerController.file(File('')), growable: true);
+
+    for (int index = 0; index < cacheManager.length; index++) {
+      final List<File> files = List.generate(
+        cacheManager.length,
+        (index) => File(''),
+      );
+      files[index] = await cacheManager[index].getSingleFile(videoContents[index].videoUrl);
+
+      files[index] = await _ensureMp4Extension(files[index]);
+      files[index] = await _moveToTemporaryDirectory(files[index]);
+
+      controllers[index] = VideoPlayerController.file(files[index]);
+
+      await controllers[index].initialize();
+      controllers[index].setLooping(true);
+
+      if (index == 0) {
+        controllers[index].play();
+      } else {
+        controllers[index].pause();
+      }
+    }
+    return controllers;
   }
 
   Future<void> fetchVideoContents() async {
     state = state.copyWith(isLoading: true);
     try {
-      final videoContents = await VideoContentServices().fetchVideoContents();
+      final videoContents = await VideoContentServices().fetchAllVideos();
       if (videoContents.isEmpty) {
         state = state.copyWith(isLoading: false, error: Exception('No video contents found'));
         return;
       }
 
-      List<Config> config = List.generate(
-        videoContents.length,
-        (index) => Config(
-          videoContents[index].videoUrl,
-          stalePeriod: const Duration(hours: 6),
-          maxNrOfCacheObjects: 20,
-        ),
-      )
-          .map(
-            (e) => e,
-          )
-          .toList();
+      // final controllers = await _cachingVideos(videoContents);
 
-      final List<CacheManager> cacheManager = config.map((cache) => CacheManager(cache)).toList();
+      // final updatedVideoContents = [
+      //   ...state.videoContents,
+      //   ...videoContents
+      // ];
+      // final updatedControllers = [
+      //   ...?state.cachedVideoContent?.controllers,
+      //   ...controllers
+      // ];
 
-      final List<VideoPlayerController> controllers = List.generate(cacheManager.length, (index) => VideoPlayerController.file(File('')), growable: true);
-
-      for (int index = 0; index < cacheManager.length; index++) {
-        final List<File> files = List.generate(
-          cacheManager.length,
-          (index) => File(''),
-        );
-        files[index] = await cacheManager[index].getSingleFile(videoContents[index].videoUrl);
-
-        files[index] = await _ensureMp4Extension(files[index]);
-        files[index] = await _moveToTemporaryDirectory(files[index]);
-
-        controllers[index] = VideoPlayerController.file(files[index]);
-
-        await controllers[index].initialize();
-        controllers[index].setLooping(true);
-
-        if (index == 0) {
-          controllers[index].play();
-        } else {
-          controllers[index].pause();
-        }
-      }
-
-      state = state.copyWith(cachedVideoContent: CachedVideoContent(videoContents: videoContents, controllers: controllers), isLoading: false);
+      state = state.copyWith(
+          videoContents: videoContents,
+          // cachedVideoContent: CachedVideoContent(
+          //   videoContents: updatedVideoContents,
+          //   controllers: updatedControllers,
+          // ),
+          isLoading: false);
     } catch (e) {
-      setError(e);
+      _setError(e);
     }
   }
 
@@ -120,9 +140,9 @@ class VideoContentNotifier extends _$VideoContentNotifier {
         category: category,
       );
 
-      setNewResponse(response);
+      _setNewResponse(response);
     } catch (e) {
-      setError(e);
+      _setError(e);
     }
   }
 

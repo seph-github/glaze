@@ -36,9 +36,6 @@ class HomeView extends HookConsumerWidget {
     final userGlazes = useState<List<Glaze>>([]);
     final cachedVideos = useMemoized<CachedVideoContent>(
       () {
-        // final cachedVideos = state.cachedVideoContent?.controllers;
-        // state.cachedVideoContent?.controllers?[0].initialize();
-        // state.cachedVideoContent?.controllers?[0].play();
         return state.cachedVideoContent ?? const CachedVideoContent();
       },
       [
@@ -88,92 +85,96 @@ class HomeView extends HookConsumerWidget {
       [],
     );
 
+    print('state $state');
+
     return LoadingLayout(
       isLoading: state.isLoading,
       child: RefreshIndicator(
-        onRefresh: () => ref.refresh(videoContentNotifierProvider.notifier).fetchVideoContents(),
+        onRefresh: () async {
+          ref.invalidate(videoContentNotifierProvider);
+          await ref.refresh(videoContentNotifierProvider.notifier).fetchVideoContents();
+        },
         color: Colors.white12,
         triggerMode: RefreshIndicatorTriggerMode.onEdge,
         child: AnimatedContainer(
-            duration: const Duration(milliseconds: 500),
-            child: PageView.builder(
-              controller: controller,
-              onPageChanged: (index) {
-                currentIndex.value = index;
+          duration: const Duration(milliseconds: 500),
+          child: PageView.builder(
+            controller: controller,
+            onPageChanged: (index) {
+              currentIndex.value = index;
 
-                for (int i = 0; i < (cachedVideos.controllers?.length ?? 0); i++) {
-                  if (i != index) {
-                    cachedVideos.controllers?[i].pause();
-                  } else {
-                    cachedVideos.controllers?[i].play();
-                  }
+              for (int i = 0; i < (cachedVideos.controllers?.length ?? 0); i++) {
+                if (i != index) {
+                  cachedVideos.controllers?[i].pause();
+                } else {
+                  cachedVideos.controllers?[i].play();
                 }
-              },
-              itemCount: cachedVideos.controllers?.length ?? 0,
-              scrollDirection: Axis.vertical,
-              physics: const AlwaysScrollableScrollPhysics(),
-              itemBuilder: (context, index) {
-                return Focus(
-                  focusNode: focusNode,
-                  autofocus: focusNode.hasFocus,
-                  canRequestFocus: true,
-                  onFocusChange: (value) {
-                    if (value) {
-                      cachedVideos.controllers?[currentIndex.value].play();
-                    } else {
-                      cachedVideos.controllers?[currentIndex.value].pause();
-                    }
-                  },
-                  child: Stack(
-                    alignment: Alignment.bottomCenter,
-                    children: [
-                      VideoPlayerView(
-                        controller: cachedVideos.controllers![index],
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        child: HomeInteractiveCard(
-                          key: PageStorageKey('HomeInteractiveCard_$index'),
-                          onGlazeLongPress: () => toggleDonutOptions(true),
-                          isGlazed: userGlazes.value.any(
-                            (glaze) {
-                              return glaze.videoId == cachedVideos.videoContents?[index].videoId;
-                            },
-                          ),
-                          onGlazeTap: () async {
-                            await ref.read(glazeNotifierProvider.notifier).onGlazed(videoId: cachedVideos.videoContents?[index].videoId ?? '').then(
-                                  (_) => ref.refresh(glazeNotifierProvider.notifier).fetchUserGlazes(),
-                                );
+              }
+            },
+            itemCount: cachedVideos.controllers?.length ?? 0,
+            scrollDirection: Axis.vertical,
+            physics: const AlwaysScrollableScrollPhysics(),
+            itemBuilder: (context, index) {
+              return Focus(
+                focusNode: focusNode,
+                autofocus: focusNode.hasFocus,
+                canRequestFocus: true,
+                onFocusChange: (value) {
+                  if (value) {
+                    cachedVideos.controllers?[currentIndex.value].play();
+                  } else {
+                    cachedVideos.controllers?[currentIndex.value].pause();
+                  }
+                },
+                child: Stack(
+                  alignment: Alignment.bottomCenter,
+                  children: [
+                    VideoPlayerView(
+                      controller: cachedVideos.controllers![index],
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: HomeInteractiveCard(
+                        key: PageStorageKey('HomeInteractiveCard_$index'),
+                        onGlazeLongPress: () => toggleDonutOptions(true),
+                        isGlazed: userGlazes.value.any(
+                          (glaze) {
+                            return glaze.videoId == cachedVideos.videoContents?[index].videoId;
                           },
-                          onShareTap: () async => await _showShareOptions(context),
-                          width: width,
-                          height: height,
-                          cachedVideos: state.cachedVideoContent,
-                          index: index,
+                        ),
+                        onGlazeTap: () async {
+                          await ref.read(glazeNotifierProvider.notifier).onGlazed(videoId: cachedVideos.videoContents?[index].videoId ?? '').then(
+                                (_) => ref.refresh(glazeNotifierProvider.notifier).fetchUserGlazes(),
+                              );
+                        },
+                        onShareTap: () async => await _showShareOptions(context),
+                        width: width,
+                        height: height,
+                        cachedVideos: state.cachedVideoContent,
+                        index: index,
+                      ),
+                    ),
+                    if (showMoreDonutOptions.value || showShareButton.value)
+                      GestureDetector(
+                        onTap: () {
+                          toggleDonutOptions(false);
+                          toggleShareButton(false);
+                        },
+                        child: Container(
+                          height: double.infinity,
+                          width: double.infinity,
+                          color: Colors.black.withValues(alpha: 0.7),
                         ),
                       ),
-                      if (showMoreDonutOptions.value || showShareButton.value)
-                        GestureDetector(
-                          onTap: () {
-                            toggleDonutOptions(false);
-                            toggleShareButton(false);
-                          },
-                          child: Container(
-                            height: double.infinity,
-                            width: double.infinity,
-                            color: Colors.black.withValues(alpha: 0.7),
-                          ),
-                        ),
-                      if (showMoreDonutOptions.value) _buildDonutOptions(context, width: width),
-                      // if (showShareButton.value)
-                      //   buildShareOptions(context, width: width),
-                    ],
-                  ),
-                );
-              },
-            )),
+                    if (showMoreDonutOptions.value) _buildDonutOptions(context, width: width),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
       ),
     );
   }

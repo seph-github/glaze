@@ -9,11 +9,32 @@ import '../../../core/services/storage_services.dart';
 class VideoContentServices {
   final SupabaseClient _supabaseClient = Supabase.instance.client;
 
-  Future<List<VideoContent>> fetchVideoContents() async {
+  Future<List<VideoContent>> fetchAllVideos() async {
     try {
       final response = await _supabaseClient.rpc('select_videos_with_owners');
 
-      final rawList = response as List<dynamic>; // explicitly cast
+      print('response $response');
+
+      final rawList = response as List<dynamic>;
+
+      final value = rawList.map((video) => VideoContent.fromJson(video as Map<String, dynamic>)).toList();
+
+      value.sort((a, b) => b.createdAt!.compareTo(a.createdAt!));
+      return value;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<VideoContent>> fetchVideoContents(int offset) async {
+    try {
+      // final response = await _supabaseClient.rpc('select_videos_with_owners');
+      final response = await _supabaseClient.rpc('select_videos_paginating', params: {
+        'page_limit': 2,
+        'page_offset': offset,
+      });
+
+      final rawList = response as List<dynamic>;
 
       final value = rawList.map((video) => VideoContent.fromJson(video as Map<String, dynamic>)).toList();
 

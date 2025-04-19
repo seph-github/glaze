@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/core/styles/color_pallete.dart';
+import 'package:glaze/feature/home/models/video_content.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../components/morphism_widget.dart';
@@ -13,7 +14,8 @@ class HomeInteractiveCard extends StatelessWidget {
     super.key,
     required this.width,
     required this.height,
-    required this.cachedVideos,
+    this.cachedVideos,
+    this.video,
     required this.index,
     this.onGlazeTap,
     this.onGlazeLongPress,
@@ -28,6 +30,7 @@ class HomeInteractiveCard extends StatelessWidget {
   final bool isGlazed;
 
   final CachedVideoContent? cachedVideos;
+  final VideoContent? video;
   final VoidCallback? onGlazeTap;
   final VoidCallback? onGlazeLongPress;
   final VoidCallback? onShareTap;
@@ -74,17 +77,17 @@ class HomeInteractiveCard extends StatelessWidget {
               ),
               const Gap(10),
               Text(
-                cachedVideos?.videoContents?[index].title ?? '',
+                video?.title ?? '',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               ),
               GestureDetector(
                 onTap: () {
-                  final userId = cachedVideos?.videoContents?[index].userId;
+                  final userId = video?.userId;
 
                   router.push(ViewUserProfileRoute(id: userId ?? '').location);
                 },
                 child: Text(
-                  'By @${cachedVideos?.videoContents?[index].username}',
+                  'By @${video?.username}',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ),
