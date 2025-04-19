@@ -1,58 +1,51 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:glaze/feature/templates/loading_layout.dart';
 import 'package:go_router/go_router.dart';
+import 'package:glaze/feature/dashboard/providers/dashboard_tab_controller_provider.dart';
+import 'package:glaze/feature/templates/loading_layout.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../moments/widgets/upload_moments_card.dart';
 import '../widgets/glaze_nav_bar.dart';
 
-class DashboardView extends HookWidget {
+class DashboardView extends HookConsumerWidget {
   const DashboardView({
     super.key,
-    required StatefulNavigationShell navigationShell,
-  }) : _navigationShell = navigationShell;
+    required this.navigationShell,
+  });
 
-  final StatefulNavigationShell _navigationShell;
+  final StatefulNavigationShell navigationShell;
 
   @override
-  Widget build(BuildContext context) {
-    final router = GoRouter.of(context);
-    final path = useState<String>(router.state.matchedLocation);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentIndex = useState(navigationShell.currentIndex);
 
-    path.value = router.state.matchedLocation;
+    void onTabSelected(int index) async {
+      if (index == 2) {
+        ref.read(dashboardTabControllerProvider.notifier).setTab(index);
+        await _showBottomSheet(context);
 
-    return Consumer(
-      builder: (context, ref, _) {
-        void goBranch(int index) async {
-          if (index == 2) {
-            await _showBottomSheet(context);
-          } else {
-            _navigationShell.goBranch(
-              index,
-              initialLocation: index != _navigationShell.currentIndex,
-            );
-          }
-        }
+        return;
+      }
 
-        return LoadingLayout(
-          bottomNavigationBar: GlazeNavBar(
-            navigationShell: _navigationShell,
-            onDestinationSelected: goBranch,
-          ),
-          child: ClipRRect(
-            borderRadius: const BorderRadius.only(
-              bottomLeft: Radius.circular(
-                24.0,
-              ),
-              bottomRight: Radius.circular(
-                24.0,
-              ),
-            ),
-            child: _navigationShell,
-          ),
+      if (index != currentIndex.value) {
+        currentIndex.value = index;
+        ref.read(dashboardTabControllerProvider.notifier).setTab(index);
+
+        navigationShell.goBranch(
+          index,
+          initialLocation: false, // Don't reset navigation stack
         );
-      },
+      }
+    }
+
+    return LoadingLayout(
+      bottomNavigationBar: GlazeNavBar(
+        // currentIndex: currentIndex.value,
+        onDestinationSelected: onTabSelected,
+        navigationShell: navigationShell,
+      ),
+      child: navigationShell, // ✅ Renders current branch automatically
     );
   }
 }
@@ -61,9 +54,11 @@ Future<void> _showBottomSheet(BuildContext context) async {
   await showCupertinoModalPopup(
     context: context,
     builder: (context) {
-      return const SafeArea(
-        child: CupertinoPopupSurface(
-          child: UploadMomentsCard(),
+      return const RepaintBoundary(
+        child: SafeArea(
+          child: CupertinoPopupSurface(
+            child: UploadMomentsCard(),
+          ),
         ),
       );
     },

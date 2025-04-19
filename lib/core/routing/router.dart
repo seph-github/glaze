@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glaze/feature/dashboard/views/dashboard_view.dart';
 import 'package:glaze/feature/home/views/video_feed_view.dart';
 import 'package:glaze/feature/profile/provider/profile_provider.dart';
+import 'package:glaze/feature/profile/provider/user_profile_provider.dart';
 import 'package:glaze/feature/profile/views/profile_edit_form.dart';
 import 'package:glaze/feature/shops/views/shop_view.dart';
 import 'package:glaze/feature/profile/views/profile_view.dart';
@@ -17,6 +18,7 @@ import 'package:glaze/feature/auth/views/auth_view.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../config/enum/profile_type.dart';
 import '../../feature/auth/providers/auth_state_change_provider.dart';
 import '../../feature/auth/services/auth_services.dart';
 import '../../feature/auth/views/auth_phone_sign_in.dart';
@@ -25,7 +27,6 @@ import '../../feature/challenges/views/challenges_view.dart';
 import '../../feature/moments/views/moments_view.dart';
 import '../../feature/onboarding/views/onboarding_view.dart';
 import '../../feature/profile/models/profile.dart';
-import '../../feature/profile/services/profile_services.dart';
 import '../../feature/profile/views/profile_completion_form.dart';
 import '../../feature/profile/views/view_user_profile.dart';
 import '../../feature/splash/providers/splash_provider.dart';
@@ -46,7 +47,7 @@ final profileNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'profile');
 GoRouter router(Ref ref) {
   FutureOr<String?> redirect(BuildContext context, GoRouterState state) async {
     final User? user = AuthServices().currentUser;
-    final Profile? profile = await ProfileServices().fetchUserProfile(user?.id ?? '');
+    final Profile? profile = await ref.read(userProfileProvider.future);
 
     final String currentPath = state.matchedLocation;
     final bool hasSplashCompleted = ref.read(splashProvider).completeSplash;
@@ -66,7 +67,7 @@ GoRouter router(Ref ref) {
     }
 
     if (currentPath == const HomeRoute().location && profile?.isCompletedProfile == false) {
-      return ProfileCompletionFormRoute(id: user.id, role: profile?.role ?? '').location;
+      return ProfileCompletionFormRoute(id: user.id, role: profile?.role ?? ProfileType.user.value).location;
     }
 
     // If the user is already on HomeRoute and the profile is complete, no redirection is needed.
@@ -92,15 +93,16 @@ GoRouter router(Ref ref) {
           )) {
         switch (auth.event) {
           case AuthChangeEvent.initialSession:
-            log('initialSession');
+            log('initialSession user id ${next.value.session?.user.id ?? ''}');
+            ref.read(profileNotifierProvider.notifier).fetchProfile(next.value.session?.user.id ?? '');
             break;
           case AuthChangeEvent.passwordRecovery:
             log('passwordRecovery');
             break;
           case AuthChangeEvent.signedIn:
             log('signedIn');
+            ref.read(profileNotifierProvider.notifier).fetchProfile(next.value.session?.user.id ?? '');
             router.pushReplacement(const HomeRoute().location);
-            // ref.watch(userNotifierProvider);
             break;
           case AuthChangeEvent.signedOut:
             log('signedOut');

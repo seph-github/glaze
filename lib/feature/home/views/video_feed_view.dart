@@ -15,6 +15,7 @@ import 'package:preload_page_view/preload_page_view.dart';
 import '../../../components/morphism_widget.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../gen/assets.gen.dart';
+import '../../dashboard/providers/dashboard_tab_controller_provider.dart';
 import '../models/video_content.dart';
 import '../provider/glaze_provider.dart';
 import '../widgets/home_interactive_card.dart';
@@ -86,9 +87,12 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
             }
 
             await controller.dispose();
-          } catch (e) {}
+          } catch (e) {
+            log('Remove controller 1st catch error: $e');
+          }
         } else {}
       } catch (e) {
+        log('Remove controller 2nd catch error: $e');
       } finally {
         disposingControllers.value.remove(videoId);
       }
@@ -155,7 +159,9 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
       if (controller != null && controller.value.isInitialized && !controller.value.isPlaying) {
         try {
           await controller.play();
-        } catch (e) {}
+        } catch (e) {
+          log('Play controller error: $e');
+        }
       }
     }
 
@@ -267,7 +273,9 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
 
         // Notify the cubit
         ref.read(videoFeedNotifierProvider.notifier).onPageChanged(newPage);
-      } catch (e) {}
+      } catch (e) {
+        log('Handle page change error: $e');
+      }
     }
 
     useEffect(() {
@@ -330,6 +338,30 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
         userGlazes.value = next.glazes ?? [];
       },
     );
+
+    useEffect(() {
+      final listener = ref.listenManual<int>(
+        dashboardTabControllerProvider,
+        (prev, next) async {
+          final isActive = next == 0;
+          log('isActive = $isActive');
+          final index = currentPage.value;
+          final controller = getController(videos.value.elementAtOrNull(index)?.videoId ?? '');
+
+          if (controller != null && controller.value.isInitialized) {
+            if (!isActive) {
+              await controller.pause();
+              debugPrint('⏸ Paused video (not on Home tab)');
+            } else {
+              await controller.play();
+              debugPrint('▶️ Resumed video (back to Home tab)');
+            }
+          }
+        },
+      );
+
+      return listener.close;
+    }, []);
 
     return RefreshIndicator(
       onRefresh: () async {

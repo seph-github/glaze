@@ -13,8 +13,6 @@ class VideoContentServices {
     try {
       final response = await _supabaseClient.rpc('select_videos_with_owners');
 
-      print('response $response');
-
       final rawList = response as List<dynamic>;
 
       final value = rawList.map((video) => VideoContent.fromJson(video as Map<String, dynamic>)).toList();

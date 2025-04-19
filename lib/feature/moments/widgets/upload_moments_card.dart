@@ -139,187 +139,189 @@ class UploadMomentsCard extends HookConsumerWidget {
       }
     }
 
-    return LoadingLayout(
-      isLoading: state.isLoading || categoryState.isLoading,
-      child: Container(
-        height: height,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: Colors.transparent,
-          image: DecorationImage(
-            image: AssetImage(Assets.images.png.glazeCardBackgroundR32.path),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
-              child: Align(
-                alignment: Alignment.topRight,
-                child: MorphismWidget.circle(
-                  onTap: onCancelUploadMoment,
-                  size: 28.0,
-                  child: SvgPicture.asset(Assets.images.svg.closeIcon.path),
-                ),
-              ),
+    return RepaintBoundary(
+      child: LoadingLayout(
+        isLoading: state.isLoading || categoryState.isLoading,
+        child: Container(
+          height: height,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            image: DecorationImage(
+              image: AssetImage(Assets.images.png.glazeCardBackgroundR32.path),
+              fit: BoxFit.cover,
             ),
-            const Divider(),
-            Expanded(
-              child: Form(
-                key: formKey,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: ListView(
-                    children: <Widget>[
-                      const Gap(16.0),
-                      Column(
-                        children: [
-                          MorphismWidget.circle(
-                            size: 64.0,
-                            child: SvgPicture.asset(Assets.images.svg.uploadIcon.path),
-                          ),
-                        ],
-                      ),
-                      Text(
-                        'Upload Your Moment',
-                        style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                              fontWeight: FontWeight.w900,
-                            ),
-                      ),
-                      Text(
-                        'Share your talent with the community!',
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                              color: ColorPallete.hintTextColor,
-                            ),
-                      ),
-                      const Gap(16.0),
-                      InputField.text(
-                        controller: titleController,
-                        hintText: 'Enter video title',
-                        helper: Text(
-                          '* up to 50 characters',
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                color: ColorPallete.hintTextColor,
-                              ),
-                        ),
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Please enter video title';
-                          }
-                          return null;
-                        },
-                      ),
-                      const Gap(10.0),
-                      InputField.paragraph(
-                        controller: captionController,
-                        maxLines: 5,
-                        hintText: 'Write video caption',
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Please enter video caption';
-                          }
-                          return null;
-                        },
-                      ),
-                      const Gap(26.0),
-                      InputField(
-                        hintText: 'Category',
-                        controller: categoryController,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Please add a category';
-                          }
-                          return null;
-                        },
-                        readOnly: true,
-                        onTap: () async {
-                          await showCategoryModalPopup(context, categoryState, categoryController);
-                        },
-                      ),
-                      if (fileState.video != null)
-                        Column(
-                          children: [
-                            const Gap(26.0),
-                            Stack(
-                              alignment: Alignment.topRight,
-                              children: [
-                                FutureBuilder<File>(
-                                  future: thumbnailFuture,
-                                  builder: (context, snapshot) {
-                                    if (snapshot.connectionState == ConnectionState.waiting) {
-                                      return const CircularProgressIndicator(); // Show loading indicator
-                                    } else if (snapshot.hasData) {
-                                      return AspectRatio(
-                                        aspectRatio: 16 / 9,
-                                        child: Container(
-                                          clipBehavior: Clip.hardEdge,
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                              color: Colors.white, // Border color
-                                              width: 0.5, // Border width
-                                            ),
-                                            borderRadius: BorderRadius.circular(16.0), // Rounded corners
-                                            image: DecorationImage(
-                                              image: FileImage(snapshot.data!), // Use the thumbnail as a background
-                                              fit: BoxFit.cover, // Adjust the image to cover the container
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    } else {
-                                      return const Text('No thumbnail available'); // Fallback message
-                                    }
-                                  },
-                                ),
-                                Positioned(
-                                  right: 8,
-                                  top: 8,
-                                  child: IconButton.filled(
-                                    onPressed: () => ref.invalidate(contentPickerNotifierProvider),
-                                    visualDensity: const VisualDensity(horizontal: -3, vertical: -2),
-                                    focusColor: ColorPallete.primaryColor,
-                                    color: ColorPallete.primaryColor,
-                                    icon: SvgPicture.asset(Assets.images.svg.closeIcon.path),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      const Gap(26.0),
-                      FocusButton(
-                        controller: fileController,
-                        validator: (value) {
-                          if (file.value == null) {
-                            return 'Please choose file';
-                          } else {}
-
-                          final fileSize = File(file.value?.path ?? '').lengthSync();
-                          if (fileSize > 100 * 1024 * 1024) {
-                            // Check if file size exceeds 100MB
-                            return 'File size must not exceed 100MB';
-                          }
-                          return null;
-                        },
-                        onTap: () async => await onImageSource(context, ref),
-                        child: const Center(
-                          child: Text('Choose a Moment'),
-                        ),
-                      ),
-                      const Gap(26.0),
-                      PrimaryButton(
-                        label: 'Upload Moment',
-                        onPressed: onSubmit,
-                        // onPressed: () {},
-                      ),
-                      const Gap(26.0),
-                    ],
+          ),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child: MorphismWidget.circle(
+                    onTap: onCancelUploadMoment,
+                    size: 28.0,
+                    child: SvgPicture.asset(Assets.images.svg.closeIcon.path),
                   ),
                 ),
               ),
-            ),
-          ],
+              const Divider(),
+              Expanded(
+                child: Form(
+                  key: formKey,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: ListView(
+                      children: <Widget>[
+                        const Gap(16.0),
+                        Column(
+                          children: [
+                            MorphismWidget.circle(
+                              size: 64.0,
+                              child: SvgPicture.asset(Assets.images.svg.uploadIcon.path),
+                            ),
+                          ],
+                        ),
+                        Text(
+                          'Upload Your Moment',
+                          style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                                fontWeight: FontWeight.w900,
+                              ),
+                        ),
+                        Text(
+                          'Share your talent with the community!',
+                          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                color: ColorPallete.hintTextColor,
+                              ),
+                        ),
+                        const Gap(16.0),
+                        InputField.text(
+                          controller: titleController,
+                          hintText: 'Enter video title',
+                          helper: Text(
+                            '* up to 50 characters',
+                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                  color: ColorPallete.hintTextColor,
+                                ),
+                          ),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Please enter video title';
+                            }
+                            return null;
+                          },
+                        ),
+                        const Gap(10.0),
+                        InputField.paragraph(
+                          controller: captionController,
+                          maxLines: 5,
+                          hintText: 'Write video caption',
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Please enter video caption';
+                            }
+                            return null;
+                          },
+                        ),
+                        const Gap(26.0),
+                        InputField(
+                          hintText: 'Category',
+                          controller: categoryController,
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Please add a category';
+                            }
+                            return null;
+                          },
+                          readOnly: true,
+                          onTap: () async {
+                            await showCategoryModalPopup(context, categoryState, categoryController);
+                          },
+                        ),
+                        if (fileState.video != null)
+                          Column(
+                            children: [
+                              const Gap(26.0),
+                              Stack(
+                                alignment: Alignment.topRight,
+                                children: [
+                                  FutureBuilder<File>(
+                                    future: thumbnailFuture,
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState == ConnectionState.waiting) {
+                                        return const CircularProgressIndicator(); // Show loading indicator
+                                      } else if (snapshot.hasData) {
+                                        return AspectRatio(
+                                          aspectRatio: 16 / 9,
+                                          child: Container(
+                                            clipBehavior: Clip.hardEdge,
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                color: Colors.white, // Border color
+                                                width: 0.5, // Border width
+                                              ),
+                                              borderRadius: BorderRadius.circular(16.0), // Rounded corners
+                                              image: DecorationImage(
+                                                image: FileImage(snapshot.data!), // Use the thumbnail as a background
+                                                fit: BoxFit.cover, // Adjust the image to cover the container
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      } else {
+                                        return const Text('No thumbnail available'); // Fallback message
+                                      }
+                                    },
+                                  ),
+                                  Positioned(
+                                    right: 8,
+                                    top: 8,
+                                    child: IconButton.filled(
+                                      onPressed: () => ref.invalidate(contentPickerNotifierProvider),
+                                      visualDensity: const VisualDensity(horizontal: -3, vertical: -2),
+                                      focusColor: ColorPallete.primaryColor,
+                                      color: ColorPallete.primaryColor,
+                                      icon: SvgPicture.asset(Assets.images.svg.closeIcon.path),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        const Gap(26.0),
+                        FocusButton(
+                          controller: fileController,
+                          validator: (value) {
+                            if (file.value == null) {
+                              return 'Please choose file';
+                            } else {}
+
+                            final fileSize = File(file.value?.path ?? '').lengthSync();
+                            if (fileSize > 100 * 1024 * 1024) {
+                              // Check if file size exceeds 100MB
+                              return 'File size must not exceed 100MB';
+                            }
+                            return null;
+                          },
+                          onTap: () async => await onImageSource(context, ref),
+                          child: const Center(
+                            child: Text('Choose a Moment'),
+                          ),
+                        ),
+                        const Gap(26.0),
+                        PrimaryButton(
+                          label: 'Upload Moment',
+                          onPressed: onSubmit,
+                          // onPressed: () {},
+                        ),
+                        const Gap(26.0),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

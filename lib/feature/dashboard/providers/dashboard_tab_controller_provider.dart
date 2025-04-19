@@ -13,9 +13,12 @@ class DashboardTabController extends _$DashboardTabController {
 
   void setTab(int index) {
     if (state != index) {
+      print('Switched from tab $state → $index');
       _lastTab = state;
-      print('Switched from tab $_lastTab → $index');
       state = index;
+      print('Updated _lastTab to $_lastTab and state to $state');
+    } else {
+      print('Tab $index is already active. No changes made.');
     }
   }
 }
