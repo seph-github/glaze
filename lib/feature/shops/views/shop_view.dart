@@ -16,6 +16,7 @@ class ShopView extends StatelessWidget {
   Widget build(BuildContext context) {
     return LoadingLayout(
       appBar: AppBarWithBackButton(
+        showBackButton: false,
         centerTitle: false,
         title: const Text('Shop'),
         titleTextStyle: Theme.of(context).textTheme.headlineLarge?.copyWith(
