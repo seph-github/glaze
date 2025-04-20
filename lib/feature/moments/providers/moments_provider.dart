@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:glaze/feature/moments/models/challenge.dart';
+import 'package:glaze/feature/challenges/models/challenge.dart';
 import 'package:glaze/feature/moments/services/moments_services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase/supabase.dart';
@@ -19,7 +19,7 @@ abstract class MomentsState with _$MomentsState {
   }) = _MomentsState;
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class MomentsNotifier extends _$MomentsNotifier {
   @override
   MomentsState build() {
@@ -41,10 +41,8 @@ class MomentsNotifier extends _$MomentsNotifier {
     state = state.copyWith(isLoading: true);
     try {
       final User? user = AuthServices().currentUser;
-      final upcomingChallenges =
-          await MomentsServices().fetchUpcomingChallenges(user!.id);
-      state = state.copyWith(
-          upcomingChallenges: upcomingChallenges, isLoading: false);
+      final upcomingChallenges = await MomentsServices().fetchUpcomingChallenges(user!.id);
+      state = state.copyWith(upcomingChallenges: upcomingChallenges, isLoading: false);
     } catch (e) {
       state = state.copyWith(error: Exception(e), isLoading: false);
     }

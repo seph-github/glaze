@@ -52,6 +52,7 @@ class ProfileView extends HookConsumerWidget {
     return LoadingLayout(
       isLoading: state.isLoading,
       appBar: AppBarWithBackButton(
+        showBackButton: false,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         centerTitle: false,
         title: const Text('Profile'),

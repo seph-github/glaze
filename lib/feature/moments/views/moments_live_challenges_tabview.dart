@@ -9,7 +9,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../../gen/fonts.gen.dart';
-import '../widgets/challenges_card.dart';
+import '../../challenges/widgets/challenges_card.dart';
 
 class MomentsLiveChallengesTabview extends HookConsumerWidget {
   const MomentsLiveChallengesTabview({super.key});
@@ -20,8 +20,7 @@ class MomentsLiveChallengesTabview extends HookConsumerWidget {
 
     useEffect(() {
       Future.microtask(
-        () async =>
-            await ref.read(momentsNotifierProvider.notifier).getChallenges(),
+        () async => await ref.read(momentsNotifierProvider.notifier).getChallenges(),
       );
 
       return null;
@@ -67,17 +66,11 @@ class MomentsLiveChallengesTabview extends HookConsumerWidget {
             children: <Widget>[
               Text(
                 'Upcoming Challenges',
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineMedium
-                    ?.copyWith(fontFamily: FontFamily.robotoBold),
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontFamily: FontFamily.robotoBold),
               ),
               Text(
                 'Stay tuned for exciting challenges to test your skills!',
-                style: Theme.of(context)
-                    .textTheme
-                    .labelLarge
-                    ?.copyWith(color: ColorPallete.hintTextColor),
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(color: ColorPallete.hintTextColor),
               ),
               const Gap(10),
               // const ChallengesCard(),
@@ -88,6 +81,7 @@ class MomentsLiveChallengesTabview extends HookConsumerWidget {
           delegate: SliverChildBuilderDelegate(
             (context, index) => ChallengesCard(
               challenge: state.challenges[index],
+              index: index,
             ),
             childCount: state.challenges.length,
           ),

@@ -15,6 +15,8 @@ class AppBarWithBackButton extends HookWidget implements PreferredSizeWidget {
     this.title,
     this.titleTextStyle,
     this.backgroundColor,
+    this.leading,
+    this.showBackButton = true,
   });
 
   final List<Widget>? actions;
@@ -23,6 +25,8 @@ class AppBarWithBackButton extends HookWidget implements PreferredSizeWidget {
   final Widget? title;
   final TextStyle? titleTextStyle;
   final Color? backgroundColor;
+  final Widget? leading;
+  final bool showBackButton;
 
   @override
   Widget build(BuildContext context) {
@@ -32,19 +36,22 @@ class AppBarWithBackButton extends HookWidget implements PreferredSizeWidget {
       backgroundColor: backgroundColor ?? Colors.transparent,
       scrolledUnderElevation: 0,
       elevation: 0,
-      leading: IconButton(
-        icon: SvgPicture.asset(
-          Assets.images.svg.backArrowIcon.path,
-        ),
-        style: IconButton.styleFrom(
-          backgroundColor: ColorPallete.inputFilledColor,
-          shape: const CircleBorder(),
-        ),
-        onPressed: onBackButtonPressed ??
-            () {
-              router.pop();
-            },
-      ),
+      leading: showBackButton
+          ? leading ??
+              IconButton(
+                icon: SvgPicture.asset(
+                  Assets.images.svg.backArrowIcon.path,
+                ),
+                style: IconButton.styleFrom(
+                  backgroundColor: ColorPallete.inputFilledColor,
+                  shape: const CircleBorder(),
+                ),
+                onPressed: onBackButtonPressed ??
+                    () {
+                      router.pop();
+                    },
+              )
+          : null,
       centerTitle: centerTitle,
       title: title,
       titleTextStyle: titleTextStyle,

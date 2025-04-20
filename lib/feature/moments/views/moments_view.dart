@@ -7,11 +7,12 @@ import 'package:glaze/feature/moments/views/moments_live_challenges_tabview.dart
 import 'package:glaze/feature/moments/views/moments_videos_tabview.dart';
 import 'package:glaze/feature/moments/widgets/search_field.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../gen/assets.gen.dart';
 import '../../../gen/fonts.gen.dart';
 
-class MomentsView extends ConsumerWidget {
+class MomentsView extends HookConsumerWidget {
   const MomentsView({super.key});
 
   @override
@@ -32,6 +33,7 @@ class MomentsView extends ConsumerWidget {
 
     return LoadingLayout(
       appBar: AppBarWithBackButton(
+        showBackButton: false,
         centerTitle: false,
         title: const Text('Moments'),
         titleTextStyle: Theme.of(context).textTheme.headlineLarge?.copyWith(
@@ -65,13 +67,13 @@ class MomentsView extends ConsumerWidget {
                               end: Alignment.bottomCenter,
                             ),
                           ),
-                          isScrollable: true,
+                          isScrollable: false,
                           indicatorSize: TabBarIndicatorSize.tab,
                           dividerColor: Colors.transparent,
                           overlayColor: WidgetStateProperty.all(Colors.transparent),
                           splashFactory: NoSplash.splashFactory,
                           textScaler: TextScaler.noScaling,
-                          tabAlignment: TabAlignment.start,
+                          // tabAlignment: TabAlignment.start,
                           tabs: tabs.map(
                             (tab) {
                               return Tab(
