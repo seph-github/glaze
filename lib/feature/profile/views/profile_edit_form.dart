@@ -41,6 +41,7 @@ class ProfileEditForm extends HookConsumerWidget {
 
     final formKey = useMemoized(() => GlobalKey<FormState>());
     final router = GoRouter.of(context);
+    final isChanged = useState(false);
 
     final fullnameController = useTextEditingController();
     final emailController = useTextEditingController();
@@ -51,11 +52,33 @@ class ProfileEditForm extends HookConsumerWidget {
     final categories = useState<List<CategoryModel>>([]);
     final updatedSelectedInterests = useState<List<String>>([]);
     final currentImage = useState<String?>(null);
+
+    void checkForChanges() {
+      isChanged.value = fullnameController.text.trim() != (state.profile?.fullName ?? '') || emailController.text.trim() != (state.profile?.email ?? '') || phoneController.text.trim() != (state.profile?.phoneNumber ?? '') || usernameController.text.trim() != (state.profile?.username ?? '') || bioController.text.trim() != (state.profile?.bio ?? '') || updatedSelectedInterests.value.toSet().difference((state.profile?.interests ?? []).toSet()).isNotEmpty || currentImage.value != state.profile?.profileImageUrl;
+    }
+
+    useEffect(() {
+      fullnameController.addListener(checkForChanges);
+      emailController.addListener(checkForChanges);
+      phoneController.addListener(checkForChanges);
+      usernameController.addListener(checkForChanges);
+      bioController.addListener(checkForChanges);
+
+      return () {
+        fullnameController.removeListener(checkForChanges);
+        emailController.removeListener(checkForChanges);
+        phoneController.removeListener(checkForChanges);
+        usernameController.removeListener(checkForChanges);
+        bioController.removeListener(checkForChanges);
+      };
+    }, []);
+
     ref.listen(
       imageState,
       (prev, next) {
         if (next.image != null) {
           currentImage.value = next.image?.path;
+          checkForChanges();
         }
       },
     );
@@ -248,29 +271,32 @@ class ProfileEditForm extends HookConsumerWidget {
                   selectedInterests: updatedSelectedInterests.value,
                   onSelected: (value) {
                     updatedSelectedInterests.value = ref.read(profileInterestsNotifierProvider.notifier).updateInterestsList(updatedSelectedInterests.value, value);
+                    checkForChanges();
                   },
                 ),
                 const Gap(32.0),
                 PrimaryButton(
                   label: 'Save',
-                  onPressed: () async {
-                    if (formKey.currentState?.validate() ?? false) {
-                      formKey.currentState?.save();
+                  onPressed: isChanged.value
+                      ? () async {
+                          if (formKey.currentState?.validate() ?? false) {
+                            formKey.currentState?.save();
 
-                      final isProfileImageChanged = currentImage.value != state.profile?.profileImageUrl;
+                            final isProfileImageChanged = currentImage.value != state.profile?.profileImageUrl;
 
-                      await ref.read(profileNotifierProvider.notifier).updateProfile(
-                            id: id,
-                            bio: bioController.text.trim(),
-                            username: usernameController.text.trim(),
-                            email: emailController.text.trim(),
-                            fullName: fullnameController.text.trim(),
-                            phoneNumber: phoneController.text.trim(),
-                            interestList: updatedSelectedInterests.value,
-                            profileImage: isProfileImageChanged && currentImage.value != null ? File(currentImage.value!) : null,
-                          );
-                    }
-                  },
+                            await ref.read(profileNotifierProvider.notifier).updateProfile(
+                                  id: id,
+                                  bio: bioController.text.trim(),
+                                  username: usernameController.text.trim(),
+                                  email: emailController.text.trim(),
+                                  fullName: fullnameController.text.trim(),
+                                  phoneNumber: phoneController.text.trim(),
+                                  interestList: updatedSelectedInterests.value,
+                                  profileImage: isProfileImageChanged && currentImage.value != null ? File(currentImage.value!) : null,
+                                );
+                          }
+                        }
+                      : null,
                 ),
                 const Gap(32.0),
               ],
