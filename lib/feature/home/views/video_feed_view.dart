@@ -169,9 +169,8 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
     Future<void> initAndPlayVideo(int index) async {
       if (videos.value.isEmpty || index >= videos.value.length) return;
 
-      await pauseAllControllers();
-
       final video = videos.value[index];
+
       final controller = await getOrCreateController(video);
 
       if (controller != null) {
@@ -185,7 +184,7 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
         }
 
         await playController(video.videoId);
-      } else {}
+      }
     }
 
     /// Get a controller for a video ID if it exists in the cache
