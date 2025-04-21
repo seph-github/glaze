@@ -35,7 +35,7 @@ class AuthHeader extends StatelessWidget {
         Text(
           buildWelcomeText(),
           style: Theme.of(context).textTheme.headlineLarge!.copyWith(
-                color: Colors.white,
+                // color: Colors.white,
                 fontWeight: FontWeight.bold,
               ),
         ),

@@ -48,11 +48,6 @@ class PrimaryButton extends StatelessWidget {
             ? const CircularProgressIndicator(
                 color: ColorPallete.whiteSmoke,
               )
-            // Lottie.asset(
-            //     'assets/lotties/donut_sprinkled.json',
-            //     height: 32.0,
-            //     width: 32.0,
-            //   )
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

@@ -7,7 +7,7 @@ ThemeData theme = ThemeData(
   colorScheme: const ColorScheme(
     brightness: Brightness.dark,
     primary: ColorPallete.primaryColor,
-    onPrimary: ColorPallete.slateViolet,
+    onPrimary: ColorPallete.magenta,
     secondary: ColorPallete.secondaryColor,
     onSecondary: ColorPallete.strawberryGlaze,
     error: ColorPallete.parlourRed,
@@ -17,7 +17,10 @@ ThemeData theme = ThemeData(
   ),
   iconTheme: const IconThemeData(size: 40, color: Colors.limeAccent),
   fontFamily: FontFamily.robotoRegular,
-  fontFamilyFallback: const [FontFamily.robotoRegular, FontFamily.hitAndRun],
+  fontFamilyFallback: const [
+    FontFamily.robotoRegular,
+    FontFamily.hitAndRun
+  ],
   textTheme: const TextTheme(
     bodyLarge: TextStyle(
       color: ColorPallete.whiteSmoke,
@@ -90,7 +93,7 @@ ThemeData darkTheme = ThemeData(
   colorScheme: const ColorScheme(
     brightness: Brightness.dark,
     primary: ColorPallete.primaryColor,
-    onPrimary: ColorPallete.slateViolet,
+    onPrimary: ColorPallete.magenta,
     secondary: ColorPallete.secondaryColor,
     onSecondary: ColorPallete.strawberryGlaze,
     error: ColorPallete.parlourRed,
@@ -171,7 +174,7 @@ ThemeData lightTheme = ThemeData(
   colorScheme: const ColorScheme(
     brightness: Brightness.light,
     primary: ColorPallete.primaryColor,
-    onPrimary: ColorPallete.slateViolet,
+    onPrimary: ColorPallete.magenta,
     secondary: ColorPallete.secondaryColor,
     onSecondary: ColorPallete.strawberryGlaze,
     error: ColorPallete.parlourRed,

@@ -20,6 +20,7 @@ import '../../../config/enum/profile_type.dart';
 import '../../../core/routing/router.dart';
 import '../../../gen/assets.gen.dart';
 import '../../auth/services/auth_services.dart';
+import '../../settings/providers/settings_theme_provider.dart';
 import '../widgets/profile_achievements_card.dart';
 import '../widgets/profile_interaction_card.dart';
 import '../widgets/profile_moments_card.dart';
@@ -30,6 +31,7 @@ class ProfileView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isLightTheme = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
     final router = GoRouter.of(context);
     final size = MediaQuery.sizeOf(context);
     final width = size.width;
@@ -162,6 +164,7 @@ class ProfileView extends HookConsumerWidget {
                 PrimaryButton(
                   label: 'Log Out',
                   backgroundColor: Colors.transparent,
+                  foregroundColor: isLightTheme ? ColorPallete.backgroundColor : null,
                   onPressed: () async {
                     await ref.read(initialAppUseProvider).setInitialAppUseComplete(true).then(
                           (_) async => await ref.read(authNotifierProvider.notifier).signOut(),

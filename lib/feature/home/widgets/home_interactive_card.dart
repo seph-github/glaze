@@ -8,6 +8,7 @@ import 'package:video_player/video_player.dart';
 
 import '../../../components/morphism_widget.dart';
 import '../../../core/routing/router.dart';
+import '../../../gen/assets.gen.dart';
 import '../models/cached_video_content.dart';
 
 class HomeInteractiveCard extends StatelessWidget {
@@ -72,7 +73,7 @@ class HomeInteractiveCard extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    SvgPicture.asset('assets/images/svg/Trophy Icon.svg'),
+                    SvgPicture.asset(Assets.images.svg.trophyIcon.path),
                     const Gap(10),
                     Text(video?.category ?? ''),
                   ],
@@ -81,7 +82,10 @@ class HomeInteractiveCard extends StatelessWidget {
               const Gap(10),
               Text(
                 video?.title ?? '',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
               ),
               GestureDetector(
                 onTap: () async {
@@ -96,12 +100,18 @@ class HomeInteractiveCard extends StatelessWidget {
                 },
                 child: Text(
                   'by @${video?.username}',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                 ),
               ),
               Text(
                 '# Trending',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
               ),
             ],
           ),

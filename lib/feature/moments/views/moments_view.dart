@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/components/app_bar_with_back_button.dart';
@@ -11,12 +10,15 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../gen/assets.gen.dart';
 import '../../../gen/fonts.gen.dart';
+import '../../settings/providers/settings_theme_provider.dart';
 
 class MomentsView extends HookConsumerWidget {
   const MomentsView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isLightTheme = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
+
     final List<String> tabs = [
       'Videos',
       'Trendings',
@@ -59,9 +61,9 @@ class MomentsView extends HookConsumerWidget {
                           indicator: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                Colors.white.withValues(alpha: 0.01),
-                                Colors.white.withValues(alpha: 0.03),
-                                Colors.white.withValues(alpha: 0.15),
+                                isLightTheme ? Colors.black.withValues(alpha: 0.01) : Colors.white.withValues(alpha: 0.01),
+                                isLightTheme ? Colors.black.withValues(alpha: 0.03) : Colors.white.withValues(alpha: 0.03),
+                                isLightTheme ? Colors.black.withValues(alpha: 0.15) : Colors.white.withValues(alpha: 0.15),
                               ],
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,

@@ -16,6 +16,7 @@ import '../../../core/routing/router.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../gen/assets.gen.dart';
 import '../../../providers/initial_app_use.dart';
+import '../../settings/providers/settings_theme_provider.dart';
 import '../widgets/auth_header.dart';
 import '../widgets/auth_sso_widget.dart';
 
@@ -40,6 +41,13 @@ class AuthView extends HookConsumerWidget {
     final agreedToTermsAndCon = useState<bool>(false);
     final recruitingTalent = useState<bool>(false);
     final hasCompletedInitialAppUse = useState<bool>(false);
+
+    final isLightTheme = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
+
+    const ColorFilter colorFilter = ColorFilter.mode(
+      ColorPallete.lightBackgroundColor,
+      BlendMode.srcIn,
+    );
 
     Future<void> loginHandler() async {
       if (toggleItems.value[selectedIndex.value] == 'Phone') {
@@ -109,14 +117,20 @@ class AuthView extends HookConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           InputField.email(
-            inputIcon: SvgPicture.asset(Assets.images.svg.emailIcon.path),
+            inputIcon: SvgPicture.asset(
+              Assets.images.svg.emailIcon.path,
+              colorFilter: isLightTheme ? colorFilter : null,
+            ),
             hintText: toggleItems.value[0],
             controller: emailController,
             validator: validateEmail,
           ),
           const Gap(16),
           InputField.password(
-            inputIcon: SvgPicture.asset(Assets.images.svg.passwordIcon.path),
+            inputIcon: SvgPicture.asset(
+              Assets.images.svg.passwordIcon.path,
+              colorFilter: isLightTheme ? colorFilter : null,
+            ),
             hintText: 'Enter your password',
             controller: passwordController,
             validator: validatePassword,
@@ -130,21 +144,30 @@ class AuthView extends HookConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           InputField.text(
-            inputIcon: SvgPicture.asset(Assets.images.svg.profileIcon.path),
+            inputIcon: SvgPicture.asset(
+              Assets.images.svg.profileIcon.path,
+              colorFilter: isLightTheme ? colorFilter : null,
+            ),
             hintText: 'Choose a username',
             controller: usernameController,
             validator: validateUsername,
           ),
           const Gap(16),
           InputField.email(
-            inputIcon: SvgPicture.asset(Assets.images.svg.emailIcon.path),
+            inputIcon: SvgPicture.asset(
+              Assets.images.svg.emailIcon.path,
+              colorFilter: isLightTheme ? colorFilter : null,
+            ),
             hintText: toggleItems.value[0],
             controller: emailController,
             validator: validateEmail,
           ),
           const Gap(16),
           InputField.password(
-            inputIcon: SvgPicture.asset(Assets.images.svg.passwordIcon.path),
+            inputIcon: SvgPicture.asset(
+              Assets.images.svg.passwordIcon.path,
+              colorFilter: isLightTheme ? colorFilter : null,
+            ),
             hintText: 'Enter your password',
             controller: passwordController,
             validator: validatePassword,

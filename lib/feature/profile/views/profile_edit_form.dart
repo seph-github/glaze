@@ -22,6 +22,7 @@ import '../../../core/styles/color_pallete.dart';
 import '../../../data/models/category/category_model.dart';
 import '../../../data/repository/category/category_repository.dart';
 import '../../../gen/assets.gen.dart';
+import '../../settings/providers/settings_theme_provider.dart';
 import '../provider/profile_interests_list_provider.dart';
 
 class ProfileEditForm extends HookConsumerWidget {
@@ -36,6 +37,7 @@ class ProfileEditForm extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isLightTheme = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
     final state = ref.watch(profileNotifierProvider);
     final imageState = contentPickerNotifierProvider;
 
@@ -52,6 +54,11 @@ class ProfileEditForm extends HookConsumerWidget {
     final categories = useState<List<CategoryModel>>([]);
     final updatedSelectedInterests = useState<List<String>>([]);
     final currentImage = useState<String?>(null);
+
+    const ColorFilter colorFilter = ColorFilter.mode(
+      ColorPallete.lightBackgroundColor,
+      BlendMode.srcIn,
+    );
 
     void checkForChanges() {
       isChanged.value = fullnameController.text.trim() != (state.profile?.fullName ?? '') || emailController.text.trim() != (state.profile?.email ?? '') || phoneController.text.trim() != (state.profile?.phoneNumber ?? '') || usernameController.text.trim() != (state.profile?.username ?? '') || bioController.text.trim() != (state.profile?.bio ?? '') || updatedSelectedInterests.value.toSet().difference((state.profile?.interests ?? []).toSet()).isNotEmpty || currentImage.value != state.profile?.profileImageUrl;
@@ -207,25 +214,27 @@ class ProfileEditForm extends HookConsumerWidget {
                   controller: usernameController,
                   inputIcon: SvgPicture.asset(
                     Assets.images.svg.profileIcon.path,
+                    colorFilter: isLightTheme ? colorFilter : null,
                   ),
                   hintText: 'Username',
-                  filled: true,
+                  filled: !isLightTheme,
                   validator: validateUsername,
                 ),
                 const Gap(10),
                 InputField.paragraph(
                   controller: bioController,
                   hintText: 'Describe yourself...',
-                  filled: true,
+                  filled: !isLightTheme,
                 ),
                 const Gap(10),
                 InputField.text(
                   controller: fullnameController,
                   inputIcon: SvgPicture.asset(
                     Assets.images.svg.profileIcon.path,
+                    colorFilter: isLightTheme ? colorFilter : null,
                   ),
                   hintText: 'Full name',
-                  filled: true,
+                  filled: !isLightTheme,
                   validator: validateFullname,
                 ),
                 const Gap(10),
@@ -234,9 +243,10 @@ class ProfileEditForm extends HookConsumerWidget {
                   readOnly: state.profile?.email != null,
                   inputIcon: SvgPicture.asset(
                     Assets.images.svg.emailIcon.path,
+                    colorFilter: isLightTheme ? colorFilter : null,
                   ),
                   hintText: 'Email address',
-                  filled: true,
+                  filled: !isLightTheme,
                   validator: validateEmail,
                 ),
                 const Gap(10),
@@ -245,10 +255,11 @@ class ProfileEditForm extends HookConsumerWidget {
                   readOnly: state.profile?.phoneNumber != null,
                   inputIcon: SvgPicture.asset(
                     Assets.images.svg.phoneIcon.path,
+                    colorFilter: isLightTheme ? colorFilter : null,
                   ),
                   hintText: 'Phone number',
-                  filled: true,
-                  // validator: validatePhone,
+                  filled: !isLightTheme,
+                  validator: validatePhone,
                 ),
                 if (state.profile?.role == ProfileType.recruiter.name)
                   Column(
@@ -258,9 +269,10 @@ class ProfileEditForm extends HookConsumerWidget {
                         controller: organizationController,
                         inputIcon: SvgPicture.asset(
                           Assets.images.svg.organizationIcon.path,
+                          colorFilter: isLightTheme ? colorFilter : null,
                         ),
                         hintText: 'Organization',
-                        filled: true,
+                        filled: !isLightTheme,
                         validator: validateOrganization,
                       ),
                     ],

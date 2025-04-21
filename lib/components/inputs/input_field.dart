@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:glaze/core/styles/color_pallete.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import '../../feature/settings/providers/settings_theme_provider.dart';
 
 class InputField extends HookWidget {
   InputField({
@@ -144,84 +147,88 @@ class InputField extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final isObscured = useState(obscureText);
+
     const double defaultBorderRadius = 16;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (label != null)
-          Text(
-            label ?? '',
-            style: const TextStyle(
-              fontSize: 20,
+    return Consumer(builder: (context, ref, _) {
+      final isLightTheme = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (label != null)
+            Text(
+              label ?? '',
+              style: const TextStyle(
+                fontSize: 20,
+              ),
             ),
+          const SizedBox(
+            height: 8,
           ),
-        const SizedBox(
-          height: 8,
-        ),
-        TextFormField(
-          readOnly: readOnly,
-          cursorColor: ColorPallete.whiteSmoke,
-          decoration: InputDecoration(
-            hintText: hintText,
-            hintStyle: const TextStyle(
-              color: ColorPallete.hintTextColor,
-            ),
-            fillColor: ColorPallete.inputFilledColor,
-            filled: filled,
-            prefixIcon: inputIcon != null
-                ? Transform.scale(
-                    scale: 0.5,
-                    child: inputIcon,
-                  )
-                : null,
-            semanticCounterText: 'counter',
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
-              borderSide: const BorderSide(
-                color: ColorPallete.whiteSmoke,
+          TextFormField(
+            readOnly: readOnly,
+            decoration: InputDecoration(
+              hintText: hintText,
+              hintStyle: const TextStyle(
+                color: ColorPallete.hintTextColor,
               ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
-              borderSide: const BorderSide(
-                color: ColorPallete.whiteSmoke,
+              fillColor: ColorPallete.inputFilledColor,
+              filled: filled,
+              prefixIcon: inputIcon != null
+                  ? Transform.scale(
+                      scale: 0.5,
+                      child: inputIcon,
+                    )
+                  : null,
+              semanticCounterText: 'counter',
+              focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
+                borderSide: const BorderSide(
+                  color: ColorPallete.whiteSmoke,
+                ),
               ),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
-              borderSide: const BorderSide(
-                width: 1 / 4,
-                color: ColorPallete.persianFable,
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
+                borderSide: BorderSide(
+                  color: isLightTheme ? ColorPallete.backgroundColor : ColorPallete.whiteSmoke,
+                ),
               ),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
-              borderSide: const BorderSide(
-                width: 1,
-                color: ColorPallete.parlourRed,
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
+                borderSide: BorderSide(
+                  width: 1 / 4,
+                  color: isLightTheme ? ColorPallete.backgroundColor : ColorPallete.persianFable,
+                ),
               ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
+                borderSide: const BorderSide(
+                  width: 1,
+                  color: ColorPallete.parlourRed,
+                ),
+              ),
+              suffixIcon: obscureText
+                  ? GestureDetector(
+                      onTap: () => isObscured.value = !isObscured.value,
+                      child: isObscured.value ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off),
+                    )
+                  : null,
+              helper: helper,
             ),
-            suffixIcon: obscureText
-                ? GestureDetector(
-                    onTap: () => isObscured.value = !isObscured.value,
-                    child: isObscured.value ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off),
-                  )
-                : null,
-            helper: helper,
+            controller: controller,
+            obscureText: isObscured.value,
+            keyboardType: keyboardType,
+            textInputAction: _inputAction,
+            maxLines: maxLines,
+            validator: (value) {
+              return validator?.call(value);
+            },
+            onTapOutside: (_) => FocusScope.of(context).unfocus(),
+            onChanged: onChanged,
+            onTap: onTap,
           ),
-          controller: controller,
-          obscureText: isObscured.value,
-          keyboardType: keyboardType,
-          textInputAction: _inputAction,
-          maxLines: maxLines,
-          validator: (value) {
-            return validator?.call(value);
-          },
-          onTapOutside: (_) => FocusScope.of(context).unfocus(),
-          onChanged: onChanged,
-          onTap: onTap,
-        ),
-      ],
-    );
+        ],
+      );
+    });
   }
 }
