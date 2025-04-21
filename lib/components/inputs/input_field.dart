@@ -20,6 +20,7 @@ class InputField extends HookWidget {
     this.helper,
     this.filled = false,
     this.onTap,
+    this.lightModeColor,
     TextEditingController? controller,
   })  : controller = controller ?? TextEditingController(text: initialValue),
         _inputAction = TextInputAction.next,
@@ -40,6 +41,7 @@ class InputField extends HookWidget {
     this.onTap,
     TextEditingController? controller,
     this.readOnly = false,
+    this.lightModeColor,
   })  : obscureText = false,
         controller = controller ?? TextEditingController(text: initialValue),
         keyboardType = TextInputType.emailAddress,
@@ -60,6 +62,7 @@ class InputField extends HookWidget {
     this.onTap,
     TextEditingController? controller,
     this.readOnly = false,
+    this.lightModeColor,
   })  : obscureText = false,
         controller = controller ?? TextEditingController(text: initialValue),
         keyboardType = TextInputType.phone,
@@ -80,6 +83,7 @@ class InputField extends HookWidget {
     this.helper,
     this.filled = false,
     this.onTap,
+    this.lightModeColor,
   })  : obscureText = true,
         controller = controller ?? TextEditingController(text: initialValue),
         keyboardType = TextInputType.text,
@@ -101,6 +105,7 @@ class InputField extends HookWidget {
     this.filled = false,
     this.onTap,
     TextEditingController? controller,
+    this.lightModeColor,
   })  : controller = controller ?? TextEditingController(text: initialValue),
         _inputAction = TextInputAction.next,
         obscureText = false,
@@ -121,6 +126,7 @@ class InputField extends HookWidget {
     int? maxLines,
     this.filled = false,
     this.onTap,
+    this.lightModeColor,
     TextEditingController? controller,
   })  : controller = controller ?? TextEditingController(text: initialValue),
         _inputAction = TextInputAction.next,
@@ -143,6 +149,7 @@ class InputField extends HookWidget {
   final Widget? helper;
   final Widget? inputIcon;
   final bool filled;
+  final Color? lightModeColor;
 
   @override
   Widget build(BuildContext context) {
@@ -190,14 +197,14 @@ class InputField extends HookWidget {
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
                 borderSide: BorderSide(
-                  color: isLightTheme ? ColorPallete.backgroundColor : ColorPallete.whiteSmoke,
+                  color: isLightTheme ? lightModeColor ?? ColorPallete.backgroundColor : ColorPallete.whiteSmoke,
                 ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
                 borderSide: BorderSide(
                   width: 1 / 4,
-                  color: isLightTheme ? ColorPallete.backgroundColor : ColorPallete.persianFable,
+                  color: isLightTheme ? lightModeColor ?? ColorPallete.backgroundColor : ColorPallete.persianFable,
                 ),
               ),
               errorBorder: OutlineInputBorder(
