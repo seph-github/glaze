@@ -3,7 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'settings_theme_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class SettingsThemeProvider extends _$SettingsThemeProvider {
   @override
   ThemeData build() => ThemeData.dark();

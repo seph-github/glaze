@@ -1,21 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/components/app_bar_with_back_button.dart';
 import 'package:glaze/feature/settings/providers/settings_theme_provider.dart';
 import 'package:glaze/feature/settings/widgets/settings_menu_tile.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../gen/assets.gen.dart';
 import '../widgets/settings_content_card.dart';
 
-class GeneralSettingsView extends HookWidget {
+class GeneralSettingsView extends HookConsumerWidget {
   const GeneralSettingsView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final lightmode = useState<bool>(false);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isLightMode = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
+    final lightmode = useState<bool>(isLightMode);
+
+    useEffect(() {
+      lightmode.value = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
+      return;
+    }, []);
+
     return LoadingLayout(
       appBar: const AppBarWithBackButton(),
       child: Padding(

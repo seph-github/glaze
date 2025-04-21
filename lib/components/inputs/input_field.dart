@@ -144,6 +144,7 @@ class InputField extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final isObscured = useState(obscureText);
+    const double defaultBorderRadius = 16;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -175,26 +176,26 @@ class InputField extends HookWidget {
                 : null,
             semanticCounterText: 'counter',
             focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(borderRadius ?? 32.0),
+              borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
               borderSide: const BorderSide(
                 color: ColorPallete.whiteSmoke,
               ),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(borderRadius ?? 32.0),
+              borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
               borderSide: const BorderSide(
                 color: ColorPallete.whiteSmoke,
               ),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(borderRadius ?? 32.0),
+              borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
               borderSide: const BorderSide(
                 width: 1 / 4,
                 color: ColorPallete.persianFable,
               ),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(borderRadius ?? 32.0),
+              borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
               borderSide: const BorderSide(
                 width: 1,
                 color: ColorPallete.parlourRed,

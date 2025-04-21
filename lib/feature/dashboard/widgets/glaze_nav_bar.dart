@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:glaze/core/styles/color_pallete.dart';
+import 'package:glaze/feature/settings/providers/settings_theme_provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../gen/assets.gen.dart';
 
-class GlazeNavBar extends StatelessWidget {
+class GlazeNavBar extends HookConsumerWidget {
   const GlazeNavBar({
     super.key,
     required StatefulNavigationShell navigationShell,
@@ -15,7 +18,14 @@ class GlazeNavBar extends StatelessWidget {
   final void Function(int)? onDestinationSelected;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isLightTheme = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
+
+    const ColorFilter colorFilter = ColorFilter.mode(
+      ColorPallete.lightBackgroundColor,
+      BlendMode.srcIn,
+    );
+
     return NavigationBar(
       backgroundColor: Theme.of(context).colorScheme.surface,
       selectedIndex: _navigationShell.currentIndex,
@@ -26,13 +36,25 @@ class GlazeNavBar extends StatelessWidget {
       ),
       destinations: [
         NavigationDestination(
-          icon: SvgPicture.asset(Assets.images.svg.homeOutlined.path),
-          selectedIcon: SvgPicture.asset(Assets.images.svg.homeFillIcon.path),
+          icon: SvgPicture.asset(
+            Assets.images.svg.homeOutlined.path,
+            colorFilter: isLightTheme ? colorFilter : null,
+          ),
+          selectedIcon: SvgPicture.asset(
+            Assets.images.svg.homeFillIcon.path,
+            colorFilter: isLightTheme ? colorFilter : null,
+          ),
           label: 'Home',
         ),
         NavigationDestination(
-          icon: SvgPicture.asset(Assets.images.svg.momentsInactiveIcon.path),
-          selectedIcon: SvgPicture.asset(Assets.images.svg.momentsFillIcon.path),
+          icon: SvgPicture.asset(
+            Assets.images.svg.momentsInactiveIcon.path,
+            colorFilter: isLightTheme ? colorFilter : null,
+          ),
+          selectedIcon: SvgPicture.asset(
+            Assets.images.svg.momentsFillIcon.path,
+            colorFilter: isLightTheme ? colorFilter : null,
+          ),
           label: 'Moments',
         ),
         NavigationDestination(
@@ -40,18 +62,33 @@ class GlazeNavBar extends StatelessWidget {
             width: 50.0,
             height: 50.0,
             margin: const EdgeInsets.only(top: 30),
-            child: SvgPicture.asset(Assets.images.svg.addIcon.path),
+            child: SvgPicture.asset(
+              Assets.images.svg.addIcon.path,
+              colorFilter: isLightTheme ? colorFilter : null,
+            ),
           ),
           label: '',
         ),
         NavigationDestination(
-          icon: SvgPicture.asset(Assets.images.svg.shopOutlined.path),
-          selectedIcon: SvgPicture.asset(Assets.images.svg.shopFillIcon.path),
+          icon: SvgPicture.asset(
+            Assets.images.svg.shopOutlined.path,
+            colorFilter: isLightTheme ? colorFilter : null,
+          ),
+          selectedIcon: SvgPicture.asset(
+            Assets.images.svg.shopFillIcon.path,
+            colorFilter: isLightTheme ? colorFilter : null,
+          ),
           label: 'Shops',
         ),
         NavigationDestination(
-          icon: SvgPicture.asset(Assets.images.svg.profileIcon.path),
-          selectedIcon: SvgPicture.asset(Assets.images.svg.profileFillIcon.path),
+          icon: SvgPicture.asset(
+            Assets.images.svg.profileIcon.path,
+            colorFilter: isLightTheme ? colorFilter : null,
+          ),
+          selectedIcon: SvgPicture.asset(
+            Assets.images.svg.profileFillIcon.path,
+            colorFilter: isLightTheme ? colorFilter : null,
+          ),
           label: 'Profile',
         )
       ],

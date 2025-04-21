@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+
 import 'package:flutter_svg/svg.dart';
 
 import '../../core/styles/color_pallete.dart';
+import '../../gen/assets.gen.dart';
 
 class CustomDropDownMenu extends HookWidget {
   CustomDropDownMenu({
@@ -101,7 +103,9 @@ class CustomDropDownMenu extends HookWidget {
             ),
           ),
           isExpanded: true,
-          icon: SvgPicture.asset('assets/images/svg/Drop Down Icon.svg'),
+          icon: SvgPicture.asset(
+            Assets.images.svg.dropDownIcon.path,
+          ),
           menuWidth: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 12.0),
           underline: Container(),
