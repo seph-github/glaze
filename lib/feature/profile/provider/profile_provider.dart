@@ -114,6 +114,7 @@ class ProfileNotifier extends _$ProfileNotifier {
 
   Future<void> updateProfile({
     required String id,
+    String? bio,
     String? username,
     String? email,
     String? fullName,
@@ -128,6 +129,7 @@ class ProfileNotifier extends _$ProfileNotifier {
     try {
       await ProfileServices().updateProfile(
         id: id,
+        bio: bio,
         username: username,
         email: email,
         fullName: fullName,

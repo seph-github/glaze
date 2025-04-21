@@ -47,6 +47,7 @@ class ProfileEditForm extends HookConsumerWidget {
     final phoneController = useTextEditingController();
     final organizationController = useTextEditingController();
     final usernameController = useTextEditingController();
+    final bioController = useTextEditingController();
     final categories = useState<List<CategoryModel>>([]);
     final updatedSelectedInterests = useState<List<String>>([]);
     final currentImage = useState<String?>(null);
@@ -105,6 +106,8 @@ class ProfileEditForm extends HookConsumerWidget {
       currentImage.value = state.profile?.profileImageUrl;
       organizationController.text = state.recruiterProfile?.organization ?? '';
       usernameController.text = state.profile?.username ?? '';
+      bioController.text = state.profile?.bio ?? '';
+
       return null;
     }, []);
 
@@ -186,6 +189,13 @@ class ProfileEditForm extends HookConsumerWidget {
                   filled: true,
                   validator: validateUsername,
                 ),
+                const Gap(10),
+                InputField.paragraph(
+                  controller: bioController,
+                  hintText: 'Describe yourself...',
+                  filled: true,
+                ),
+                const Gap(10),
                 InputField.text(
                   controller: fullnameController,
                   inputIcon: SvgPicture.asset(
@@ -251,6 +261,7 @@ class ProfileEditForm extends HookConsumerWidget {
 
                       await ref.read(profileNotifierProvider.notifier).updateProfile(
                             id: id,
+                            bio: bioController.text.trim(),
                             username: usernameController.text.trim(),
                             email: emailController.text.trim(),
                             fullName: fullnameController.text.trim(),

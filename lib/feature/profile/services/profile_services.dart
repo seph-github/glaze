@@ -106,6 +106,7 @@ class ProfileServices {
 
   Future<void> updateProfile({
     required String id,
+    String? bio,
     String? username,
     String? email,
     String? fullName,
@@ -132,6 +133,7 @@ class ProfileServices {
       final ProfileEntity profileEntity = ProfileEntity(
         id: id,
         username: username,
+        bio: bio,
         fullName: fullName,
         phoneNumber: phoneNumber,
         email: email,
