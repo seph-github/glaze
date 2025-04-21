@@ -54,10 +54,12 @@ Future<void> _showBottomSheet(BuildContext context) async {
   await showCupertinoModalPopup(
     context: context,
     builder: (context) {
-      return const RepaintBoundary(
+      return RepaintBoundary(
         child: SafeArea(
-          child: CupertinoPopupSurface(
-            child: UploadMomentsCard(),
+          bottom: false,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16.0),
+            child: const UploadMomentsCard(),
           ),
         ),
       );

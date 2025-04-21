@@ -21,6 +21,7 @@ import '../../../components/morphism_widget.dart';
 import '../../../components/snack_bar/custom_snack_bar.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../gen/assets.gen.dart';
+import '../../settings/providers/settings_theme_provider.dart';
 
 class UploadMomentsCard extends HookConsumerWidget {
   const UploadMomentsCard({
@@ -29,6 +30,7 @@ class UploadMomentsCard extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isLightTheme = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
     final fileState = ref.watch(contentPickerNotifierProvider);
     final router = GoRouter.of(context);
     final formKey = GlobalKey<FormState>();
@@ -186,6 +188,7 @@ class UploadMomentsCard extends HookConsumerWidget {
                           'Upload Your Moment',
                           style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                                 fontWeight: FontWeight.w900,
+                                color: Colors.white,
                               ),
                         ),
                         Text(
@@ -198,6 +201,7 @@ class UploadMomentsCard extends HookConsumerWidget {
                         InputField.text(
                           controller: titleController,
                           hintText: 'Enter video title',
+                          lightModeColor: isLightTheme ? Colors.white : null,
                           helper: Text(
                             '* up to 50 characters',
                             style: Theme.of(context).textTheme.labelSmall?.copyWith(
@@ -216,6 +220,7 @@ class UploadMomentsCard extends HookConsumerWidget {
                           controller: captionController,
                           maxLines: 5,
                           hintText: 'Write video caption',
+                          lightModeColor: isLightTheme ? Colors.white : null,
                           validator: (value) {
                             if (value!.isEmpty) {
                               return 'Please enter video caption';
@@ -227,6 +232,7 @@ class UploadMomentsCard extends HookConsumerWidget {
                         InputField(
                           hintText: 'Category',
                           controller: categoryController,
+                          lightModeColor: isLightTheme ? Colors.white : null,
                           validator: (value) {
                             if (value!.isEmpty) {
                               return 'Please add a category';
@@ -291,6 +297,7 @@ class UploadMomentsCard extends HookConsumerWidget {
                         const Gap(26.0),
                         FocusButton(
                           controller: fileController,
+                          borderRadius: 16.0,
                           validator: (value) {
                             if (file.value == null) {
                               return 'Please choose file';
@@ -304,8 +311,13 @@ class UploadMomentsCard extends HookConsumerWidget {
                             return null;
                           },
                           onTap: () async => await onImageSource(context, ref),
-                          child: const Center(
-                            child: Text('Choose a Moment'),
+                          child: Center(
+                            child: Text(
+                              'Choose a Moment',
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: ColorPallete.whiteSmoke,
+                                  ),
+                            ),
                           ),
                         ),
                         const Gap(26.0),
@@ -412,49 +424,47 @@ Future<void> showCategoryModalPopup(
     builder: (ctx) {
       final size = MediaQuery.of(ctx).size;
 
-      return SafeArea(
-        child: CupertinoPopupSurface(
-          child: Material(
-            child: Container(
-              height: size.height - kToolbarHeight, // Set height to half of the screen
-              width: double.infinity,
+      return CupertinoPopupSurface(
+        child: Material(
+          child: Container(
+            height: size.height - kToolbarHeight, // Set height to half of the screen
+            width: double.infinity,
 
-              color: ColorPallete.backgroundColor,
+            color: ColorPallete.backgroundColor,
 
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Gap(16.0),
-                  Text(
-                    'Select a Category',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Gap(16.0),
+                Text(
+                  'Select a Category',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(),
+                ),
+                const Divider(
+                  color: Colors.grey,
+                  thickness: 1.0,
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: categoryState.categories.length,
+                    itemBuilder: (ctx, index) {
+                      return ListTile(
+                        title: Text(
+                          categoryState.categories[index].name,
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                        ),
+                        onTap: () {
+                          categoryController.text = categoryState.categories[index].name;
+                          ctx.pop(ctx);
+                        },
+                      );
+                    },
                   ),
-                  const Divider(
-                    color: Colors.grey,
-                    thickness: 1.0,
-                  ),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: categoryState.categories.length,
-                      itemBuilder: (ctx, index) {
-                        return ListTile(
-                          title: Text(
-                            categoryState.categories[index].name,
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                          ),
-                          onTap: () {
-                            categoryController.text = categoryState.categories[index].name;
-                            ctx.pop(ctx);
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
