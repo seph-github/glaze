@@ -282,6 +282,7 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
       Future.microtask(
         () async {
           try {
+            await ref.read(glazeNotifierProvider.notifier).fetchUserGlazes();
             ref.read(videoFeedNotifierProvider);
             if (state.videos.isNotEmpty) {
               videos.value = state.videos;

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 
 import 'package:gap/gap.dart';
 import 'package:glaze/components/snack_bar/custom_snack_bar.dart';
@@ -17,14 +16,6 @@ class MomentsLiveChallengesTabview extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(momentsNotifierProvider);
-
-    useEffect(() {
-      Future.microtask(
-        () async => await ref.read(momentsNotifierProvider.notifier).getChallenges(),
-      );
-
-      return null;
-    }, []);
 
     ref.listen(
       momentsNotifierProvider,

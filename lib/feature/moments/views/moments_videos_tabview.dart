@@ -1,55 +1,59 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:glaze/feature/home/provider/video_content_provider.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:glaze/feature/home/models/video_content.dart';
 import 'package:shimmer/shimmer.dart';
 
 class MomentsVideosTabview extends StatelessWidget {
-  const MomentsVideosTabview({super.key});
+  const MomentsVideosTabview({
+    super.key,
+    this.videos,
+  });
+
+  final List<VideoContent>? videos;
 
   @override
   Widget build(BuildContext context) {
-    return Consumer(
-      builder: (context, ref, child) {
-        final state = ref.watch(videoContentNotifierProvider);
+    if (videos!.isEmpty) {
+      return const Center(
+        child: Text('No Videos Found!'),
+      );
+    }
 
-        return GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            childAspectRatio: 9 / 16,
-          ),
-          padding: const EdgeInsets.only(top: 8.0),
-          itemCount: state.videoContents.length,
-          itemBuilder: (context, index) {
-            return CachedNetworkImage(
-              imageUrl: state.videoContents[index].thumbnailUrl,
-              placeholder: (context, url) {
-                return Shimmer.fromColors(
-                  baseColor: Colors.grey[300]!,
-                  highlightColor: Colors.grey[100]!,
-                  child: Container(
-                    margin: const EdgeInsets.all(1.0),
-                    color: Colors.grey,
-                  ),
-                );
-              },
-              // const Center(
-              //   child: CircularProgressIndicator(
-              //     color: ColorPallete.primaryColor,
-              //   ),
-              // ),
-              imageBuilder: (context, imageProvider) => Container(
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: imageProvider,
-                    fit: BoxFit.cover,
-                  ),
-                ),
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        childAspectRatio: 9 / 16,
+      ),
+      padding: const EdgeInsets.only(top: 8.0),
+      itemCount: videos?.length ?? 0,
+      itemBuilder: (context, index) {
+        return CachedNetworkImage(
+          imageUrl: videos?[index].thumbnailUrl ?? '',
+          placeholder: (context, url) {
+            return Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[100]!,
+              child: Container(
+                margin: const EdgeInsets.all(1.0),
+                color: Colors.grey,
               ),
-              errorWidget: (context, url, error) => const Icon(Icons.error),
-              fit: BoxFit.cover,
             );
           },
+          // const Center(
+          //   child: CircularProgressIndicator(
+          //     color: ColorPallete.primaryColor,
+          //   ),
+          // ),
+          imageBuilder: (context, imageProvider) => Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: imageProvider,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          errorWidget: (context, url, error) => const Icon(Icons.error),
+          fit: BoxFit.cover,
         );
       },
     );

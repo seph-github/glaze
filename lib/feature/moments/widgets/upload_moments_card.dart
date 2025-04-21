@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
+import 'package:glaze/components/modals/glaze_modals.dart';
 import 'package:glaze/feature/camera/provider/content_picker_provider.dart';
 import 'package:glaze/feature/category/provider/category_provider.dart';
 import 'package:glaze/feature/home/provider/video_content_provider.dart';
@@ -241,7 +242,7 @@ class UploadMomentsCard extends HookConsumerWidget {
                           },
                           readOnly: true,
                           onTap: () async {
-                            await showCategoryModalPopup(context, categoryState, categoryController);
+                            await GlazeModal.showCategoryModalPopup(context, categoryState, categoryController);
                           },
                         ),
                         if (fileState.video != null)
@@ -409,65 +410,6 @@ Future<void> showUploadMomentCard(BuildContext context) async {
             child: const Text('Discard'),
           ),
         ],
-      );
-    },
-  );
-}
-
-Future<void> showCategoryModalPopup(
-  BuildContext context,
-  CategoryState categoryState,
-  TextEditingController categoryController,
-) {
-  return showCupertinoModalPopup(
-    context: context,
-    builder: (ctx) {
-      final size = MediaQuery.of(ctx).size;
-
-      return CupertinoPopupSurface(
-        child: Material(
-          child: Container(
-            height: size.height - kToolbarHeight, // Set height to half of the screen
-            width: double.infinity,
-
-            color: ColorPallete.backgroundColor,
-
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Gap(16.0),
-                Text(
-                  'Select a Category',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(),
-                ),
-                const Divider(
-                  color: Colors.grey,
-                  thickness: 1.0,
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: categoryState.categories.length,
-                    itemBuilder: (ctx, index) {
-                      return ListTile(
-                        title: Text(
-                          categoryState.categories[index].name,
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                        ),
-                        onTap: () {
-                          categoryController.text = categoryState.categories[index].name;
-                          ctx.pop(ctx);
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
       );
     },
   );
