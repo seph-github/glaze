@@ -308,11 +308,16 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
 
     useEffect(() {
       final state = appLifecycle;
+
       final wasActive = isAppActive.value;
       isAppActive.value = state == AppLifecycleState.resumed;
+      final dashboardIndex = ref.watch(dashboardTabControllerProvider);
       if (isAppActive.value && !wasActive) {
-        // App has come back to foreground
-        cleanupAndReinitializeCurrentVideo();
+        if (dashboardIndex != 0) {
+          pauseAllControllers();
+        } else {
+          cleanupAndReinitializeCurrentVideo();
+        }
       } else if (!isAppActive.value && wasActive) {
         // App is going to background - pause all videos
         pauseAllControllers();

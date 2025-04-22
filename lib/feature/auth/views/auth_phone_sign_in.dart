@@ -69,64 +69,66 @@ class AuthPhoneSignIn extends HookConsumerWidget {
             router.pop();
           },
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
-            decoration: BoxDecoration(
-              color: ColorPallete.inputFilledColor,
-              borderRadius: BorderRadius.circular(16.0),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Sign in with Phone Number',
-                  style: Theme.of(context).textTheme.headlineLarge!.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                const Gap(16.0),
-                Text(
-                  'Enter your phone number to receive a verification code',
-                  style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                        color: Colors.grey,
-                        fontWeight: FontWeight.w400,
-                      ),
-                ),
-                const Gap(16.0),
-                Form(
-                  key: formKey,
-                  child: PhoneNumberInput(
-                    phoneController: phoneController,
-                    focusNode: phonePickerFocusNode,
-                    dialCodeController: dialCodeController,
-                    validator: validatePhone,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
+              decoration: BoxDecoration(
+                color: ColorPallete.inputFilledColor,
+                borderRadius: BorderRadius.circular(16.0),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Sign in with Phone Number',
+                    style: Theme.of(context).textTheme.headlineLarge!.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
-                ),
-                const Gap(32.0),
-                PrimaryButton(
-                  label: 'Send OTP',
-                  onPressed: () {
-                    phonePickerFocusNode.unfocus();
+                  const Gap(16.0),
+                  Text(
+                    'Enter your phone number to receive a verification code',
+                    style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w400,
+                        ),
+                  ),
+                  const Gap(16.0),
+                  Form(
+                    key: formKey,
+                    child: PhoneNumberInput(
+                      phoneController: phoneController,
+                      focusNode: phonePickerFocusNode,
+                      dialCodeController: dialCodeController,
+                      validator: validatePhone,
+                    ),
+                  ),
+                  const Gap(32.0),
+                  PrimaryButton(
+                    label: 'Send OTP',
+                    onPressed: () {
+                      phonePickerFocusNode.unfocus();
 
-                    if (formKey.currentState?.validate() == true) {
-                      formKey.currentState?.save();
+                      if (formKey.currentState?.validate() == true) {
+                        formKey.currentState?.save();
 
-                      final phoneNumber = dialCodeController.text.trim() + phoneController.text.trim();
+                        final phoneNumber = dialCodeController.text.trim() + phoneController.text.trim();
 
-                      ref.read(authNotifierProvider.notifier).signInWithPhone(
-                            phoneNumber,
-                          );
-                    } else {
-                      return;
-                    }
-                  },
-                ),
-              ],
+                        ref.read(authNotifierProvider.notifier).signInWithPhone(
+                              phoneNumber,
+                            );
+                      } else {
+                        return;
+                      }
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),
