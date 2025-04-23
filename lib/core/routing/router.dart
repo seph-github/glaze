@@ -14,6 +14,7 @@ import 'package:glaze/feature/profile/provider/user_profile_provider.dart';
 import 'package:glaze/feature/profile/views/profile_edit_form.dart';
 import 'package:glaze/feature/shops/views/shop_view.dart';
 import 'package:glaze/feature/profile/views/profile_view.dart';
+import 'package:glaze/feature/video/video_preview_view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:glaze/feature/auth/views/auth_view.dart';
 
@@ -27,6 +28,7 @@ import '../../feature/auth/services/auth_services.dart';
 import '../../feature/auth/views/auth_phone_sign_in.dart';
 import '../../feature/auth/views/auth_verify_phone.dart';
 import '../../feature/challenges/views/challenges_view.dart';
+import '../../feature/home/models/video_content.dart';
 import '../../feature/moments/views/moments_view.dart';
 import '../../feature/onboarding/views/onboarding_view.dart';
 import '../../feature/profile/models/profile.dart';
@@ -426,5 +428,19 @@ class NoViewRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const Placeholder();
+  }
+}
+
+@TypedGoRoute<VideoPreviewRoute>(path: '/video_preview')
+class VideoPreviewRoute extends GoRouteData {
+  const VideoPreviewRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    final Map<String, dynamic> extras = state.extra as Map<String, dynamic>;
+    final VideoContent video = extras['video'];
+    return VideoPreviewView(
+      video: video,
+    );
   }
 }

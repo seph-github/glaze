@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:glaze/core/routing/router.dart';
 import 'package:glaze/feature/home/models/video_content.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 
 class MomentsVideosTabview extends StatelessWidget {
@@ -13,6 +15,7 @@ class MomentsVideosTabview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final GoRouter router = GoRouter.of(context);
     if (videos!.isEmpty) {
       return const Center(
         child: Text('No Videos Found!'),
@@ -27,33 +30,38 @@ class MomentsVideosTabview extends StatelessWidget {
       padding: const EdgeInsets.only(top: 8.0),
       itemCount: videos?.length ?? 0,
       itemBuilder: (context, index) {
-        return CachedNetworkImage(
-          imageUrl: videos?[index].thumbnailUrl ?? '',
-          placeholder: (context, url) {
-            return Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
-              child: Container(
-                margin: const EdgeInsets.all(1.0),
-                color: Colors.grey,
-              ),
+        return GestureDetector(
+          onTap: () {
+            router.push(
+              const VideoPreviewRoute().location,
+              extra: {
+                'video': videos?[index],
+              },
             );
           },
-          // const Center(
-          //   child: CircularProgressIndicator(
-          //     color: ColorPallete.primaryColor,
-          //   ),
-          // ),
-          imageBuilder: (context, imageProvider) => Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: imageProvider,
-                fit: BoxFit.cover,
+          child: CachedNetworkImage(
+            imageUrl: videos?[index].thumbnailUrl ?? '',
+            placeholder: (context, url) {
+              return Shimmer.fromColors(
+                baseColor: Colors.grey[300]!,
+                highlightColor: Colors.grey[100]!,
+                child: Container(
+                  margin: const EdgeInsets.all(1.0),
+                  color: Colors.grey,
+                ),
+              );
+            },
+            imageBuilder: (context, imageProvider) => Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: imageProvider,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
+            errorWidget: (context, url, error) => const Icon(Icons.error),
+            fit: BoxFit.cover,
           ),
-          errorWidget: (context, url, error) => const Icon(Icons.error),
-          fit: BoxFit.cover,
         );
       },
     );
