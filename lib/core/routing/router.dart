@@ -6,6 +6,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glaze/core/routing/observer/route_observer_provider.dart';
+import 'package:glaze/feature/auth/views/auth_forget_password_view.dart';
 import 'package:glaze/feature/dashboard/views/dashboard_view.dart';
 import 'package:glaze/feature/home/views/video_feed_view.dart';
 import 'package:glaze/feature/profile/provider/profile_provider.dart';
@@ -255,6 +256,7 @@ class HomeRoute extends GoRouteData {
   routes: [
     TypedGoRoute<AuthPhoneSignInRoute>(path: 'phone-sign-in'),
     TypedGoRoute<AuthVerifyPhoneRoute>(path: 'verify-phone'),
+    TypedGoRoute<AuthForgetPasswordRoute>(path: 'forget-password'),
   ],
 )
 class AuthRoute extends GoRouteData {
@@ -295,6 +297,15 @@ class AuthVerifyPhoneRoute extends GoRouteData {
     return AuthVerifyPhone(
       phoneNumber: phoneNumberWithDialCode,
     );
+  }
+}
+
+class AuthForgetPasswordRoute extends GoRouteData {
+  const AuthForgetPasswordRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const AuthForgetPasswordView();
   }
 }
 

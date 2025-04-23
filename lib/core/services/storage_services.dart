@@ -12,7 +12,7 @@ class StorageServices {
     required String fileName,
   }) async {
     try {
-      final String dirName = '$id/${file.path.split('/').last}';
+      final String dirName = '$id/${DateTime.now()}-${file.path.split('/').last}';
 
       final result = await _storageClient.from(bucketName).upload(dirName, file);
       final url = _storageClient.from(bucketName).getPublicUrl(result);

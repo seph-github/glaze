@@ -16,6 +16,7 @@ abstract class GlazeState with _$GlazeState {
     @Default(null) String? response,
     @Default(false) bool isLoading,
     @Default(null) dynamic error,
+    @Default(0) int glazesCount,
   }) = _GlazeState;
 
   const GlazeState._();
@@ -53,6 +54,18 @@ class GlazeNotifier extends _$GlazeNotifier {
       final glazes = await GlazeServices().fetchUserGlazes(userId: user?.id ?? '');
 
       state = state.copyWith(glazes: glazes, isLoading: false);
+    } catch (e) {
+      setError(e);
+    }
+  }
+
+  Future<void> getVideoGlazeCount(String videoId) async {
+    state = state.copyWith(isLoading: true);
+    try {
+      print('calling notifier $videoId');
+      final count = await GlazeServices().getVideoGlazeCount(videoId);
+
+      state = state.copyWith(isLoading: false, glazesCount: count);
     } catch (e) {
       setError(e);
     }

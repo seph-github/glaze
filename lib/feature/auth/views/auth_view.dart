@@ -195,7 +195,9 @@ class AuthView extends HookConsumerWidget {
                 const Gap(16),
                 if (isLogin.value)
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      const AuthForgetPasswordRoute().push(context);
+                    },
                     child: const Align(
                       alignment: Alignment.centerRight,
                       child: Text('Forgot Password?'),

@@ -33,6 +33,7 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
       :height
     ) = MediaQuery.sizeOf(context);
     final showMoreDonutOptions = useState<bool>(false);
+    final showShareButton = useState<bool>(false);
     final userGlazes = useState<List<Glaze>>([]);
 
     const int maxCacheSize = 3;
@@ -48,6 +49,10 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
 
     void toggleDonutOptions(bool value) {
       showMoreDonutOptions.value = value;
+    }
+
+    void toggleShareButton(bool value) {
+      showShareButton.value = value;
     }
 
     /// Pause all controllers
@@ -355,9 +360,12 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
 
           if (controller != null && controller.value.isInitialized) {
             if (!isActive) {
+              // await pauseAllControllers();
               await controller.pause();
               debugPrint('⏸ Paused video (not on Home tab)');
             } else {
+              // await cleanupAndReinitializeCurrentVideo();
+              // initAndPlayVideo(index);
               await controller.play();
               debugPrint('▶️ Resumed video (back to Home tab)');
             }
@@ -411,59 +419,72 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
                     }
 
                     // 🧠 Add pause/play toggle
-                    return GestureDetector(
-                      onTap: () async {
-                        if (!isCurrent) return;
+                    return Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        GestureDetector(
+                          onTap: () async {
+                            if (!isCurrent) return;
 
-                        if (controller.value.isPlaying) {
-                          await controller.pause();
-                        } else {
-                          await controller.play();
-                        }
-                      },
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          VideoPlayer(controller),
-                          if (!controller.value.isPlaying)
-                            Container(
-                              width: 50,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.black.withValues(alpha: 0.3),
-                              ),
-                              child: Center(
-                                child: SvgPicture.asset(Assets.images.svg.playIcon.path),
-                              ),
+                            if (controller.value.isPlaying) {
+                              await controller.pause();
+                            } else {
+                              await controller.play();
+                            }
+                          },
+                          child: VideoPlayer(controller),
+                        ),
+                        if (!controller.value.isPlaying)
+                          Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.black.withValues(alpha: 0.3),
                             ),
-                          Positioned(
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            child: HomeInteractiveCard(
-                              key: PageStorageKey('HomeInteractiveCard_$index'),
-                              onGlazeLongPress: () => toggleDonutOptions(true),
-                              controller: getController(videos.value[index].videoId),
-                              isGlazed: userGlazes.value.any(
-                                (glaze) {
-                                  return glaze.videoId == videos.value[index].videoId;
-                                },
-                              ),
-                              onGlazeTap: () async {
-                                await ref.read(glazeNotifierProvider.notifier).onGlazed(videoId: videos.value[index].videoId).then(
-                                      (_) => ref.refresh(glazeNotifierProvider.notifier).fetchUserGlazes(),
-                                    );
-                              },
-                              onShareTap: () async => await _showShareOptions(context),
-                              width: width,
-                              height: height,
-                              video: videos.value[index],
-                              index: index,
+                            child: Center(
+                              child: SvgPicture.asset(Assets.images.svg.playIcon.path),
                             ),
                           ),
-                        ],
-                      ),
+                        Positioned(
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          child: HomeInteractiveCard(
+                            key: PageStorageKey('HomeInteractiveCard_$index'),
+                            onGlazeLongPress: () => toggleDonutOptions(true),
+                            controller: getController(videos.value[index].videoId),
+                            isGlazed: userGlazes.value.any(
+                              (glaze) {
+                                return glaze.videoId == videos.value[index].videoId;
+                              },
+                            ),
+                            onGlazeTap: () async {
+                              await ref.read(glazeNotifierProvider.notifier).onGlazed(videoId: videos.value[index].videoId).then(
+                                    (_) => ref.refresh(glazeNotifierProvider.notifier).fetchUserGlazes(),
+                                  );
+                            },
+                            onShareTap: () async => await _showShareOptions(context),
+                            width: width,
+                            height: height,
+                            video: videos.value[index],
+                            index: index,
+                          ),
+                        ),
+                        if (showMoreDonutOptions.value || showShareButton.value)
+                          GestureDetector(
+                            onTap: () {
+                              toggleDonutOptions(false);
+                              toggleShareButton(false);
+                            },
+                            child: Container(
+                              height: double.infinity,
+                              width: double.infinity,
+                              color: Colors.black.withValues(alpha: 0.7),
+                            ),
+                          ),
+                        if (showMoreDonutOptions.value) _buildDonutOptions(context, width: width),
+                      ],
                     );
                   },
                 );
@@ -471,6 +492,29 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
             );
           },
           onPageChanged: (index) => handlePageChange(index),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDonutOptions(BuildContext ctx, {double? width}) {
+    return Positioned(
+      right: 16.0,
+      bottom: 140.0,
+      child: MorphismWidget.rounded(
+        width: width! / 2.25,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SvgPicture.asset('assets/images/svg/Glaze Donuts Icon.svg'),
+              SvgPicture.asset('assets/images/svg/Glaze Donuts Icon.svg'),
+              SvgPicture.asset('assets/images/svg/Glaze Donuts Icon.svg'),
+              SvgPicture.asset('assets/images/svg/Plus icon.svg'),
+            ],
+          ),
         ),
       ),
     );

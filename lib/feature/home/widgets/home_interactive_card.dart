@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/core/styles/color_pallete.dart';
@@ -11,7 +12,7 @@ import '../../../core/routing/router.dart';
 import '../../../gen/assets.gen.dart';
 import '../models/cached_video_content.dart';
 
-class HomeInteractiveCard extends StatelessWidget {
+class HomeInteractiveCard extends HookWidget {
   const HomeInteractiveCard({
     super.key,
     required this.width,
@@ -43,6 +44,7 @@ class HomeInteractiveCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final router = GoRouter.of(context);
+    final glazeCount = useState<int>(video?.glazesCount ?? 0);
     return Container(
       width: width,
       height: 150,
@@ -119,10 +121,17 @@ class HomeInteractiveCard extends StatelessWidget {
             children: <Widget>[
               MorphismWidget.circle(
                 color: isGlazed ? ColorPallete.primaryColor : null,
-                onTap: onGlazeTap,
+                onTap: () async {
+                  onGlazeTap?.call();
+                },
                 onLongPress: onGlazeLongPress,
                 size: 45.0,
-                child: SvgPicture.asset('assets/images/svg/Glaze Donuts Icon.svg'),
+                child: SvgPicture.asset(Assets.images.svg.glazeDonutsIcon.path),
+              ),
+              const Gap(2),
+              Text(
+                glazeCount.value.toString(),
+                style: Theme.of(context).textTheme.labelSmall,
               ),
               const Gap(10),
               MorphismWidget.circle(

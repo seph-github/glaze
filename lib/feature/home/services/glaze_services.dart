@@ -38,4 +38,15 @@ class GlazeServices {
       throw Exception('GlazeRepository.fetchUserGlaze: $e');
     }
   }
+
+  Future<int> getVideoGlazeCount(String videoId) async {
+    try {
+      final response = await _supabaseClient.from('glazes').select('video_id').eq('video_id', videoId).count();
+
+      print('video response ${response.count}');
+      return response.count;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }
