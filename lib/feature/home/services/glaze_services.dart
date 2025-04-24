@@ -1,3 +1,4 @@
+import 'package:glaze/feature/home/models/glaze_stats.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/glaze.dart';
@@ -41,10 +42,35 @@ class GlazeServices {
 
   Future<int> getVideoGlazeCount(String videoId) async {
     try {
-      final response = await _supabaseClient.from('glazes').select('video_id').eq('video_id', videoId).count();
+      final response = await _supabaseClient.from('videos').select('glazes_count').eq('id', videoId).single();
 
-      print('video response ${response.count}');
-      return response.count;
+      return response['glazes_count'];
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<GlazeStats> getVideoGlazeStats({required String videoId, required String userId}) async {
+    try {
+      final response = await _supabaseClient.rpc(
+        'get_video_glaze_stats',
+        params: {
+          'vid': videoId,
+          'uid': userId,
+        },
+      );
+
+      final raw = response as List<dynamic>;
+
+      if (raw.isEmpty) {
+        return const GlazeStats(count: 0, hasGlazed: false);
+      }
+
+      final stat = response.first;
+      return GlazeStats(
+        count: stat['total_glazes'],
+        hasGlazed: stat['has_glazed'],
+      );
     } catch (e) {
       rethrow;
     }

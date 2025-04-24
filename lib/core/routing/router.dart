@@ -12,6 +12,7 @@ import 'package:glaze/feature/home/views/video_feed_view.dart';
 import 'package:glaze/feature/profile/provider/profile_provider.dart';
 import 'package:glaze/feature/profile/provider/user_profile_provider.dart';
 import 'package:glaze/feature/profile/views/profile_edit_form.dart';
+import 'package:glaze/feature/profile/views/profile_interactive_view.dart';
 import 'package:glaze/feature/shops/views/shop_view.dart';
 import 'package:glaze/feature/profile/views/profile_view.dart';
 import 'package:glaze/feature/video/video_preview_view.dart';
@@ -441,6 +442,22 @@ class VideoPreviewRoute extends GoRouteData {
     final VideoContent video = extras['video'];
     return VideoPreviewView(
       video: video,
+    );
+  }
+}
+
+@TypedGoRoute<ProfileInteractiveRoute>(path: '/interactive')
+class ProfileInteractiveRoute extends GoRouteData {
+  const ProfileInteractiveRoute({
+    this.initialIndex = 0,
+  });
+
+  final int initialIndex;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return ProfileInteractiveView(
+      initialIndex: initialIndex,
     );
   }
 }

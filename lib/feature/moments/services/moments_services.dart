@@ -31,8 +31,6 @@ class MomentsServices {
 
       if (response == null) return [];
 
-      print('Search response $response');
-
       final raw = response as List<dynamic>;
 
       return raw.map((e) => VideoContent.fromJson(e)).toList();

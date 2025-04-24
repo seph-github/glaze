@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:glaze/components/app_bar_with_back_button.dart';
+import 'package:glaze/feature/home/models/glaze.dart';
 import 'package:glaze/feature/home/models/video_content.dart';
 import 'package:glaze/feature/home/widgets/home_interactive_card.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:lottie/lottie.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../gen/assets.gen.dart';
+import '../home/provider/glaze_provider.dart';
 import '../templates/loading_layout.dart';
 
 class VideoPreviewView extends HookConsumerWidget {
@@ -26,22 +27,33 @@ class VideoPreviewView extends HookConsumerWidget {
       :height
     ) = MediaQuery.sizeOf(context);
     final controller = useState<VideoPlayerController>(
-      VideoPlayerController.networkUrl(Uri.parse(video.videoUrl)),
+      VideoPlayerController.networkUrl(
+        Uri.parse(video.videoUrl),
+      ),
     );
 
     final isInitialized = useState(false);
     final showPlayerIcon = useState<bool>(false);
+    final userGlazes = useState<List<Glaze>>([]);
 
     useEffect(() {
-      controller.value.initialize().then((_) {
+      controller.value.initialize().then((_) async {
         isInitialized.value = true;
+        await ref.read(glazeNotifierProvider.notifier).getVideoGlazeStats(video.videoId);
 
-        controller.value.play();
-        controller.value.setLooping(true);
+        await controller.value.play();
+        await controller.value.setLooping(true);
       });
 
       return controller.value.dispose;
     }, []);
+
+    ref.listen(
+      glazeNotifierProvider,
+      (prev, next) {
+        userGlazes.value = next.glazes ?? [];
+      },
+    );
 
     return LoadingLayout(
       isLoading: !isInitialized.value,
@@ -85,13 +97,17 @@ class VideoPreviewView extends HookConsumerWidget {
             left: 0,
             right: 0,
             child: SafeArea(
-              child: Flexible(
-                child: HomeInteractiveCard(
-                  video: video,
-                  width: width,
-                  height: height,
-                  index: 0,
-                ),
+              child: HomeInteractiveCard(
+                video: video,
+                width: width,
+                height: height,
+                glazeCount: ref.watch(glazeNotifierProvider).stats.count,
+                isGlazed: ref.watch(glazeNotifierProvider).stats.hasGlazed,
+                onGlazeTap: () async {
+                  await ref.read(glazeNotifierProvider.notifier).onGlazed(videoId: video.videoId).then(
+                        (_) => ref.read(glazeNotifierProvider.notifier).getVideoGlazeStats(video.videoId),
+                      );
+                },
               ),
             ),
           )

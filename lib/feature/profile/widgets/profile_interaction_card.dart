@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:glaze/core/routing/router.dart';
+import 'package:go_router/go_router.dart';
 
 class ProfileInteractionCard extends StatelessWidget {
   const ProfileInteractionCard({
@@ -14,6 +16,7 @@ class ProfileInteractionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final GoRouter router = GoRouter.of(context);
     return Container(
       height: 80.0,
       width: double.infinity,
@@ -24,24 +27,29 @@ class ProfileInteractionCard extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                following.toString(),
-                style: const TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
+          GestureDetector(
+            onTap: () => router.push(const ProfileInteractiveRoute(
+              initialIndex: 0,
+            ).location),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  following.toString(),
+                  style: const TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              const Text(
-                'Following',
-                style: TextStyle(
-                  fontSize: 12.0,
-                  color: Colors.grey,
+                const Text(
+                  'Following',
+                  style: TextStyle(
+                    fontSize: 12.0,
+                    color: Colors.grey,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           const VerticalDivider(
             width: 0.5,
@@ -50,24 +58,29 @@ class ProfileInteractionCard extends StatelessWidget {
             endIndent: 20,
             indent: 20,
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                followers.toString(),
-                style: const TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
+          GestureDetector(
+            onTap: () => router.push(const ProfileInteractiveRoute(
+              initialIndex: 1,
+            ).location),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  followers.toString(),
+                  style: const TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              const Text(
-                'Followers',
-                style: TextStyle(
-                  fontSize: 12.0,
-                  color: Colors.grey,
+                const Text(
+                  'Followers',
+                  style: TextStyle(
+                    fontSize: 12.0,
+                    color: Colors.grey,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           const VerticalDivider(
             width: 0.5,
@@ -76,24 +89,29 @@ class ProfileInteractionCard extends StatelessWidget {
             endIndent: 20,
             indent: 20,
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                glazes.toString(),
-                style: const TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
+          GestureDetector(
+            onTap: () => router.push(const ProfileInteractiveRoute(
+              initialIndex: 2,
+            ).location),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  glazes.toString(),
+                  style: const TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              const Text(
-                'Total Glazes',
-                style: TextStyle(
-                  fontSize: 12.0,
-                  color: Colors.grey,
+                const Text(
+                  'Total Glazes',
+                  style: TextStyle(
+                    fontSize: 12.0,
+                    color: Colors.grey,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

@@ -19,7 +19,7 @@ abstract class ProfileState with _$ProfileState {
     @Default(null) Profile? viewUserProfile,
     @Default(null) RecruiterProfile? recruiterProfile,
     @Default(false) bool isLoading,
-    @Default(null) Exception? error,
+    @Default(null) dynamic error,
   }) = _ProfileState;
 
   const ProfileState._();
@@ -145,4 +145,17 @@ class ProfileNotifier extends _$ProfileNotifier {
       setError(e);
     }
   }
+
+  // Future<void> getUserInteractions() async {
+  //   state = state.copyWith(isLoading: true);
+  //   try {
+  //     final user = AuthServices().currentUser;
+  //     final response = await ProfileServices().getUserInteractions(user!.id);
+
+  //     log('response $response');
+  //     state = state.copyWith(isLoading: false);
+  //   } catch (error) {
+  //     setError(error);
+  //   }
+  // }
 }

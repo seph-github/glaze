@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:glaze/feature/auth/services/auth_services.dart';
+import 'package:glaze/feature/home/models/glaze_stats.dart';
 import 'package:glaze/feature/home/services/glaze_services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -17,6 +18,7 @@ abstract class GlazeState with _$GlazeState {
     @Default(false) bool isLoading,
     @Default(null) dynamic error,
     @Default(0) int glazesCount,
+    @Default(GlazeStats(count: 0, hasGlazed: false)) GlazeStats stats,
   }) = _GlazeState;
 
   const GlazeState._();
@@ -62,12 +64,23 @@ class GlazeNotifier extends _$GlazeNotifier {
   Future<void> getVideoGlazeCount(String videoId) async {
     state = state.copyWith(isLoading: true);
     try {
-      print('calling notifier $videoId');
       final count = await GlazeServices().getVideoGlazeCount(videoId);
 
       state = state.copyWith(isLoading: false, glazesCount: count);
     } catch (e) {
       setError(e);
+    }
+  }
+
+  Future<void> getVideoGlazeStats(String videoId) async {
+    state = state.copyWith(isLoading: true);
+    try {
+      final user = AuthServices().currentUser;
+      final response = await GlazeServices().getVideoGlazeStats(videoId: videoId, userId: user?.id ?? '');
+
+      state = state.copyWith(isLoading: false, stats: response);
+    } catch (error) {
+      setError(error);
     }
   }
 }

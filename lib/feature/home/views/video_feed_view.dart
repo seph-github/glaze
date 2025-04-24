@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
-import 'package:glaze/feature/home/models/glaze.dart';
 import 'package:glaze/feature/home/provider/video_feed_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -27,6 +26,7 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(videoFeedNotifierProvider);
+    final glazeState = ref.watch(glazeNotifierProvider);
     final appLifecycle = useAppLifecycleState();
     final Size(
       :width,
@@ -34,7 +34,6 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
     ) = MediaQuery.sizeOf(context);
     final showMoreDonutOptions = useState<bool>(false);
     final showShareButton = useState<bool>(false);
-    final userGlazes = useState<List<Glaze>>([]);
 
     const int maxCacheSize = 3;
     final currentPage = useState<int>(0);
@@ -148,6 +147,7 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
         enforceCacheLimit(); // Ensure cache size limit
 
         completer.complete(controller);
+
         return controller;
       } catch (e) {
         completer.completeError(e);
@@ -187,6 +187,8 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
         if (index != currentPage.value) {
           return;
         }
+
+        await ref.read(glazeNotifierProvider.notifier).getVideoGlazeStats(videos.value[index].videoId);
 
         await playController(video.videoId);
       }
@@ -342,13 +344,6 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
       },
     );
 
-    ref.listen(
-      glazeNotifierProvider,
-      (prev, next) {
-        userGlazes.value = next.glazes ?? [];
-      },
-    );
-
     useEffect(() {
       final listener = ref.listenManual<int>(
         dashboardTabControllerProvider,
@@ -432,20 +427,25 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
                               await controller.play();
                             }
                           },
-                          child: VideoPlayer(controller),
-                        ),
-                        if (!controller.value.isPlaying)
-                          Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.black.withValues(alpha: 0.3),
-                            ),
-                            child: Center(
-                              child: SvgPicture.asset(Assets.images.svg.playIcon.path),
-                            ),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              VideoPlayer(controller),
+                              if (!controller.value.isPlaying)
+                                Container(
+                                  width: 50,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.black.withValues(alpha: 0.3),
+                                  ),
+                                  child: Center(
+                                    child: SvgPicture.asset(Assets.images.svg.playIcon.path),
+                                  ),
+                                ),
+                            ],
                           ),
+                        ),
                         Positioned(
                           bottom: 0,
                           left: 0,
@@ -454,21 +454,17 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
                             key: PageStorageKey('HomeInteractiveCard_$index'),
                             onGlazeLongPress: () => toggleDonutOptions(true),
                             controller: getController(videos.value[index].videoId),
-                            isGlazed: userGlazes.value.any(
-                              (glaze) {
-                                return glaze.videoId == videos.value[index].videoId;
-                              },
-                            ),
+                            glazeCount: glazeState.stats.count,
+                            isGlazed: glazeState.stats.hasGlazed,
                             onGlazeTap: () async {
-                              await ref.read(glazeNotifierProvider.notifier).onGlazed(videoId: videos.value[index].videoId).then(
-                                    (_) => ref.refresh(glazeNotifierProvider.notifier).fetchUserGlazes(),
+                              await ref.read(glazeNotifierProvider.notifier).onGlazed(videoId: video.videoId).then(
+                                    (_) => ref.read(glazeNotifierProvider.notifier).getVideoGlazeStats(video.videoId),
                                   );
                             },
                             onShareTap: () async => await _showShareOptions(context),
                             width: width,
                             height: height,
                             video: videos.value[index],
-                            index: index,
                           ),
                         ),
                         if (showMoreDonutOptions.value || showShareButton.value)

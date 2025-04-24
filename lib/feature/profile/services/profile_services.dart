@@ -27,7 +27,7 @@ class ProfileServices {
 
       final raw = response as List<dynamic>;
 
-      // log('ProfileServices.fetchUserProfile: $raw');
+      log('ProfileServices.fetchUserProfile: $raw');
 
       return Profile.fromJson(raw.first);
     } on PostgrestException catch (e) {
@@ -191,4 +191,46 @@ class ProfileServices {
       rethrow;
     }
   }
+
+  // Future<UserInteractions> getUserInteractions(String id) async {
+  //   try {
+  //     final response = await _supabaseClient.rpc(
+  //       'get_user_social_stats',
+  //       params: {
+  //         'params_user_id': id,
+  //       },
+  //     );
+
+  //     if (response == null || response is! List<dynamic>) {
+  //       return const UserInteractions(
+  //         followers: [],
+  //         following: [],
+  //         glazes: [],
+  //       );
+  //     }
+
+  //     // Parse the response as a List<dynamic> and extract the first map
+  //     final raw = response.first as Map<String, dynamic>;
+
+  //     // Parse followers
+  //     final followers = (raw['followers'] as List<dynamic>?)?.map((e) => UserInteract.fromJson(e as Map<String, dynamic>)).toList() ?? [];
+
+  //     // Parse following
+  //     final following = (raw['following'] as List<dynamic>?)?.map((e) => UserInteract.fromJson(e as Map<String, dynamic>)).toList() ?? [];
+
+  //     // Parse glazes
+  //     final glazes = (raw['glazes'] as List<dynamic>?)?.map((e) => Glaze.fromJson(e as Map<String, dynamic>)).toList() ?? [];
+
+  //     final userInteractions = UserInteractions(
+  //       followers: followers,
+  //       following: following,
+  //       glazes: glazes,
+  //     );
+
+  //     return userInteractions;
+  //   } catch (e, stackTrace) {
+  //     log('get user interactions error: $e', stackTrace: stackTrace);
+  //     rethrow;
+  //   }
+  // }
 }

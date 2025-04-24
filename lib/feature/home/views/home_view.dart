@@ -153,7 +153,6 @@ class HomeView extends HookConsumerWidget {
                         width: width,
                         height: height,
                         cachedVideos: state.cachedVideoContent,
-                        index: index,
                       ),
                     ),
                     if (showMoreDonutOptions.value || showShareButton.value)

@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/components/app_bar_with_back_button.dart';
+import 'package:glaze/components/custom_tab_bar.dart';
 import 'package:glaze/feature/moments/providers/moments_provider.dart';
 import 'package:glaze/feature/moments/views/moments_live_challenges_tabview.dart';
 import 'package:glaze/feature/moments/views/moments_videos_tabview.dart';
@@ -103,60 +104,14 @@ class MomentsView extends HookConsumerWidget {
                 ),
               const Gap(10),
               Expanded(
-                child: DefaultTabController(
+                child: CustomTabBar(
                   length: tabs.length,
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 40,
-                        child: TabBar(
-                          controller: tabController,
-                          onTap: (value) {
-                            currentIndex.value = value;
-                          },
-                          indicator: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                isLightTheme ? Colors.black.withValues(alpha: 0.01) : Colors.white.withValues(alpha: 0.01),
-                                isLightTheme ? Colors.black.withValues(alpha: 0.03) : Colors.white.withValues(alpha: 0.03),
-                                isLightTheme ? Colors.black.withValues(alpha: 0.15) : Colors.white.withValues(alpha: 0.15),
-                              ],
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                            ),
-                          ),
-                          isScrollable: false,
-                          indicatorSize: TabBarIndicatorSize.tab,
-                          dividerColor: Colors.transparent,
-                          overlayColor: WidgetStateProperty.all(Colors.transparent),
-                          splashFactory: NoSplash.splashFactory,
-                          textScaler: TextScaler.noScaling,
-                          tabs: tabs.map(
-                            (tab) {
-                              return Tab(
-                                child: Text(
-                                  tab,
-                                  style: Theme.of(context).textTheme.labelLarge,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              );
-                            },
-                          ).toList(),
-                        ),
-                      ),
-                      Expanded(
-                        child: TabBarView(
-                          controller: tabController,
-                          children: tabViews.map(
-                            (tab) {
-                              return tab;
-                            },
-                          ).toList(),
-                        ),
-                      ),
-                    ],
-                  ),
+                  controller: tabController,
+                  tabs: tabs,
+                  tabViews: tabViews,
+                  onTap: (value) {
+                    currentIndex.value = value;
+                  },
                 ),
               ),
             ],

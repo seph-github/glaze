@@ -19,16 +19,15 @@ class HomeInteractiveCard extends HookWidget {
     required this.height,
     this.cachedVideos,
     this.video,
-    required this.index,
     this.onGlazeTap,
     this.onGlazeLongPress,
     this.onShareTap,
     this.onShareLongPress,
     this.isGlazed = false,
     this.controller,
+    this.glazeCount = 0,
   });
 
-  final int index;
   final double width;
   final double height;
   final bool isGlazed;
@@ -40,11 +39,12 @@ class HomeInteractiveCard extends HookWidget {
   final VoidCallback? onShareTap;
   final VoidCallback? onShareLongPress;
   final VideoPlayerController? controller;
+  final int glazeCount;
 
   @override
   Widget build(BuildContext context) {
     final router = GoRouter.of(context);
-    final glazeCount = useState<int>(video?.glazesCount ?? 0);
+
     return Container(
       width: width,
       height: 150,
@@ -130,7 +130,8 @@ class HomeInteractiveCard extends HookWidget {
               ),
               const Gap(2),
               Text(
-                glazeCount.value.toString(),
+                glazeCount.toString(),
+                // glazeCount.value.toString(),
                 style: Theme.of(context).textTheme.labelSmall,
               ),
               const Gap(10),
