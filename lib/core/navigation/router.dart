@@ -144,7 +144,12 @@ GoRouter router(Ref ref) {
     ),
     TypedStatefulShellBranch<MomentsShellBranch>(
       routes: [
-        TypedGoRoute<MomentsRoute>(path: '/moments'),
+        TypedGoRoute<MomentsRoute>(
+          path: '/moments',
+          routes: [
+            TypedGoRoute<VideoPreviewRoute>(path: 'video-preview')
+          ],
+        ),
       ],
     ),
     TypedStatefulShellBranch<NoViewShellBranch>(
@@ -247,7 +252,7 @@ class SplashRoute extends GoRouteData {
   Widget build(BuildContext context, GoRouterState state) => const SplashView();
 }
 
-@TypedGoRoute<HomeRoute>(path: '/')
+// @TypedGoRoute<HomeRoute>(path: '/')
 class HomeRoute extends GoRouteData {
   const HomeRoute();
 
@@ -313,7 +318,7 @@ class AuthForgetPasswordRoute extends GoRouteData {
   }
 }
 
-@TypedGoRoute<ShopRoute>(path: '/shop')
+// @TypedGoRoute<ShopRoute>(path: '/shop')
 class ShopRoute extends GoRouteData {
   const ShopRoute();
 
@@ -326,7 +331,7 @@ class ShopRoute extends GoRouteData {
   }
 }
 
-@TypedGoRoute<MomentsRoute>(path: '/moments')
+// @TypedGoRoute<MomentsRoute>(path: '/moments')
 class MomentsRoute extends GoRouteData {
   const MomentsRoute();
 
@@ -339,7 +344,7 @@ class MomentsRoute extends GoRouteData {
   }
 }
 
-@TypedGoRoute<ProfileRoute>(path: '/profile')
+// @TypedGoRoute<ProfileRoute>(path: '/profile')
 class ProfileRoute extends GoRouteData {
   const ProfileRoute();
 
@@ -433,7 +438,7 @@ class NoViewRoute extends GoRouteData {
   }
 }
 
-@TypedGoRoute<VideoPreviewRoute>(path: '/video_preview')
+// @TypedGoRoute<VideoPreviewRoute>(path: '/video_preview')
 class VideoPreviewRoute extends GoRouteData {
   const VideoPreviewRoute();
 

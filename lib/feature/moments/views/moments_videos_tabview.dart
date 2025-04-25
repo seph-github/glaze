@@ -32,7 +32,7 @@ class MomentsVideosTabview extends StatelessWidget {
       itemBuilder: (context, index) {
         return GestureDetector(
           onTap: () {
-            router.push(
+            router.go(
               const VideoPreviewRoute().location,
               extra: {
                 'video': videos?[index],

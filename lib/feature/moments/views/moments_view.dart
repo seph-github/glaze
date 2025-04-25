@@ -65,8 +65,8 @@ class MomentsView extends HookConsumerWidget {
         videos: videos,
       ),
       const UnderConstruction(),
-      const MomentsLiveChallengesTabview(),
       const UnderConstruction(),
+      const MomentsLiveChallengesTabview(),
     ];
 
     return LoadingLayout(
@@ -177,47 +177,47 @@ class MomentsView extends HookConsumerWidget {
                     const Gap(
                       8.0,
                     ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        const Text('Limit:'),
-                        const Gap(32.0),
-                        IconButton(
-                          onPressed: () {
-                            if (resultLimit.value > 1) {
-                              setState(
-                                () {
-                                  resultLimit.value -= 1;
-                                },
-                              );
-                            }
-                          },
-                          icon: const Icon(Icons.keyboard_arrow_left_rounded),
-                        ),
-                        Container(
-                          alignment: Alignment.center,
-                          height: 40.0,
-                          width: 60.0,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8.0),
-                            border: Border.all(
-                              color: Colors.white,
-                            ),
-                          ),
-                          child: Text(
-                            resultLimit.value.toString(),
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            setState(() => resultLimit.value += 1);
-                          },
-                          icon: const Icon(
-                            Icons.keyboard_arrow_right_rounded,
-                          ),
-                        ),
-                      ],
-                    ),
+                    // Row(
+                    //   crossAxisAlignment: CrossAxisAlignment.start,
+                    //   children: <Widget>[
+                    //     const Text('Limit:'),
+                    //     const Gap(32.0),
+                    //     IconButton(
+                    //       onPressed: () {
+                    //         if (resultLimit.value > 1) {
+                    //           setState(
+                    //             () {
+                    //               resultLimit.value -= 1;
+                    //             },
+                    //           );
+                    //         }
+                    //       },
+                    //       icon: const Icon(Icons.keyboard_arrow_left_rounded),
+                    //     ),
+                    //     Container(
+                    //       alignment: Alignment.center,
+                    //       height: 40.0,
+                    //       width: 60.0,
+                    //       decoration: BoxDecoration(
+                    //         borderRadius: BorderRadius.circular(8.0),
+                    //         border: Border.all(
+                    //           color: Colors.white,
+                    //         ),
+                    //       ),
+                    //       child: Text(
+                    //         resultLimit.value.toString(),
+                    //       ),
+                    //     ),
+                    //     IconButton(
+                    //       onPressed: () {
+                    //         setState(() => resultLimit.value += 1);
+                    //       },
+                    //       icon: const Icon(
+                    //         Icons.keyboard_arrow_right_rounded,
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
                     const Gap(16.0),
                     Row(
                       children: [

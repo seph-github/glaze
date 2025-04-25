@@ -362,9 +362,11 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
           if (controller != null && controller.value.isInitialized) {
             if (!isActive) {
               await controller.pause();
+              showPlayIcon.value = false;
               debugPrint('⏸ Paused video (not on Home tab)');
             } else {
               await controller.play();
+              showPlayIcon.value = true;
               debugPrint('▶️ Resumed video (back to Home tab)');
             }
           }
@@ -455,24 +457,10 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
                           final isCurrentlyGlazed = video.hasGlazed;
                           final newGlazeCount = isCurrentlyGlazed ? (video.glazesCount ?? 0) - 1 : (video.glazesCount ?? 0) + 1;
 
-                          // Update the video state globally
                           ref.read(videosProvider.notifier).updateVideo(video.id, newGlazeCount, !isCurrentlyGlazed);
 
-                          // Optionally, make an API call to persist the change
-
-                          // Call API to glaze
                           await ref.read(glazeNotifierProvider.notifier).onGlazed(videoId: video.id);
                         },
-                        // isGlazed: userGlazes.value.any(
-                        //   (glaze) {
-                        //     return glaze.videoId == videos.value[index].id;
-                        //   },
-                        // ),
-                        // onGlazeTap: () async {
-                        //   await ref.read(glazeNotifierProvider.notifier).onGlazed(videoId: videos.value[index].id).then(
-                        //         (_) => ref.refresh(glazeNotifierProvider.notifier).fetchUserGlazes(),
-                        //       );
-                        // },
                         onShareTap: () async => await _showShareOptions(context),
                         width: width,
                         height: height,
