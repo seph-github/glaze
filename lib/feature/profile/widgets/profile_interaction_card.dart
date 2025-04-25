@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:glaze/core/routing/router.dart';
+import 'package:glaze/core/navigation/router.dart';
 import 'package:go_router/go_router.dart';
 
 class ProfileInteractionCard extends StatelessWidget {

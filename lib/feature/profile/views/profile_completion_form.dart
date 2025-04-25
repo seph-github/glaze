@@ -7,7 +7,7 @@ import 'package:gap/gap.dart';
 
 import 'package:glaze/components/inputs/input_field.dart';
 import 'package:glaze/config/enum/profile_type.dart';
-import 'package:glaze/core/routing/router.dart';
+import 'package:glaze/core/navigation/router.dart';
 import 'package:glaze/core/styles/color_pallete.dart';
 import 'package:glaze/data/models/category/category_model.dart';
 import 'package:glaze/data/repository/category/category_repository.dart';

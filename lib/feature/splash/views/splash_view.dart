@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/components/buttons/primary_button.dart';
-import 'package:glaze/core/routing/router.dart';
+import 'package:glaze/core/navigation/router.dart';
 import 'package:glaze/feature/splash/providers/splash_provider.dart';
 import 'package:go_router/go_router.dart';
 
@@ -85,12 +85,8 @@ class SplashView extends StatelessWidget {
                         label: 'Get Started',
                         onPressed: () async {
                           final router = GoRouter.of(context);
-                          await ref
-                              .read(splashProvider)
-                              .setSplashComplete(true)
-                              .then(
-                                (_) => router.pushReplacement(
-                                    const AuthRoute().location),
+                          await ref.read(splashProvider).setSplashComplete(true).then(
+                                (_) => router.pushReplacement(const AuthRoute().location),
                               );
                         },
                       );

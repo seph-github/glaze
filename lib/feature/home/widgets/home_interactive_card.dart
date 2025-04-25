@@ -8,7 +8,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../components/morphism_widget.dart';
-import '../../../core/routing/router.dart';
+import '../../../core/navigation/router.dart';
 import '../../../gen/assets.gen.dart';
 import '../models/cached_video_content/cached_video_content.dart';
 

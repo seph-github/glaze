@@ -12,7 +12,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../components/buttons/primary_button.dart';
 import '../../../components/inputs/input_field.dart';
 import '../../../config/enum/profile_type.dart';
-import '../../../core/routing/router.dart';
+import '../../../core/navigation/router.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../gen/assets.gen.dart';
 import '../../../providers/initial_app_use.dart';

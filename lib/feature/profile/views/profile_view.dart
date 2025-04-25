@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
@@ -9,7 +11,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../components/app_bar_with_back_button.dart';
 import '../../../components/buttons/primary_button.dart';
 import '../../../config/enum/profile_type.dart';
-import '../../../core/routing/router.dart';
+import '../../../core/navigation/router.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../gen/assets.gen.dart';
 import '../../../gen/fonts.gen.dart';
@@ -31,6 +33,8 @@ class ProfileView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isLightTheme = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
+    final state = ref.watch(profileNotifierProvider);
+
     final router = GoRouter.of(context);
     final size = MediaQuery.sizeOf(context);
     final width = size.width;
@@ -48,7 +52,7 @@ class ProfileView extends HookConsumerWidget {
       [],
     );
 
-    final state = ref.watch(profileNotifierProvider);
+    log('profile ${state.profile?.following}');
 
     return LoadingLayout(
       isLoading: state.isLoading,

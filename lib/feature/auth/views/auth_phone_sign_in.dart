@@ -9,7 +9,7 @@ import 'package:glaze/feature/templates/loading_layout.dart';
 import 'package:glaze/utils/form_validators.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import '../../../core/routing/router.dart';
+import '../../../core/navigation/router.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../gen/assets.gen.dart';
 import '../../../utils/throw_error_exception_helper.dart';

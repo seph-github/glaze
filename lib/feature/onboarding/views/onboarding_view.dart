@@ -8,7 +8,7 @@ import 'package:glaze/feature/templates/loading_layout.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../components/buttons/primary_button.dart';
-import '../../../core/routing/router.dart';
+import '../../../core/navigation/router.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../provider/onboarding_provider.dart';
 

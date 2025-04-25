@@ -5,7 +5,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:glaze/core/routing/observer/route_observer_provider.dart';
+import 'package:glaze/core/navigation/observer/route_observer_provider.dart';
 import 'package:glaze/feature/auth/views/auth_forget_password_view.dart';
 import 'package:glaze/feature/dashboard/views/dashboard_view.dart';
 // import 'package:glaze/feature/home/views/video_feed_view.dart';
@@ -31,7 +31,6 @@ import '../../feature/auth/views/auth_verify_phone.dart';
 import '../../feature/challenges/views/challenges_view.dart';
 import '../../feature/home/models/video_content/video_content.dart';
 import '../../feature/home/views/video_feed_view.dart';
-import '../../feature/home/views2/video_feed_view2.dart';
 import '../../feature/moments/views/moments_view.dart';
 import '../../feature/onboarding/views/onboarding_view.dart';
 import '../../feature/profile/models/profile.dart';
