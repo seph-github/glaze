@@ -1,7 +1,8 @@
 import 'dart:io';
 
+import 'package:glaze/feature/auth/services/auth_services.dart';
 import 'package:glaze/feature/home/entity/video_content_entity.dart';
-import 'package:glaze/feature/home/models/video_content.dart';
+import 'package:glaze/feature/home/models/video_content/video_content.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/services/storage_services.dart';
@@ -26,11 +27,15 @@ class VideoContentServices {
 
   Future<List<VideoContent>> fetchVideoContents(int offset) async {
     try {
-      // final response = await _supabaseClient.rpc('select_videos_with_owners');
-      final response = await _supabaseClient.rpc('select_videos_paginating', params: {
-        'page_limit': 2,
-        'page_offset': offset,
-      });
+      final user = AuthServices().currentUser;
+      final response = await _supabaseClient.rpc(
+        'select_videos_paginating',
+        params: {
+          'uid': user?.id,
+          'page_limit': 2,
+          'page_offset': offset,
+        },
+      );
 
       final rawList = response as List<dynamic>;
 

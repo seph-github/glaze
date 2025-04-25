@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:glaze/feature/home/models/video_content.dart';
+import 'package:glaze/feature/home/models/video_content/video_content.dart';
 import 'package:glaze/feature/home/services/video_content_services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -12,7 +12,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../auth/services/auth_services.dart';
-import '../models/cached_video_content.dart';
+import '../models/cached_video_content/cached_video_content.dart';
 
 part 'video_content_provider.freezed.dart';
 part 'video_content_provider.g.dart';

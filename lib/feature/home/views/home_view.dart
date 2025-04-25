@@ -3,8 +3,8 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/components/morphism_widget.dart';
-import 'package:glaze/feature/home/models/cached_video_content.dart';
-import 'package:glaze/feature/home/models/glaze.dart';
+import 'package:glaze/feature/home/models/cached_video_content/cached_video_content.dart';
+import 'package:glaze/feature/home/models/glaze/glaze.dart';
 import 'package:glaze/feature/home/provider/glaze_provider.dart';
 import 'package:glaze/feature/home/provider/video_content_provider.dart';
 import 'package:glaze/feature/home/views/video_player_view.dart';
@@ -137,15 +137,16 @@ class HomeView extends HookConsumerWidget {
                       left: 0,
                       right: 0,
                       child: HomeInteractiveCard(
+                        video: state.cachedVideoContent!.videoContents![index],
                         key: PageStorageKey('HomeInteractiveCard_$index'),
                         onGlazeLongPress: () => toggleDonutOptions(true),
                         isGlazed: userGlazes.value.any(
                           (glaze) {
-                            return glaze.videoId == cachedVideos.videoContents?[index].videoId;
+                            return glaze.videoId == cachedVideos.videoContents?[index].id;
                           },
                         ),
                         onGlazeTap: () async {
-                          await ref.read(glazeNotifierProvider.notifier).onGlazed(videoId: cachedVideos.videoContents?[index].videoId ?? '').then(
+                          await ref.read(glazeNotifierProvider.notifier).onGlazed(videoId: cachedVideos.videoContents?[index].id ?? '').then(
                                 (_) => ref.refresh(glazeNotifierProvider.notifier).fetchUserGlazes(),
                               );
                         },

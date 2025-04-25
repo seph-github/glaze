@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/core/styles/color_pallete.dart';
-import 'package:glaze/feature/home/models/video_content.dart';
+import 'package:glaze/feature/home/models/video_content/video_content.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../components/morphism_widget.dart';
 import '../../../core/routing/router.dart';
 import '../../../gen/assets.gen.dart';
-import '../models/cached_video_content.dart';
+import '../models/cached_video_content/cached_video_content.dart';
 
-class HomeInteractiveCard extends HookWidget {
+class HomeInteractiveCard extends HookConsumerWidget {
   const HomeInteractiveCard({
     super.key,
     required this.width,
     required this.height,
     this.cachedVideos,
-    this.video,
+    required this.video,
     this.onGlazeTap,
     this.onGlazeLongPress,
     this.onShareTap,
@@ -33,7 +33,7 @@ class HomeInteractiveCard extends HookWidget {
   final bool isGlazed;
 
   final CachedVideoContent? cachedVideos;
-  final VideoContent? video;
+  final VideoContent video;
   final VoidCallback? onGlazeTap;
   final VoidCallback? onGlazeLongPress;
   final VoidCallback? onShareTap;
@@ -42,7 +42,7 @@ class HomeInteractiveCard extends HookWidget {
   final int glazeCount;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final router = GoRouter.of(context);
 
     return Container(
@@ -77,13 +77,13 @@ class HomeInteractiveCard extends HookWidget {
                   children: <Widget>[
                     SvgPicture.asset(Assets.images.svg.trophyIcon.path),
                     const Gap(10),
-                    Text(video?.category ?? ''),
+                    Text(video.category ?? ''),
                   ],
                 ),
               ),
               const Gap(10),
               Text(
-                video?.title ?? '',
+                video.title ?? '',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -91,17 +91,17 @@ class HomeInteractiveCard extends HookWidget {
               ),
               GestureDetector(
                 onTap: () async {
-                  final userId = video?.userId;
+                  final userId = video.userId;
                   await controller?.pause();
                   router.push(
-                    ViewUserProfileRoute(id: userId ?? '').location,
+                    ViewUserProfileRoute(id: userId).location,
                     extra: {
                       'controller': controller,
                     },
                   );
                 },
                 child: Text(
-                  'by @${video?.username}',
+                  'by @${video.username}',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -121,17 +121,14 @@ class HomeInteractiveCard extends HookWidget {
             children: <Widget>[
               MorphismWidget.circle(
                 color: isGlazed ? ColorPallete.primaryColor : null,
-                onTap: () async {
-                  onGlazeTap?.call();
-                },
+                onTap: onGlazeTap,
                 onLongPress: onGlazeLongPress,
                 size: 45.0,
                 child: SvgPicture.asset(Assets.images.svg.glazeDonutsIcon.path),
               ),
               const Gap(2),
               Text(
-                glazeCount.toString(),
-                // glazeCount.value.toString(),
+                '$glazeCount',
                 style: Theme.of(context).textTheme.labelSmall,
               ),
               const Gap(10),

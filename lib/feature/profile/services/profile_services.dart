@@ -27,8 +27,6 @@ class ProfileServices {
 
       final raw = response as List<dynamic>;
 
-      log('ProfileServices.fetchUserProfile: $raw');
-
       return Profile.fromJson(raw.first);
     } on PostgrestException catch (e) {
       log('Error fetching user profile: ${e.message}');
@@ -51,8 +49,6 @@ class ProfileServices {
       );
 
       final raw = response as List<dynamic>;
-
-      // log('ProfileServices.fetchUserProfile: $raw');
 
       return Profile.fromJson(raw.first);
     } on PostgrestException catch (e) {

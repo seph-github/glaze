@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:glaze/components/app_bar_with_back_button.dart';
-import 'package:glaze/feature/home/models/glaze.dart';
-import 'package:glaze/feature/home/models/video_content.dart';
+import 'package:glaze/feature/home/models/glaze/glaze.dart';
+import 'package:glaze/feature/home/models/video_content/video_content.dart';
 import 'package:glaze/feature/home/widgets/home_interactive_card.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:video_player/video_player.dart';
@@ -39,7 +39,7 @@ class VideoPreviewView extends HookConsumerWidget {
     useEffect(() {
       controller.value.initialize().then((_) async {
         isInitialized.value = true;
-        await ref.read(glazeNotifierProvider.notifier).getVideoGlazeStats(video.videoId);
+        await ref.read(glazeNotifierProvider.notifier).getVideoGlazeStats(video.id);
 
         await controller.value.play();
         await controller.value.setLooping(true);
@@ -104,8 +104,8 @@ class VideoPreviewView extends HookConsumerWidget {
                 glazeCount: ref.watch(glazeNotifierProvider).stats.count,
                 isGlazed: ref.watch(glazeNotifierProvider).stats.hasGlazed,
                 onGlazeTap: () async {
-                  await ref.read(glazeNotifierProvider.notifier).onGlazed(videoId: video.videoId).then(
-                        (_) => ref.read(glazeNotifierProvider.notifier).getVideoGlazeStats(video.videoId),
+                  await ref.read(glazeNotifierProvider.notifier).onGlazed(videoId: video.id).then(
+                        (_) => ref.read(glazeNotifierProvider.notifier).getVideoGlazeStats(video.id),
                       );
                 },
               ),

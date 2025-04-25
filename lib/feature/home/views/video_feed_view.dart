@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
+import 'package:glaze/feature/home/models/glaze/glaze.dart';
 import 'package:glaze/feature/home/provider/video_feed_provider.dart';
+import 'package:glaze/feature/home/provider/videos_provider/videos_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:video_player/video_player.dart';
@@ -15,7 +17,8 @@ import '../../../components/morphism_widget.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../gen/assets.gen.dart';
 import '../../dashboard/providers/dashboard_tab_controller_provider.dart';
-import '../models/video_content.dart';
+
+import '../models/video_content/video_content.dart';
 import '../provider/glaze_provider.dart';
 import '../widgets/home_interactive_card.dart';
 import '../widgets/share_option_button.dart';
@@ -26,14 +29,13 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(videoFeedNotifierProvider);
-    final glazeState = ref.watch(glazeNotifierProvider);
     final appLifecycle = useAppLifecycleState();
     final Size(
       :width,
       :height
     ) = MediaQuery.sizeOf(context);
     final showMoreDonutOptions = useState<bool>(false);
-    final showShareButton = useState<bool>(false);
+    final userGlazes = useState<List<Glaze>>([]);
 
     const int maxCacheSize = 3;
     final currentPage = useState<int>(0);
@@ -42,16 +44,14 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
     final accessOrder = useState<List<String>>([]);
     final disposingControllers = useState<Set<String>>({});
     final PreloadPageController pageController = PreloadPageController();
+    final showPlayIcon = useState<bool>(false);
 
-    final videos = useState<List<VideoContent>>([]);
+    // final videos = useState<List<VideoContent>>([]);
+    final videos = ref.watch(videosProvider);
     final controllerCreationMap = useState<Map<String, Completer<VideoPlayerController>>>({});
 
     void toggleDonutOptions(bool value) {
       showMoreDonutOptions.value = value;
-    }
-
-    void toggleShareButton(bool value) {
-      showShareButton.value = value;
     }
 
     /// Pause all controllers
@@ -120,19 +120,19 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
     /// Get or create a controller for a video
     Future<VideoPlayerController?> getOrCreateController(VideoContent video) async {
       // Check if the controller already exists in the cache
-      if (controllerCache.value.containsKey(video.videoId)) {
-        touchController(video.videoId); // Mark as recently used
-        return controllerCache.value[video.videoId];
+      if (controllerCache.value.containsKey(video.id)) {
+        touchController(video.id); // Mark as recently used
+        return controllerCache.value[video.id];
       }
 
       // Check if a controller creation process is already in progress
-      if (controllerCreationMap.value.containsKey(video.videoId)) {
-        return await controllerCreationMap.value[video.videoId]!.future;
+      if (controllerCreationMap.value.containsKey(video.id)) {
+        return await controllerCreationMap.value[video.id]!.future;
       }
 
       // Start the controller creation process
       final completer = Completer<VideoPlayerController>();
-      controllerCreationMap.value[video.videoId] = completer;
+      controllerCreationMap.value[video.id] = completer;
 
       try {
         final videoFile = await ref.watch(videoFeedNotifierProvider.notifier).getCachedVideoFile(video.videoUrl);
@@ -141,20 +141,19 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
         await controller.initialize();
         controller.setLooping(true);
 
-        controllerCache.value[video.videoId] = controller; // Add to cache
-        touchController(video.videoId); // Update access order
+        controllerCache.value[video.id] = controller; // Add to cache
+        touchController(video.id); // Update access order
 
         enforceCacheLimit(); // Ensure cache size limit
 
         completer.complete(controller);
-
         return controller;
       } catch (e) {
         completer.completeError(e);
         return null;
       } finally {
-        disposingControllers.value.remove(video.videoId);
-        controllerCreationMap.value.remove(video.videoId);
+        disposingControllers.value.remove(video.id);
+        controllerCreationMap.value.remove(video.id);
       }
     }
 
@@ -172,9 +171,9 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
 
     /// Initialize and play a video at the given index
     Future<void> initAndPlayVideo(int index) async {
-      if (videos.value.isEmpty || index >= videos.value.length) return;
+      if (videos.isEmpty || index >= videos.length) return;
 
-      final video = videos.value[index];
+      final video = videos[index];
 
       final controller = await getOrCreateController(video);
 
@@ -188,9 +187,7 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
           return;
         }
 
-        await ref.read(glazeNotifierProvider.notifier).getVideoGlazeStats(videos.value[index].videoId);
-
-        await playController(video.videoId);
+        await playController(video.id);
       }
     }
 
@@ -201,11 +198,11 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
 
     /// Clean up and reinitialize the current video when coming back from background
     Future<void> cleanupAndReinitializeCurrentVideo() async {
-      if (videos.value.isEmpty || currentPage.value >= videos.value.length) return;
+      if (videos.isEmpty || currentPage.value >= videos.length) return;
 
       await pauseAllControllers();
 
-      final videoId = videos.value[currentPage.value].videoId;
+      final videoId = videos[currentPage.value].id;
       final controller = getController(videoId);
 
       // If controller exists but has errors, dispose it
@@ -231,15 +228,15 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
     }
 
     Future<void> manageControllerWindow(int currentPage) async {
-      if (videos.value.isEmpty) return;
+      if (videos.isEmpty) return;
 
-      final windowStart = (currentPage - 1).clamp(0, videos.value.length - 1);
-      final windowEnd = (currentPage + 1).clamp(0, videos.value.length - 1);
+      final windowStart = (currentPage - 1).clamp(0, videos.length - 1);
+      final windowEnd = (currentPage + 1).clamp(0, videos.length - 1);
 
       final idsToKeep = <String>{};
       for (int i = windowStart; i <= windowEnd; i++) {
-        if (i < videos.value.length) {
-          idsToKeep.add(videos.value[i].videoId);
+        if (i < videos.length) {
+          idsToKeep.add(videos[i].id);
         }
       }
 
@@ -248,20 +245,20 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
         await removeController(id);
       }
 
-      if (currentPage < videos.value.length) {
-        await getOrCreateController(videos.value[currentPage]);
+      if (currentPage < videos.length) {
+        await getOrCreateController(videos[currentPage]);
         if (windowStart < currentPage && windowStart >= 0) {
-          await getOrCreateController(videos.value[windowStart]);
+          await getOrCreateController(videos[windowStart]);
         }
-        if (windowEnd > currentPage && windowEnd < videos.value.length) {
-          await getOrCreateController(videos.value[windowEnd]);
+        if (windowEnd > currentPage && windowEnd < videos.length) {
+          await getOrCreateController(videos[windowEnd]);
         }
       }
     }
 
     /// Handle page changes in the video feed
     Future<void> handlePageChange(int newPage) async {
-      if (videos.value.isEmpty || newPage >= videos.value.length) return;
+      if (videos.isEmpty || newPage >= videos.length) return;
 
       currentPage.value = newPage;
 
@@ -273,7 +270,7 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
         await manageControllerWindow(newPage);
 
         // Play only the current video
-        if (videos.value.isNotEmpty && newPage < videos.value.length) {
+        if (videos.isNotEmpty && newPage < videos.length) {
           await initAndPlayVideo(newPage);
         }
 
@@ -290,9 +287,10 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
         () async {
           try {
             await ref.read(glazeNotifierProvider.notifier).fetchUserGlazes();
-            ref.read(videoFeedNotifierProvider);
+            ref.watch(videoFeedNotifierProvider);
             if (state.videos.isNotEmpty) {
-              videos.value = state.videos;
+              // videos = state.videos;
+              ref.read(videosProvider.notifier).setVideos(state.videos);
               await initAndPlayVideo(0);
             }
           } catch (e) {
@@ -338,9 +336,17 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
       videoFeedNotifierProvider,
       (prev, next) {
         if (prev?.videos != next.videos || prev?.isLoading != next.isLoading || prev?.preloadedVideoUrls != next.preloadedVideoUrls) {
-          videos.value = next.videos;
+          // videos.value = next.videos;
+          ref.read(videosProvider.notifier).addVideos(next.videos);
           manageControllerWindow(currentPage.value);
         }
+      },
+    );
+
+    ref.listen(
+      glazeNotifierProvider,
+      (prev, next) {
+        userGlazes.value = next.glazes ?? [];
       },
     );
 
@@ -351,16 +357,13 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
           final isActive = next == 0;
           log('isActive = $isActive');
           final index = currentPage.value;
-          final controller = getController(videos.value.elementAtOrNull(index)?.videoId ?? '');
+          final controller = getController(ref.watch(videosProvider).elementAtOrNull(index)?.id ?? '');
 
           if (controller != null && controller.value.isInitialized) {
             if (!isActive) {
-              // await pauseAllControllers();
               await controller.pause();
               debugPrint('⏸ Paused video (not on Home tab)');
             } else {
-              // await cleanupAndReinitializeCurrentVideo();
-              // initAndPlayVideo(index);
               await controller.play();
               debugPrint('▶️ Resumed video (back to Home tab)');
             }
@@ -389,11 +392,10 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
           scrollDirection: Axis.vertical,
           controller: pageController,
           physics: const AlwaysScrollableScrollPhysics(),
-          itemCount: videos.value.length,
+          itemCount: videos.length,
           itemBuilder: (context, index) {
-            final video = videos.value[index];
+            final video = videos[currentPage.value];
 
-            // 💡 Skip building distant pages
             if ((index - currentPage.value).abs() > 1) return const SizedBox.shrink();
 
             return FutureBuilder<VideoPlayerController?>(
@@ -404,113 +406,87 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
                 }
 
                 final controller = snapshot.data!;
-                final isCurrent = index == currentPage.value;
 
-                return ValueListenableBuilder<VideoPlayerValue>(
-                  valueListenable: controller,
-                  builder: (context, value, child) {
-                    if (!value.isInitialized) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
+                return Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    GestureDetector(
+                      onTap: () async {
+                        if (!(index == currentPage.value)) return;
 
-                    // 🧠 Add pause/play toggle
-                    return Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        GestureDetector(
-                          onTap: () async {
-                            if (!isCurrent) return;
-
-                            if (controller.value.isPlaying) {
-                              await controller.pause();
-                            } else {
-                              await controller.play();
-                            }
-                          },
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              VideoPlayer(controller),
-                              if (!controller.value.isPlaying)
-                                Container(
-                                  width: 50,
-                                  height: 50,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.black.withValues(alpha: 0.3),
-                                  ),
-                                  child: Center(
-                                    child: SvgPicture.asset(Assets.images.svg.playIcon.path),
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          child: HomeInteractiveCard(
-                            key: PageStorageKey('HomeInteractiveCard_$index'),
-                            onGlazeLongPress: () => toggleDonutOptions(true),
-                            controller: getController(videos.value[index].videoId),
-                            glazeCount: glazeState.stats.count,
-                            isGlazed: glazeState.stats.hasGlazed,
-                            onGlazeTap: () async {
-                              await ref.read(glazeNotifierProvider.notifier).onGlazed(videoId: video.videoId).then(
-                                    (_) => ref.read(glazeNotifierProvider.notifier).getVideoGlazeStats(video.videoId),
-                                  );
-                            },
-                            onShareTap: () async => await _showShareOptions(context),
-                            width: width,
-                            height: height,
-                            video: videos.value[index],
-                          ),
-                        ),
-                        if (showMoreDonutOptions.value || showShareButton.value)
-                          GestureDetector(
-                            onTap: () {
-                              toggleDonutOptions(false);
-                              toggleShareButton(false);
-                            },
-                            child: Container(
-                              height: double.infinity,
-                              width: double.infinity,
-                              color: Colors.black.withValues(alpha: 0.7),
+                        if (controller.value.isPlaying) {
+                          showPlayIcon.value = false;
+                          await controller.pause();
+                        } else {
+                          showPlayIcon.value = true;
+                          await controller.play();
+                        }
+                      },
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          VideoPlayer(controller),
+                          if (!controller.value.isPlaying && !showPlayIcon.value)
+                            Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.black.withValues(alpha: 0.3),
+                              ),
+                              child: Center(
+                                child: SvgPicture.asset(Assets.images.svg.playIcon.path),
+                              ),
                             ),
-                          ),
-                        if (showMoreDonutOptions.value) _buildDonutOptions(context, width: width),
-                      ],
-                    );
-                  },
+                        ],
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: HomeInteractiveCard(
+                        key: PageStorageKey('HomeInteractiveCard_${currentPage.value}'),
+                        onGlazeLongPress: () => toggleDonutOptions(true),
+                        controller: getController(videos[currentPage.value].id),
+                        glazeCount: videos[currentPage.value].glazesCount ?? 0,
+                        isGlazed: videos[currentPage.value].hasGlazed,
+                        onGlazeTap: () async {
+                          final isCurrentlyGlazed = video.hasGlazed;
+                          final newGlazeCount = isCurrentlyGlazed ? (video.glazesCount ?? 0) - 1 : (video.glazesCount ?? 0) + 1;
+
+                          // Update the video state globally
+                          ref.read(videosProvider.notifier).updateVideo(video.id, newGlazeCount, !isCurrentlyGlazed);
+
+                          // Optionally, make an API call to persist the change
+
+                          // Call API to glaze
+                          await ref.read(glazeNotifierProvider.notifier).onGlazed(videoId: video.id);
+                        },
+                        // isGlazed: userGlazes.value.any(
+                        //   (glaze) {
+                        //     return glaze.videoId == videos.value[index].id;
+                        //   },
+                        // ),
+                        // onGlazeTap: () async {
+                        //   await ref.read(glazeNotifierProvider.notifier).onGlazed(videoId: videos.value[index].id).then(
+                        //         (_) => ref.refresh(glazeNotifierProvider.notifier).fetchUserGlazes(),
+                        //       );
+                        // },
+                        onShareTap: () async => await _showShareOptions(context),
+                        width: width,
+                        height: height,
+                        video: videos[currentPage.value],
+                      ),
+                    ),
+                  ],
                 );
+                //   },
+                // );
               },
             );
           },
           onPageChanged: (index) => handlePageChange(index),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDonutOptions(BuildContext ctx, {double? width}) {
-    return Positioned(
-      right: 16.0,
-      bottom: 140.0,
-      child: MorphismWidget.rounded(
-        width: width! / 2.25,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SvgPicture.asset('assets/images/svg/Glaze Donuts Icon.svg'),
-              SvgPicture.asset('assets/images/svg/Glaze Donuts Icon.svg'),
-              SvgPicture.asset('assets/images/svg/Glaze Donuts Icon.svg'),
-              SvgPicture.asset('assets/images/svg/Plus icon.svg'),
-            ],
-          ),
         ),
       ),
     );

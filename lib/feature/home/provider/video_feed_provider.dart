@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:glaze/feature/home/models/video_content.dart';
+import 'package:glaze/feature/home/models/video_content/video_content.dart';
 import 'package:glaze/feature/home/services/video_content_services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -44,14 +44,12 @@ class VideoFeedNotifier extends _$VideoFeedNotifier {
     state = state.copyWith(isLoading: true);
     try {
       final videos = await _videoServices.fetchVideoContents(offset);
-      // print('initial load videos $videos');
       final hasMoreVideos = videos.length == 2;
       if (hasMoreVideos) {
         offset += 2;
       }
       state = state.copyWith(isLoading: false, videos: videos, hasMoreVideos: hasMoreVideos, currentVideoIndex: 0);
 
-      // Start preloading next videos after initial load
       if (videos.isNotEmpty) {
         preloadNextVideos();
       }
@@ -148,6 +146,7 @@ class VideoFeedNotifier extends _$VideoFeedNotifier {
     final cacheManager = DefaultCacheManager();
     final fileInfo = await cacheManager.getFileFromCache(videoUrl);
     final file = fileInfo?.file ?? await cacheManager.getSingleFile(videoUrl);
+
     _preloadedFiles[videoUrl] = file;
     return file;
   }
@@ -170,5 +169,9 @@ class VideoFeedNotifier extends _$VideoFeedNotifier {
     _preloadQueue.clear();
     _preloadedFiles.clear();
     return null;
+  }
+
+  File? getCachedFile(String videoUrl) {
+    return _preloadedFiles[videoUrl];
   }
 }

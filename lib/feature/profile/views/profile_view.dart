@@ -2,28 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
-import 'package:glaze/components/app_bar_with_back_button.dart';
-
-import 'package:glaze/components/buttons/primary_button.dart';
-import 'package:glaze/core/styles/color_pallete.dart';
-import 'package:glaze/feature/auth/providers/auth_provider.dart';
-import 'package:glaze/feature/profile/provider/profile_provider.dart';
-import 'package:glaze/feature/profile/widgets/profile_users_interest_list.dart';
-import 'package:glaze/feature/templates/loading_layout.dart';
-import 'package:glaze/gen/fonts.gen.dart';
-import 'package:glaze/providers/initial_app_use.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../components/app_bar_with_back_button.dart';
+import '../../../components/buttons/primary_button.dart';
 import '../../../config/enum/profile_type.dart';
 import '../../../core/routing/router.dart';
+import '../../../core/styles/color_pallete.dart';
 import '../../../gen/assets.gen.dart';
+import '../../../gen/fonts.gen.dart';
+import '../../../providers/initial_app_use.dart';
+import '../../auth/providers/auth_provider.dart';
 import '../../auth/services/auth_services.dart';
 import '../../settings/providers/settings_theme_provider.dart';
+import '../../templates/loading_layout.dart';
+import '../provider/profile_provider.dart';
 import '../widgets/profile_achievements_card.dart';
 import '../widgets/profile_interaction_card.dart';
 import '../widgets/profile_moments_card.dart';
+import '../widgets/profile_users_interest_list.dart';
 import '../widgets/user_profile_image_widget.dart';
 
 class ProfileView extends HookConsumerWidget {

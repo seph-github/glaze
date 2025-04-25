@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:glaze/feature/challenges/models/challenge.dart';
-import 'package:glaze/feature/home/models/video_content.dart';
+import 'package:glaze/feature/home/models/video_content/video_content.dart';
 import 'package:glaze/feature/moments/services/moments_services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase/supabase.dart';

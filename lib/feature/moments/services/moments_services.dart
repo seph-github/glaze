@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:glaze/feature/challenges/models/challenge.dart';
-import 'package:glaze/feature/home/models/video_content.dart';
+import 'package:glaze/feature/home/models/video_content/video_content.dart';
 import 'package:glaze/feature/moments/models/enrolled_challenge.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

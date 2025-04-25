@@ -1,7 +1,7 @@
-import 'package:glaze/feature/home/models/glaze_stats.dart';
+import 'package:glaze/feature/home/models/glaze_stats/glaze_stats.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../models/glaze.dart';
+import '../models/glaze/glaze.dart';
 
 class GlazeServices {
   final SupabaseClient _supabaseClient = Supabase.instance.client;

@@ -1,11 +1,11 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:glaze/feature/auth/services/auth_services.dart';
-import 'package:glaze/feature/home/models/glaze_stats.dart';
+import 'package:glaze/feature/home/models/glaze_stats/glaze_stats.dart';
 import 'package:glaze/feature/home/services/glaze_services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../models/glaze.dart';
+import '../models/glaze/glaze.dart';
 
 part 'glaze_provider.freezed.dart';
 part 'glaze_provider.g.dart';
@@ -73,6 +73,7 @@ class GlazeNotifier extends _$GlazeNotifier {
   }
 
   Future<void> getVideoGlazeStats(String videoId) async {
+    print('called this notifier');
     state = state.copyWith(isLoading: true);
     try {
       final user = AuthServices().currentUser;
