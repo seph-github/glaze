@@ -21,7 +21,7 @@ class ProfileInteractionCard extends StatelessWidget {
       height: 80.0,
       width: double.infinity,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16.0),
+        borderRadius: BorderRadius.circular(12.0),
         border: Border.all(color: Colors.grey, width: 0.25),
       ),
       child: Row(

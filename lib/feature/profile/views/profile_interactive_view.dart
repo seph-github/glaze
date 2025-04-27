@@ -32,7 +32,7 @@ class ProfileInteractiveView extends HookConsumerWidget {
 
     final List<Widget> tabViews = [
       FollowingListWidget(following: state.profile?.following ?? []),
-      FollowersListWidget(followers: state.profile?.followers ?? []),
+      FollowersListWidget(followers: state.profile?.followers ?? [], following: state.profile?.following ?? []),
       _buildGlazeWidget(state.profile?.glazes ?? []),
     ];
 
@@ -57,20 +57,25 @@ class ProfileInteractiveView extends HookConsumerWidget {
 }
 
 class FollowersListWidget extends HookWidget {
-  const FollowersListWidget({super.key, required this.followers});
+  const FollowersListWidget({
+    super.key,
+    required this.followers,
+    required this.following,
+  });
 
   final List<Interact> followers;
+  final List<Interact> following;
   @override
   Widget build(BuildContext context) {
     final followerStates = useState<Map<String, bool>>({
-      for (final follower in followers) follower.id: false,
+      for (final follower in followers) follower.id: following.any((item) => item.id == follower.id),
     });
 
     void toggleFollow(String id) {
       final current = followerStates.value[id] ?? false;
       followerStates.value = {
         ...followerStates.value,
-        id: !current, // toggle the specific user
+        id: !current,
       };
     }
 
@@ -99,11 +104,23 @@ class FollowersListWidget extends HookWidget {
                   fontWeight: FontWeight.bold,
                 ),
           ),
-          trailing: _buildFollowButton(
-            id: follower.id,
-            isFollowed: isFollowed,
-            onPressed: () async {
-              toggleFollow(follower.id);
+          trailing: Consumer(
+            builder: (context, ref, _) {
+              return ElevatedButton(
+                onPressed: () {
+                  if (!isFollowed) toggleFollow(follower.id);
+
+                  ref.read(followUserNotifierProvider.notifier).onFollowUser(followerId: AuthServices().currentUser?.id ?? '', followingId: follower.id);
+                },
+                style: ElevatedButton.styleFrom(
+                  fixedSize: const Size.fromWidth(120),
+                  backgroundColor: isFollowed ? ColorPallete.inputFilledColor : ColorPallete.primaryColor,
+                ),
+                child: Text(
+                  isFollowed ? 'Message' : 'Follow',
+                  style: const TextStyle(color: Colors.white),
+                ),
+              );
             },
           ),
         );
@@ -208,7 +225,7 @@ Widget _buildGlazeWidget(List<Glaze> glazes) {
                     ),
               ),
               TextSpan(
-                text: ' has glazed you content this times showing strong engagements.',
+                text: ' has glazed you content showing strong engagements.',
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       color: ColorPallete.hintTextColor,
                       fontWeight: FontWeight.bold,

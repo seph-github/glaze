@@ -23,7 +23,7 @@ class ProfileMomentsCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
+            padding: EdgeInsets.symmetric(horizontal: 12.0),
             child: Text(
               'Moments',
               style: TextStyle(fontSize: 20),

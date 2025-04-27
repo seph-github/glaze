@@ -39,6 +39,7 @@ class ProfileView extends HookConsumerWidget {
     final size = MediaQuery.sizeOf(context);
     final width = size.width;
     final User? user = AuthServices().currentUser;
+    const double padding = 12.0;
 
     useEffect(
       () {
@@ -71,7 +72,7 @@ class ProfileView extends HookConsumerWidget {
               child: Container(
                 width: 46.0,
                 height: width,
-                padding: const EdgeInsets.all(12.0),
+                padding: const EdgeInsets.all(padding),
                 decoration: const BoxDecoration(
                   color: ColorPallete.secondaryColor,
                   shape: BoxShape.circle,
@@ -90,7 +91,7 @@ class ProfileView extends HookConsumerWidget {
             child: Container(
               width: 46.0,
               height: width,
-              padding: const EdgeInsets.all(12.0),
+              padding: const EdgeInsets.all(padding),
               decoration: const BoxDecoration(
                 color: ColorPallete.secondaryColor,
                 shape: BoxShape.circle,
@@ -118,7 +119,7 @@ class ProfileView extends HookConsumerWidget {
                 ),
                 const SizedBox(height: 20),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: padding),
                   child: ProfileInteractionCard(
                     following: state.profile?.following.length ?? 0,
                     followers: state.profile?.followers.length ?? 0,
@@ -126,7 +127,7 @@ class ProfileView extends HookConsumerWidget {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(12.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
