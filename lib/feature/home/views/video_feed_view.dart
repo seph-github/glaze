@@ -44,7 +44,7 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
     final accessOrder = useState<List<String>>([]);
     final disposingControllers = useState<Set<String>>({});
     final PreloadPageController pageController = PreloadPageController();
-    final showPlayIcon = useState<bool>(false);
+    final showPlayIcon = useState<bool>(true);
 
     // final videos = useState<List<VideoContent>>([]);
     final videos = ref.watch(videosProvider);
@@ -376,6 +376,8 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
       return listener.close;
     }, []);
 
+    print('show the icon: ${showPlayIcon.value}');
+
     return RefreshIndicator(
       onRefresh: () async {
         // Pause all current playing videos
@@ -396,7 +398,7 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
           physics: const AlwaysScrollableScrollPhysics(),
           itemCount: videos.length,
           itemBuilder: (context, index) {
-            final video = videos[currentPage.value];
+            final video = videos[index];
 
             if ((index - currentPage.value).abs() > 1) return const SizedBox.shrink();
 
@@ -414,9 +416,11 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
                   children: [
                     GestureDetector(
                       onTap: () async {
-                        if (!(index == currentPage.value)) return;
-
-                        if (controller.value.isPlaying) {
+                        print('on tapped! ${showPlayIcon.value}, video is playing? ${controller.value.isPlaying}');
+                        if (!(index == currentPage.value)) {
+                          print('in here');
+                          return;
+                        } else if (controller.value.isPlaying) {
                           showPlayIcon.value = false;
                           await controller.pause();
                         } else {
@@ -448,11 +452,11 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
                       left: 0,
                       right: 0,
                       child: HomeInteractiveCard(
-                        key: PageStorageKey('HomeInteractiveCard_${currentPage.value}'),
+                        key: PageStorageKey('HomeInteractiveCard_$index'),
                         onGlazeLongPress: () => toggleDonutOptions(true),
                         controller: getController(videos[currentPage.value].id),
-                        glazeCount: videos[currentPage.value].glazesCount ?? 0,
-                        isGlazed: videos[currentPage.value].hasGlazed,
+                        glazeCount: videos[index].glazesCount ?? 0,
+                        isGlazed: videos[index].hasGlazed,
                         onGlazeTap: () async {
                           final isCurrentlyGlazed = video.hasGlazed;
                           final newGlazeCount = isCurrentlyGlazed ? (video.glazesCount ?? 0) - 1 : (video.glazesCount ?? 0) + 1;
@@ -464,7 +468,7 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
                         onShareTap: () async => await _showShareOptions(context),
                         width: width,
                         height: height,
-                        video: videos[currentPage.value],
+                        video: videos[index],
                       ),
                     ),
                   ],

@@ -107,10 +107,11 @@ class FollowersListWidget extends HookWidget {
           trailing: Consumer(
             builder: (context, ref, _) {
               return ElevatedButton(
-                onPressed: () {
-                  if (!isFollowed) toggleFollow(follower.id);
-
-                  ref.read(followUserNotifierProvider.notifier).onFollowUser(followerId: AuthServices().currentUser?.id ?? '', followingId: follower.id);
+                onPressed: () async {
+                  if (!isFollowed) {
+                    await ref.read(followUserNotifierProvider.notifier).onFollowUser(followerId: AuthServices().currentUser?.id ?? '', followingId: follower.id);
+                    toggleFollow(follower.id);
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   fixedSize: const Size.fromWidth(120),
