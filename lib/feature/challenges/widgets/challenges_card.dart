@@ -4,11 +4,11 @@ import 'package:gap/gap.dart';
 import 'package:glaze/components/morphism_widget.dart';
 import 'package:glaze/core/styles/color_pallete.dart';
 import 'package:glaze/feature/challenges/models/challenge.dart';
-import 'package:glaze/feature/challenges/widgets/challenge_timer.dart';
 import 'package:glaze/feature/challenges/widgets/circle_stack.dart';
 import 'package:glaze/gen/fonts.gen.dart';
 
 import '../../../gen/assets.gen.dart';
+import '../../../utils/app_timer.dart';
 
 class ChallengesCard extends StatelessWidget {
   const ChallengesCard({
@@ -22,7 +22,7 @@ class ChallengesCard extends StatelessWidget {
 
   static const List<Color> lightColors = [
     Color(0xFFFFEB3B), // Bright Yellow
-    Color(0xFF4CAF50), // Vibrant Green
+    Color(0xFF4CAF50), // Vibrant Greenx
     Color(0xFF2196F3), // Bright Blue
     Color(0xFFFF5722), // Bright Orange
     Color(0xFF9C27B0), // Bright Purple
@@ -120,7 +120,7 @@ class ChallengesCard extends StatelessWidget {
           ),
         ),
         const Gap(8),
-        ChallengeTimer(startDate: challenge.startDate, endDate: challenge.endDate),
+        AppTimer(startDate: challenge.startDate, endDate: challenge.endDate),
         const Spacer(),
         const SizedBox(
           width: 100,
@@ -148,7 +148,8 @@ class ChallengesCard extends StatelessWidget {
           width: width * 0.65,
           child: Text(
             challenge.title,
-            overflow: TextOverflow.ellipsis, // Ensures the text is fully visible
+            overflow:
+                TextOverflow.ellipsis, // Ensures the text is fully visible
             softWrap: true, // Allows the text to wrap to a new line
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontFamily: FontFamily.robotoBold,
