@@ -32,12 +32,11 @@ class ShopView extends HookConsumerWidget {
 
     return RefreshIndicator(
       onRefresh: () async {
-        await ref
-            .refresh(productsNotifierProvider.notifier)
-            .fetchAvailableProducts();
+        await ref.refresh(productsNotifierProvider.notifier).fetchAvailableProducts();
       },
       triggerMode: RefreshIndicatorTriggerMode.onEdge,
-      color: Colors.transparent,
+      elevation: 1,
+      backgroundColor: Colors.transparent,
       child: LoadingLayout(
         isLoading: state.isLoading,
         appBar: AppBarWithBackButton(
@@ -132,10 +131,7 @@ class ShopProductsCard extends StatelessWidget {
                 children: <Widget>[
                   Text(
                     type.name,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
-                        ?.copyWith(fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                   ),
                   const Spacer(),
                   if (endDate != null)
@@ -169,8 +165,7 @@ class ShopProductsCard extends StatelessWidget {
                   const Spacer(),
                   Text(
                     priceInDollars,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w900, color: Colors.amber),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900, color: Colors.amber),
                   ),
                 ],
               ),
@@ -228,10 +223,7 @@ class ShopProductsCard extends StatelessWidget {
         const Gap(10),
         Text(
           'Unlock special perks and bonuses.',
-          style: Theme.of(context)
-              .textTheme
-              .labelMedium
-              ?.copyWith(color: Colors.amber),
+          style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.amber),
         ),
       ],
     );
