@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../config/enum/profile_type.dart';
@@ -72,7 +74,8 @@ class AuthServices {
     }
   }
 
-  Future<AuthResponse> verifyPhone({required String phone, required String token}) async {
+  Future<AuthResponse> verifyPhone(
+      {required String phone, required String token}) async {
     try {
       final AuthResponse authtResponse = await _supabase.auth.verifyOTP(
         token: token,
@@ -92,7 +95,8 @@ class AuthServices {
 
   Future<AuthResponse> anonymousSignin() async {
     try {
-      final AuthResponse authResponse = await _supabase.auth.signInAnonymously();
+      final AuthResponse authResponse =
+          await _supabase.auth.signInAnonymously();
 
       // final int tempUserId = createRandomNumber();
 
@@ -129,6 +133,27 @@ class AuthServices {
   Future<void> resetPassword(String email) async {
     try {
       await _supabase.auth.resetPasswordForEmail(email);
+    } on AuthApiException catch (_) {
+      rethrow;
+    } on AuthException catch (_) {
+      rethrow;
+    } catch (e) {
+      log('Error resetting password: $e');
+      rethrow;
+    }
+  }
+
+  Future<UserResponse> updateUser({
+    String? email,
+    String? password,
+  }) async {
+    try {
+      final UserAttributes userAttributes = UserAttributes(
+        email: email,
+        password: password,
+      );
+
+      return await _supabase.auth.updateUser(userAttributes);
     } on AuthApiException catch (_) {
       rethrow;
     } on AuthException catch (_) {

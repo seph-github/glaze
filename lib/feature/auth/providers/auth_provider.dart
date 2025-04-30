@@ -34,6 +34,7 @@ class AuthNotifier extends _$AuthNotifier {
 
   void setPhoneSentError(Exception error) {
     state = state.copyWith(error: null);
+    print(error);
     state = state.copyWith(error: error, isLoading: false, otpSent: false);
   }
 
@@ -88,7 +89,8 @@ class AuthNotifier extends _$AuthNotifier {
     }
   }
 
-  Future<void> verifyPhone({required String phone, required String token}) async {
+  Future<void> verifyPhone(
+      {required String phone, required String token}) async {
     state = state.copyWith(isLoading: true);
     try {
       final authResponse = await AuthServices().verifyPhone(
@@ -122,10 +124,10 @@ class AuthNotifier extends _$AuthNotifier {
   }
 
   Future<void> resetPassword(String email) async {
-    state = state.copyWith(isLoading: true);
+    state = state.copyWith(isLoading: true, error: null, otpSent: false);
     try {
       await AuthServices().resetPassword(email);
-      state = state.copyWith(isLoading: false, otpSent: true);
+      state = state.copyWith(isLoading: false, otpSent: false);
     } catch (e) {
       setPhoneSentError(e as Exception);
     }
