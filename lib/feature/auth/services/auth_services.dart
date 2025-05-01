@@ -74,8 +74,7 @@ class AuthServices {
     }
   }
 
-  Future<AuthResponse> verifyPhone(
-      {required String phone, required String token}) async {
+  Future<AuthResponse> verifyPhone({required String phone, required String token}) async {
     try {
       final AuthResponse authtResponse = await _supabase.auth.verifyOTP(
         token: token,
@@ -95,8 +94,7 @@ class AuthServices {
 
   Future<AuthResponse> anonymousSignin() async {
     try {
-      final AuthResponse authResponse =
-          await _supabase.auth.signInAnonymously();
+      final AuthResponse authResponse = await _supabase.auth.signInAnonymously();
 
       // final int tempUserId = createRandomNumber();
 
@@ -132,10 +130,12 @@ class AuthServices {
 
   Future<void> resetPassword(String email) async {
     try {
-      await _supabase.auth.resetPasswordForEmail(email);
-    } on AuthApiException catch (_) {
+      await _supabase.auth.resetPasswordForEmail(email, redirectTo: 'https://glaze-admin.netlify.app/auth/reset-password');
+    } on AuthApiException catch (e) {
+      log('Error AuthApiException resetting password: $e');
       rethrow;
-    } on AuthException catch (_) {
+    } on AuthException catch (e) {
+      log('Error AuthException resetting password: $e');
       rethrow;
     } catch (e) {
       log('Error resetting password: $e');
@@ -143,18 +143,27 @@ class AuthServices {
     }
   }
 
-  Future<UserResponse> updateUser({
+  Future<UserResponse> updatePassword({
     String? email,
     String? password,
+    String? token,
+    String? tokenHash,
   }) async {
     try {
-      final UserAttributes userAttributes = UserAttributes(
-        email: email,
-        password: password,
-      );
+      final authResponse = await _supabase.auth.verifyOTP(type: OtpType.email, tokenHash: tokenHash);
 
-      return await _supabase.auth.updateUser(userAttributes);
-    } on AuthApiException catch (_) {
+      if (authResponse.session!.accessToken.isNotEmpty && !authResponse.session!.isExpired && authResponse.user != null) {
+        final UserAttributes userAttributes = UserAttributes(
+          email: email,
+          password: password,
+        );
+
+        return await _supabase.auth.updateUser(userAttributes);
+      }
+
+      throw Exception('Session is invalid');
+    } on AuthApiException catch (e) {
+      log('Auth API exception $e');
       rethrow;
     } on AuthException catch (_) {
       rethrow;

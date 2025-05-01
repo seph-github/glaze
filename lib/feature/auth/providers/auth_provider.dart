@@ -89,8 +89,7 @@ class AuthNotifier extends _$AuthNotifier {
     }
   }
 
-  Future<void> verifyPhone(
-      {required String phone, required String token}) async {
+  Future<void> verifyPhone({required String phone, required String token}) async {
     state = state.copyWith(isLoading: true);
     try {
       final authResponse = await AuthServices().verifyPhone(
@@ -127,9 +126,25 @@ class AuthNotifier extends _$AuthNotifier {
     state = state.copyWith(isLoading: true, error: null, otpSent: false);
     try {
       await AuthServices().resetPassword(email);
-      state = state.copyWith(isLoading: false, otpSent: false);
+      state = state.copyWith(isLoading: false, otpSent: true);
     } catch (e) {
       setPhoneSentError(e as Exception);
+    }
+  }
+
+  Future<void> updatePassword({
+    required String email,
+    required String password,
+    required String token,
+    String? tokenHash,
+  }) async {
+    state = state.copyWith(isLoading: true, error: null, otpSent: false);
+    try {
+      final response = await AuthServices().updatePassword(email: email, password: password, token: token, tokenHash: tokenHash);
+      print('response $response');
+      state = state.copyWith(isLoading: false, otpSent: true);
+    } catch (error) {
+      setPhoneSentError(error as Exception);
     }
   }
 }

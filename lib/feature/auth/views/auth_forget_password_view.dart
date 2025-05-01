@@ -14,6 +14,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../components/app_bar_with_back_button.dart';
+import '../../../components/dialogs/dialogs.dart';
 
 class AuthForgetPasswordView extends HookConsumerWidget {
   const AuthForgetPasswordView({
@@ -26,23 +27,21 @@ class AuthForgetPasswordView extends HookConsumerWidget {
     final formKey = useMemoized(() => GlobalKey<FormState>());
 
     final emailController = useTextEditingController();
-    final passwordController = useTextEditingController();
-    final confirmPasswordController = useTextEditingController();
-
-    final state = ref.watch(authNotifierProvider);
-
-    print(state);
 
     ref.listen(
       authNotifierProvider,
-      (previous, next) {
+      (previous, next) async {
         if (next.isLoading) {
           return;
         }
-        if (next.error == null) {
-          // router.pop();
-          CustomSnackBar.showSnackBar(context,
-              message: 'Password reset link sent to your email');
+        if (next.otpSent) {
+          // CustomSnackBar.showSnackBar(context, message: 'Password reset link sent to your email');
+          await Dialogs.createContentDialog(
+            context,
+            title: 'Email Sent',
+            content: 'The email containing the reset password procedure has been sent to the email provided below. Kindly check your inbox or spam folder to start the process.',
+            onPressed: () => context.pop(),
+          );
         }
         if (next.error != null) {
           CustomSnackBar.showSnackBar(context, message: next.error.toString());
@@ -54,8 +53,7 @@ class AuthForgetPasswordView extends HookConsumerWidget {
     return LoadingLayout(
       isLoading: ref.watch(authNotifierProvider).isLoading,
       appBar: AppBarWithBackButton(
-        title: Text('Forget Password?',
-            style: Theme.of(context).textTheme.titleLarge),
+        title: Text('Forget Password', style: Theme.of(context).textTheme.titleLarge),
         centerTitle: true,
         onBackButtonPressed: () {
           router.pop();
@@ -74,13 +72,7 @@ class AuthForgetPasswordView extends HookConsumerWidget {
                 // Text('Please enter your email address to reset your password',
                 //     style: Theme.of(context).textTheme.headlineSmall),
                 const Gap(30.0),
-                Text(
-                    'We will send you an email with a link to reset your password, please enter the email associated with your account',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleSmall
-                        ?.copyWith(color: ColorPallete.borderColor)),
+                Text('We will send you an email with a link to reset your password, please enter the email associated with your account', textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleSmall?.copyWith(color: ColorPallete.borderColor)),
                 const Gap(10.0),
                 InputField.email(
                   hintText: 'Email',

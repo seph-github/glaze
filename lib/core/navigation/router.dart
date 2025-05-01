@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glaze/core/navigation/observer/route_observer_provider.dart';
 import 'package:glaze/feature/auth/views/auth_forget_password_view.dart';
+import 'package:glaze/feature/auth/views/auth_reset_password_view.dart';
 import 'package:glaze/feature/dashboard/views/dashboard_view.dart';
 // import 'package:glaze/feature/home/views/video_feed_view.dart';
 import 'package:glaze/feature/profile/provider/profile_provider.dart';
@@ -266,6 +267,7 @@ class HomeRoute extends GoRouteData {
     TypedGoRoute<AuthPhoneSignInRoute>(path: 'phone-sign-in'),
     TypedGoRoute<AuthVerifyPhoneRoute>(path: 'verify-phone'),
     TypedGoRoute<AuthForgetPasswordRoute>(path: 'forget-password'),
+    TypedGoRoute<AuthResetPasswordRoute>(path: 'reset-password'),
   ],
 )
 class AuthRoute extends GoRouteData {
@@ -315,6 +317,30 @@ class AuthForgetPasswordRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const AuthForgetPasswordView();
+  }
+}
+
+class AuthResetPasswordRoute extends GoRouteData {
+  const AuthResetPasswordRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    final token = state.uri.queryParameters['access_token'];
+    final type = state.uri.queryParameters['type'];
+    final email = state.uri.queryParameters['email'];
+    final hash = state.uri.queryParameters['token_hash'];
+
+    print('Token $token, Type $type, Email $email, Hash $hash');
+
+    if (type == 'recovery' && token != null && email != null && hash != null) {
+      return AuthResetPasswordView(
+        accessToken: token,
+        email: email,
+        tokenHash: hash,
+      );
+    } else {
+      return const Placeholder();
+    }
   }
 }
 

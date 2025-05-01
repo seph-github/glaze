@@ -12,7 +12,7 @@ Future<void> initializer() async {
     url: url,
     anonKey: apiKey,
     authOptions: const FlutterAuthClientOptions(
-      authFlowType: AuthFlowType.pkce,
+      authFlowType: AuthFlowType.implicit,
     ),
     debug: true,
     realtimeClientOptions: const RealtimeClientOptions(
