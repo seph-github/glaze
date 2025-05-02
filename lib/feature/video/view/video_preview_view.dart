@@ -13,8 +13,8 @@ import 'package:video_player/video_player.dart';
 import '../../../gen/assets.gen.dart';
 import '../../../utils/video_feed_sharing_popup.dart';
 import '../../dashboard/providers/dashboard_tab_controller_provider.dart';
-import '../../home/provider/glaze_provider.dart';
-import '../../home/provider/video_feed_provider.dart';
+import '../../home/provider/glaze_provider/glaze_provider.dart';
+import '../../home/provider/video_feed_provider/video_feed_provider.dart';
 import '../../home/provider/videos_provider/videos_provider.dart';
 import '../../home/widgets/home_interactive_card.dart';
 import '../../templates/loading_layout.dart';
@@ -53,8 +53,6 @@ class VideoPreviewView extends HookConsumerWidget with WidgetsBindingObserver {
     final controllerCreationMap = useState<Map<String, Completer<VideoPlayerController>>>({});
     final currentPage = useState<int>(pageController.initialPage);
     final showPlayIcon = useState<bool>(true);
-
-    // final userGlazes = useState<List<Glaze>>([]);
 
     Future<void> pauseAllControllers() async {
       final controllers = List<VideoPlayerController>.from(controllerCache.value.values);
@@ -150,7 +148,7 @@ class VideoPreviewView extends HookConsumerWidget with WidgetsBindingObserver {
     Future<void> playController(String videoId) async {
       final controller = controllerCache.value[videoId];
 
-      final tabIndex = ref.watch(dashboardTabControllerProvider);
+      final tabIndex = ref.read(dashboardTabControllerProvider);
       if (controller != null && controller.value.isInitialized && !controller.value.isPlaying && tabIndex == 1) {
         try {
           await controller.play();
@@ -284,14 +282,6 @@ class VideoPreviewView extends HookConsumerWidget with WidgetsBindingObserver {
         (prev, next) async {
           final isActive = next == 1;
 
-          if (!isActive) {
-            // Pop this page if the user switches away from tab 1
-
-            router.pop();
-
-            return;
-          }
-
           final index = currentPage.value;
           final controller = getController(this.videos[index].id);
 
@@ -334,30 +324,6 @@ class VideoPreviewView extends HookConsumerWidget with WidgetsBindingObserver {
       appLifecycle
     ]);
 
-    useEffect(() {
-      final listener = ref.listenManual<int>(
-        dashboardTabControllerProvider,
-        (prev, next) async {
-          final isActive = next == 1;
-
-          final index = currentPage.value;
-          final controller = getController(this.videos[index].id);
-
-          if (controller != null && controller.value.isInitialized) {
-            if (!isActive) {
-              await controller.pause();
-              showPlayIcon.value = false;
-            } else {
-              await controller.play();
-              showPlayIcon.value = true;
-            }
-          }
-        },
-      );
-
-      return listener.close;
-    }, []);
-
     return LoadingLayout(
       appBar: AppBarWithBackButton(
         onBackButtonPressed: () async {
@@ -369,7 +335,7 @@ class VideoPreviewView extends HookConsumerWidget with WidgetsBindingObserver {
           scrollDirection: Axis.vertical,
           controller: pageController,
           physics: const AlwaysScrollableScrollPhysics(),
-          itemCount: this.videos.length,
+          itemCount: videos.length,
           itemBuilder: (context, index) {
             if (index < 0 || index >= videos.length) return const SizedBox.shrink();
 

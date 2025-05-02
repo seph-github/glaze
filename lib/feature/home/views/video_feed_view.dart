@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:glaze/feature/home/models/glaze/glaze.dart';
-import 'package:glaze/feature/home/provider/video_feed_provider.dart';
+import 'package:glaze/feature/home/provider/video_feed_provider/video_feed_provider.dart';
 import 'package:glaze/feature/home/provider/videos_provider/videos_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:video_player/video_player.dart';
@@ -16,7 +16,7 @@ import '../../../utils/video_feed_sharing_popup.dart';
 import '../../dashboard/providers/dashboard_tab_controller_provider.dart';
 
 import '../models/video_content/video_content.dart';
-import '../provider/glaze_provider.dart';
+import '../provider/glaze_provider/glaze_provider.dart';
 import '../widgets/home_interactive_card.dart';
 
 class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
@@ -258,7 +258,7 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
 
     useEffect(() {
       WidgetsBinding.instance.addObserver(this);
-      ref.read(dashboardTabControllerProvider.notifier).setTab(0);
+      // ref.read(dashboardTabControllerProvider.notifier).setTab(0);
       Future.microtask(
         () async {
           try {

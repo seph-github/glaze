@@ -5,7 +5,7 @@ import 'package:glaze/feature/home/services/glaze_services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../models/glaze/glaze.dart';
+import '../../models/glaze/glaze.dart';
 
 part 'glaze_provider.freezed.dart';
 part 'glaze_provider.g.dart';

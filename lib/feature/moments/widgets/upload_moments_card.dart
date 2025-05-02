@@ -6,7 +6,7 @@ import 'package:gap/gap.dart';
 import 'package:glaze/components/modals/glaze_modals.dart';
 import 'package:glaze/feature/camera/provider/content_picker_provider.dart';
 import 'package:glaze/feature/category/provider/category_provider.dart';
-import 'package:glaze/feature/home/provider/video_content_provider.dart';
+import 'package:glaze/feature/home/provider/video_content_provider/video_content_provider.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
 import 'package:glaze/utils/generate_thumbnail.dart';
 import 'package:go_router/go_router.dart';

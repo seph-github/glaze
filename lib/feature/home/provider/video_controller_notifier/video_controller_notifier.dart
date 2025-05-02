@@ -3,10 +3,10 @@ import 'dart:developer';
 import 'package:preload_page_view/preload_page_view.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:video_player/video_player.dart';
-import '../models/video_content/video_content.dart';
+import '../../models/video_content/video_content.dart';
 
-import 'video_feed_provider.dart';
-import 'videos_provider/videos_provider.dart'; // Assuming this contains the `videoFeedNotifierProvider`
+import '../video_feed_provider/video_feed_provider.dart';
+import '../videos_provider/videos_provider.dart'; // Assuming this contains the `videoFeedNotifierProvider`
 
 part 'video_controller_notifier.g.dart';
 

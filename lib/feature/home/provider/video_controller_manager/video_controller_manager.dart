@@ -1,11 +1,11 @@
 import 'dart:developer';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:glaze/feature/home/provider/video_feed_provider.dart';
+import 'package:glaze/feature/home/provider/video_feed_provider/video_feed_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:video_player/video_player.dart';
 
-import '../models/video_content/video_content.dart';
+import '../../models/video_content/video_content.dart';
 
 part 'video_controller_manager.freezed.dart';
 part 'video_controller_manager.g.dart';

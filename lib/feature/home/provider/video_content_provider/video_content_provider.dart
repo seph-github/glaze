@@ -11,8 +11,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:video_player/video_player.dart';
 
-import '../../auth/services/auth_services.dart';
-import '../models/cached_video_content/cached_video_content.dart';
+import '../../../auth/services/auth_services.dart';
+import '../../models/cached_video_content/cached_video_content.dart';
 
 part 'video_content_provider.freezed.dart';
 part 'video_content_provider.g.dart';
