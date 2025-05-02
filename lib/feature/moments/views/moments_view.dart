@@ -6,7 +6,7 @@ import 'package:gap/gap.dart';
 import 'package:glaze/components/app_bar_with_back_button.dart';
 import 'package:glaze/components/custom_tab_bar.dart';
 import 'package:glaze/feature/moments/providers/moments_provider.dart';
-import 'package:glaze/feature/moments/views/moments_live_challenges_tabview.dart';
+import 'package:glaze/feature/moments/views/moments_upcoming_tabview.dart';
 import 'package:glaze/feature/moments/views/moments_videos_tabview.dart';
 import 'package:glaze/feature/moments/widgets/search_field.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
@@ -20,6 +20,7 @@ import '../../../gen/assets.gen.dart';
 import '../../../gen/fonts.gen.dart';
 import '../../category/provider/category_provider.dart';
 import '../../settings/providers/settings_theme_provider.dart';
+import 'moments_live_tabview.dart';
 
 class MomentsView extends HookConsumerWidget {
   const MomentsView({super.key});
@@ -63,8 +64,8 @@ class MomentsView extends HookConsumerWidget {
       MomentsVideosTabview(
         videos: videos,
       ),
-      const UnderConstruction(),
-      const MomentsLiveChallengesTabview(),
+      const MomentsLiveTabview(),
+      const MomentsUpcomingTabview(),
     ];
 
     return LoadingLayout(

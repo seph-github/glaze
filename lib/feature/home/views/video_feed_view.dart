@@ -144,7 +144,9 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
 
     Future<void> playController(String videoId) async {
       final controller = controllerCache.value[videoId];
-      final tabIndex = ref.watch(dashboardTabControllerProvider);
+      final tabIndex = ref.read(dashboardTabControllerProvider);
+
+      print('tab index $tabIndex');
       if (controller != null && controller.value.isInitialized && !controller.value.isPlaying && tabIndex == 0) {
         try {
           await controller.play();
@@ -256,7 +258,7 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
 
     useEffect(() {
       WidgetsBinding.instance.addObserver(this);
-
+      ref.read(dashboardTabControllerProvider.notifier).setTab(0);
       Future.microtask(
         () async {
           try {
@@ -306,10 +308,13 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
 
     ref.listen(
       videoFeedNotifierProvider,
-      (prev, next) {
+      (prev, next) async {
         if (prev?.videos != next.videos || prev?.isLoading != next.isLoading || prev?.preloadedVideoUrls != next.preloadedVideoUrls) {
           ref.read(videosProvider.notifier).addVideos(next.videos);
-          manageControllerWindow(currentPage.value);
+          // manageControllerWindow(currentPage.value);
+
+          // Autoplay the first video
+          await initAndPlayVideo(0);
         }
       },
     );
@@ -362,6 +367,7 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
           physics: const AlwaysScrollableScrollPhysics(),
           itemCount: videos.length,
           itemBuilder: (context, index) {
+            if (index >= videos.length) return const SizedBox.shrink();
             final video = videos[index];
 
             if ((index - currentPage.value).abs() > 1) return const SizedBox.shrink();

@@ -1,6 +1,7 @@
 // ignore_for_file: invalid_annotation_target
 
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:glaze/config/enum/challenge_type.dart';
 
 part 'challenge.freezed.dart';
 part 'challenge.g.dart';
@@ -13,6 +14,7 @@ class Challenge with _$Challenge {
     String? description,
     String? prize,
     String? status,
+    ChallengeType? type,
     @JsonKey(name: 'image_url') String? imageUrl,
     @JsonKey(name: 'winner_id') String? winnerId,
     @JsonKey(name: 'is_default') @Default(false) bool isDefault,

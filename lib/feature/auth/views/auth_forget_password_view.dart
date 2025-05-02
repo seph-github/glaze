@@ -35,17 +35,18 @@ class AuthForgetPasswordView extends HookConsumerWidget {
           return;
         }
         if (next.otpSent) {
-          // CustomSnackBar.showSnackBar(context, message: 'Password reset link sent to your email');
           await Dialogs.createContentDialog(
             context,
             title: 'Email Sent',
-            content: 'The email containing the reset password procedure has been sent to the email provided below. Kindly check your inbox or spam folder to start the process.',
+            content: 'A password reset email has been sent to the provided address. Kindly review your inbox, including the spam/junk folder, to complete the process.',
             onPressed: () => context.pop(),
           );
         }
         if (next.error != null) {
-          CustomSnackBar.showSnackBar(context, message: next.error.toString());
-          ref.read(authNotifierProvider.notifier).clearError();
+          if (context.mounted) {
+            CustomSnackBar.showSnackBar(context, message: next.error.toString());
+            ref.read(authNotifierProvider.notifier).clearError();
+          }
         }
       },
     );
@@ -66,11 +67,7 @@ class AuthForgetPasswordView extends HookConsumerWidget {
             key: formKey,
             autovalidateMode: AutovalidateMode.disabled,
             child: Column(
-              // crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                // const SizedBox(height: 20),
-                // Text('Please enter your email address to reset your password',
-                //     style: Theme.of(context).textTheme.headlineSmall),
                 const Gap(30.0),
                 Text('We will send you an email with a link to reset your password, please enter the email associated with your account', textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleSmall?.copyWith(color: ColorPallete.borderColor)),
                 const Gap(10.0),
@@ -80,22 +77,6 @@ class AuthForgetPasswordView extends HookConsumerWidget {
                   inputIcon: SvgPicture.asset(Assets.images.svg.emailIcon.path),
                   validator: (value) => validateEmail(value),
                 ),
-                // const SizedBox(height: 10),
-                // InputField.password(
-                //   hintText: 'New Password',
-                //   controller: passwordController,
-                //   inputIcon:
-                //       SvgPicture.asset(Assets.images.svg.passwordIcon.path),
-                //   validator: (value) => validatePassword(value),
-                // ),
-                // const SizedBox(height: 10),
-                // InputField.password(
-                //   hintText: 'Confirm Password',
-                //   controller: confirmPasswordController,
-                //   inputIcon:
-                //       SvgPicture.asset(Assets.images.svg.passwordIcon.path),
-                //   validator: (value) => validatePassword(value),
-                // ),
                 const SizedBox(height: 30),
                 PrimaryButton(
                   label: 'Reset Password',

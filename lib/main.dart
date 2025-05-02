@@ -1,10 +1,7 @@
 import 'dart:async';
-import 'dart:developer';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:glaze/app.dart';
 import 'package:glaze/core/initializer.dart';
 import 'package:glaze/data/local/shared_prefs.dart';
@@ -14,8 +11,8 @@ Future<void> main() async {
   runZonedGuarded(
     () async {
       await initializer();
-      final SharedPreferences sharedPreferences =
-          await SharedPreferences.getInstance();
+      final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
       runApp(
         ProviderScope(
           overrides: [
@@ -26,11 +23,11 @@ Future<void> main() async {
       );
     },
     (error, stack) {
-      log('main error: $error');
-      if (kDebugMode) {
-        log("An unhandled exception occurred", error: error, stackTrace: stack);
-        Fluttertoast.showToast(msg: "$error");
-      }
+      // log('main error: $error');
+      // if (kDebugMode) {
+      //   log("An unhandled exception occurred", error: error, stackTrace: stack);
+      //   Fluttertoast.showToast(msg: "$error");
+      // }
     },
   );
 }

@@ -1,7 +1,9 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:glaze/feature/shops/models/shop_product.dart';
-import 'package:glaze/feature/shops/services/product_services.dart';
+import 'package:glaze/feature/shop/models/shop_product.dart';
+import 'package:glaze/feature/shop/services/product_services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../models/donut/donut.dart';
 
 part 'products_provider.freezed.dart';
 part 'products_provider.g.dart';
@@ -10,6 +12,7 @@ part 'products_provider.g.dart';
 abstract class ProductState with _$ProductState {
   const factory ProductState({
     @Default([]) List<ShopProduct> shopProduct,
+    @Default([]) List<Donut> donuts,
     @Default(false) bool isLoading,
     @Default(null) dynamic error,
   }) = _ProductState;
@@ -35,13 +38,14 @@ class ProductsNotifier extends _$ProductsNotifier {
     state = state.copyWith(isLoading: true);
     try {
       final response = await _productServices.fetchAvailableProducts();
+      final donutResponse = await _productServices.fetchAvailableDonuts();
 
       if (response.isEmpty) {
-        state = state.copyWith(isLoading: false, shopProduct: []);
+        state = state.copyWith(isLoading: false, shopProduct: [], donuts: []);
         return;
       }
 
-      state = state.copyWith(isLoading: false, shopProduct: response);
+      state = state.copyWith(isLoading: false, shopProduct: response, donuts: donutResponse);
     } catch (error) {
       setError(error);
     }

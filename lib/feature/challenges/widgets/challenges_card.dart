@@ -6,7 +6,10 @@ import 'package:glaze/core/styles/color_pallete.dart';
 import 'package:glaze/feature/challenges/models/challenge.dart';
 import 'package:glaze/feature/challenges/widgets/circle_stack.dart';
 import 'package:glaze/gen/fonts.gen.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../components/buttons/primary_button.dart';
+import '../../../components/dialogs/dialogs.dart';
 import '../../../gen/assets.gen.dart';
 import '../../../utils/app_timer.dart';
 
@@ -21,20 +24,21 @@ class ChallengesCard extends StatelessWidget {
   final int index;
 
   static const List<Color> lightColors = [
-    Color(0xFFFFEB3B), // Bright Yellow
-    Color(0xFF4CAF50), // Vibrant Greenx
-    Color(0xFF2196F3), // Bright Blue
-    Color(0xFFFF5722), // Bright Orange
-    Color(0xFF9C27B0), // Bright Purple
+    Color(0xFFF875AA),
+    Color(0xFF6AD4DD),
+    Color(0xFFA0D683),
+    Color(0xFFFEEE91),
+    Color(0xFF2196F3),
   ];
 
   String _getPrizeText(String value) {
     if (value.isEmpty) return '';
 
-    if (value.contains('\$')) {
+    if (int.tryParse(value) is int) {
       return '\$${value.replaceAll('\$', '')}';
+    } else {
+      return value;
     }
-    return '\$$value';
   }
 
   @override
@@ -68,41 +72,55 @@ class ChallengesCard extends StatelessWidget {
           const Gap(8),
           Container(
             alignment: Alignment.center,
-            height: 50.0,
+            height: 40.0,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16.0),
               color: randomColor.withValues(alpha: 0.4),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                Text(
-                  _getPrizeText(challenge.prize ?? ''),
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontFamily: FontFamily.robotoSemiBold,
-                        color: Colors.white,
-                      ),
+                Flexible(
+                  child: Text(
+                    _getPrizeText(challenge.prize ?? ''),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontFamily: FontFamily.robotoBold,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                  ),
                 ),
-                Text(
-                  _getPrizeText(challenge.prize ?? ''),
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontFamily: FontFamily.robotoBold,
-                        color: Colors.white,
-                        fontSize: 20.0,
-                      ),
-                ),
+                // Flexible(
+                //   child: Text(
+                //     _getPrizeText(challenge.prize ?? ''),
+                //     overflow: TextOverflow.clip,
+                //     style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                //           fontFamily: FontFamily.robotoBold,
+                //           color: Colors.white,
+                //           fontSize: 20.0,
+                //         ),
+                //   ),
+                // ),
               ],
             ),
           ),
-          // const Gap(12),
-          // PrimaryButton(
-          //   onPressed: () {},
-          //   label: 'Join the Challenge',
-          //   borderRadius: 16.0,
-          //   backgroundColor: Colors.yellow,
-          // ),
+          const Gap(12),
+          PrimaryButton(
+            onPressed: () async {
+              await Dialogs.createContentDialog(
+                context,
+                title: 'Warning!',
+                content: 'Feature Under-Development',
+                onPressed: () => context.pop(),
+              );
+            },
+            label: 'Join',
+            borderRadius: 16.0,
+            height: 40,
+            backgroundColor: randomColor.withValues(alpha: 0.6),
+          ),
         ],
       ),
     );
@@ -148,8 +166,7 @@ class ChallengesCard extends StatelessWidget {
           width: width * 0.65,
           child: Text(
             challenge.title,
-            overflow:
-                TextOverflow.ellipsis, // Ensures the text is fully visible
+            overflow: TextOverflow.ellipsis, // Ensures the text is fully visible
             softWrap: true, // Allows the text to wrap to a new line
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontFamily: FontFamily.robotoBold,

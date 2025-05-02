@@ -20,8 +20,7 @@ class CategoriesNotifier extends _$CategoriesNotifier {
     try {
       state = const AsyncLoading();
       state = await AsyncValue.guard(
-        () async =>
-            await ref.read(categoryRepositoryProvider).fetchCategories(),
+        () async => await ref.read(categoryRepositoryProvider).fetchCategories(),
       );
       return Future.value(state.value);
     } catch (e) {
@@ -40,8 +39,7 @@ class CategoryRepository {
 
   Future<List<CategoryModel>> fetchCategories() async {
     try {
-      final List<Map<String, dynamic>> result =
-          await _supabaseService.select(table: 'categories');
+      final List<Map<String, dynamic>> result = await _supabaseService.select(table: 'categories');
 
       if (result.isEmpty) {
         return [];
