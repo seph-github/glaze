@@ -9,14 +9,13 @@ import 'package:glaze/core/navigation/observer/route_observer_provider.dart';
 import 'package:glaze/feature/auth/views/auth_forget_password_view.dart';
 import 'package:glaze/feature/auth/views/auth_reset_password_view.dart';
 import 'package:glaze/feature/dashboard/views/dashboard_view.dart';
-// import 'package:glaze/feature/home/views/video_feed_view.dart';
 import 'package:glaze/feature/profile/provider/profile_provider.dart';
 import 'package:glaze/feature/profile/provider/user_profile_provider.dart';
 import 'package:glaze/feature/profile/views/profile_edit_form.dart';
 import 'package:glaze/feature/profile/views/profile_interactive_view.dart';
 import 'package:glaze/feature/shop/views/shop_view.dart';
 import 'package:glaze/feature/profile/views/profile_view.dart';
-import 'package:glaze/feature/video/video_preview_view.dart';
+import 'package:glaze/feature/video/view/video_preview_view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:glaze/feature/auth/views/auth_view.dart';
 

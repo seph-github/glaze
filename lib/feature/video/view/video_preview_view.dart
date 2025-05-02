@@ -10,14 +10,14 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:preload_page_view/preload_page_view.dart';
 import 'package:video_player/video_player.dart';
 
-import '../../gen/assets.gen.dart';
-import '../../utils/video_feed_sharing_popup.dart';
-import '../dashboard/providers/dashboard_tab_controller_provider.dart';
-import '../home/provider/glaze_provider.dart';
-import '../home/provider/video_feed_provider.dart';
-import '../home/provider/videos_provider/videos_provider.dart';
-import '../home/widgets/home_interactive_card.dart';
-import '../templates/loading_layout.dart';
+import '../../../gen/assets.gen.dart';
+import '../../../utils/video_feed_sharing_popup.dart';
+import '../../dashboard/providers/dashboard_tab_controller_provider.dart';
+import '../../home/provider/glaze_provider.dart';
+import '../../home/provider/video_feed_provider.dart';
+import '../../home/provider/videos_provider/videos_provider.dart';
+import '../../home/widgets/home_interactive_card.dart';
+import '../../templates/loading_layout.dart';
 
 class VideoPreviewView extends HookConsumerWidget with WidgetsBindingObserver {
   const VideoPreviewView({

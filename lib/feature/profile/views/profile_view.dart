@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
@@ -53,8 +51,6 @@ class ProfileView extends HookConsumerWidget {
       },
       [],
     );
-
-    log('profile ${state.profile?.following}');
 
     return LoadingLayout(
       isLoading: state.isLoading,
