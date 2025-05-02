@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
+import 'package:glaze/components/app_bar_with_back_button.dart';
 import 'package:glaze/components/buttons/primary_button.dart';
 import 'package:glaze/config/enum/profile_type.dart';
 import 'package:glaze/feature/camera/provider/content_picker_provider.dart';
@@ -18,6 +19,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../components/dialogs/dialogs.dart';
 import '../../../components/inputs/input_field.dart';
+import '../../../components/inputs/phone_number_input.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../data/models/category/category_model.dart';
 import '../../../data/repository/category/category_repository.dart';
@@ -29,11 +31,9 @@ class ProfileEditForm extends HookConsumerWidget {
   const ProfileEditForm({
     super.key,
     required this.id,
-    // this.data,
   });
 
   final String id;
-  // final Profile? data;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -51,6 +51,7 @@ class ProfileEditForm extends HookConsumerWidget {
     final organizationController = useTextEditingController();
     final usernameController = useTextEditingController();
     final bioController = useTextEditingController();
+    final dialCodeController = useTextEditingController();
     final categories = useState<List<CategoryModel>>([]);
     final updatedSelectedInterests = useState<List<String>>([]);
     final currentImage = useState<String?>(null);
@@ -145,23 +146,15 @@ class ProfileEditForm extends HookConsumerWidget {
 
     return LoadingLayout(
       isLoading: ref.watch(imageState).isLoading || state.isLoading,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: SvgPicture.asset(
-            Assets.images.svg.backArrowIcon.path,
-          ),
-          style: IconButton.styleFrom(
-            backgroundColor: ColorPallete.inputFilledColor,
-            shape: const CircleBorder(),
-          ),
-          onPressed: () {
-            formKey.currentState?.reset();
-            ref.invalidate(imageState);
-            ref.invalidate(profileInterestsNotifierProvider);
-            router.pop();
-          },
-        ),
+      appBar: AppBarWithBackButton(
+        onBackButtonPressed: () {
+          formKey.currentState?.reset();
+          ref.invalidate(imageState);
+          ref.invalidate(profileInterestsNotifierProvider);
+          router.pop();
+        },
         title: const Text('Edit Profile'),
+        centerTitle: true,
       ),
       child: SafeArea(
         child: Padding(
@@ -191,10 +184,19 @@ class ProfileEditForm extends HookConsumerWidget {
                                       File(currentImage.value ?? ''),
                                     ) as ImageProvider
                               : AssetImage(
-                                  Assets.images.png.profilePlaceholder.path,
-                                ),
+                                  Assets.images.svg.closeIcon.path,
+                                ) as ImageProvider,
                           fit: BoxFit.cover,
                         ),
+                      ),
+                      child: Transform.scale(
+                        scale: 0.75,
+                        child: currentImage.value != null
+                            ? null
+                            : SvgPicture.asset(
+                                Assets.images.svg.profileIcon.path,
+                                fit: BoxFit.contain,
+                              ),
                       ),
                     ),
                     TextButton(
@@ -250,17 +252,25 @@ class ProfileEditForm extends HookConsumerWidget {
                   validator: validateEmail,
                 ),
                 const Gap(10),
-                InputField.text(
-                  controller: phoneController,
-                  readOnly: state.profile?.phoneNumber != null,
-                  inputIcon: SvgPicture.asset(
-                    Assets.images.svg.phoneIcon.path,
-                    colorFilter: isLightTheme ? colorFilter : null,
+                if (state.profile?.phoneNumber == null)
+                  PhoneNumberInput(
+                    phoneController: phoneController,
+                    dialCodeController: dialCodeController,
+                    filled: !isLightTheme,
+                    validator: validatePhone,
                   ),
-                  hintText: 'Phone number',
-                  filled: !isLightTheme,
-                  validator: validatePhone,
-                ),
+                if (state.profile?.phoneNumber != null)
+                  InputField.text(
+                    controller: phoneController,
+                    readOnly: state.profile?.phoneNumber != null,
+                    inputIcon: SvgPicture.asset(
+                      Assets.images.svg.phoneIcon.path,
+                      colorFilter: isLightTheme ? colorFilter : null,
+                    ),
+                    hintText: 'Phone number',
+                    filled: !isLightTheme,
+                    validator: validatePhone,
+                  ),
                 if (state.profile?.role == ProfileType.recruiter.name)
                   Column(
                     children: [

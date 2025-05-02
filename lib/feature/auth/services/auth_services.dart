@@ -94,17 +94,9 @@ class AuthServices {
 
   Future<AuthResponse> anonymousSignin() async {
     try {
-      final AuthResponse authResponse = await _supabase.auth.signInAnonymously();
-
-      // final int tempUserId = createRandomNumber();
-
-      // await supabaseService.update(
-      //   id: authResponse.user!.id,
-      //   table: 'profiles',
-      //   data: {
-      //     'username_id': tempUserId,
-      //   },
-      // );
+      final AuthResponse authResponse = await _supabase.auth.signInAnonymously(data: {
+        'role': ProfileType.user.value,
+      });
 
       return authResponse;
     } on AuthApiException catch (_) {

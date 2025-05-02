@@ -37,10 +37,9 @@ class MomentsView extends HookConsumerWidget {
     final videos = ref.watch(momentsNotifierProvider).videos;
 
     final List<String> tabs = [
-      'Videos',
-      'Trendings',
-      'Live Challenges',
-      'Upcoming Challenges'
+      'Explore',
+      'Live',
+      'Upcoming'
     ];
 
     final tabController = useTabController(
@@ -64,7 +63,6 @@ class MomentsView extends HookConsumerWidget {
       MomentsVideosTabview(
         videos: videos,
       ),
-      const UnderConstruction(),
       const UnderConstruction(),
       const MomentsLiveChallengesTabview(),
     ];

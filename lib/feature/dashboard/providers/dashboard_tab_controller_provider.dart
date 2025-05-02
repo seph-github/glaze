@@ -2,7 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'dashboard_tab_controller_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class DashboardTabController extends _$DashboardTabController {
   int _lastTab = 0;
 

@@ -78,7 +78,7 @@ class GlazeNavBar extends HookConsumerWidget {
             Assets.images.svg.shopFillIcon.path,
             colorFilter: isLightTheme ? colorFilter : null,
           ),
-          label: 'Shops',
+          label: 'Shop',
         ),
         NavigationDestination(
           icon: SvgPicture.asset(

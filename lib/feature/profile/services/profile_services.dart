@@ -126,6 +126,11 @@ class ProfileServices {
         );
       }
 
+      final UserAttributes userAttributes = UserAttributes(
+        email: email,
+        phone: phoneNumber,
+      );
+
       final ProfileEntity profileEntity = ProfileEntity(
         id: id,
         username: username,
@@ -163,6 +168,8 @@ class ProfileServices {
             )
             .eq('user_id', id);
       }
+
+      await _supabaseClient.auth.updateUser(userAttributes);
 
       await _supabaseClient
           .from('profiles')

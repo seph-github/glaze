@@ -47,7 +47,7 @@ class HomeInteractiveCard extends HookConsumerWidget {
 
     return Container(
       width: width,
-      height: 150,
+      height: 130,
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       decoration: BoxDecoration(
         shape: BoxShape.rectangle,

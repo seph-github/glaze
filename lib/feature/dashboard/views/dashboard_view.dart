@@ -21,7 +21,15 @@ class DashboardView extends HookConsumerWidget {
     final currentIndex = useState(navigationShell.currentIndex);
 
     void onTabSelected(int index) async {
-      if (index == 2) {
+      final router = GoRouter.of(context);
+      final currentRoute = router.state.matchedLocation;
+
+      if (router.canPop() && currentRoute.contains('/moments/video-preview')) {
+        router.pop();
+        await Future.delayed(const Duration(milliseconds: 50));
+      }
+
+      if (index == 2 && context.mounted) {
         ref.read(dashboardTabControllerProvider.notifier).setTab(index);
         await _showBottomSheet(context);
 

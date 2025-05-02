@@ -30,9 +30,6 @@ class VideoControllerManager extends _$VideoControllerManager {
 
   Future<VideoPlayerController?> getOrCreate(VideoContent video) async {
     final id = video.id;
-    log('🛠 Creating controller for ${video.id}');
-    log('✅ Controller initialized for ${video.id}');
-
     if (state.controllers.containsKey(id)) {
       _touch(id);
       return state.controllers[id];

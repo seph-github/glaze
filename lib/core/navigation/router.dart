@@ -62,8 +62,6 @@ GoRouter router(Ref ref) {
     final String currentPath = state.matchedLocation;
     final bool hasSplashCompleted = ref.read(splashProvider).completeSplash;
 
-    // log('router redirect: $currentPath, user: ${user != null}, role: ${profile?.role}, completed profile: ${profile?.isCompletedProfile}, splash completed: $hasSplashCompleted');
-
     if (!hasSplashCompleted) {
       return const SplashRoute().location;
     }
@@ -258,7 +256,9 @@ class HomeRoute extends GoRouteData {
   const HomeRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => const VideoFeedView();
+  Widget build(BuildContext context, GoRouterState state) {
+    return const VideoFeedView();
+  }
 }
 
 @TypedGoRoute<AuthRoute>(
@@ -329,8 +329,6 @@ class AuthResetPasswordRoute extends GoRouteData {
     final type = state.uri.queryParameters['type'];
     final email = state.uri.queryParameters['email'];
     final hash = state.uri.queryParameters['token_hash'];
-
-    print('Token $token, Type $type, Email $email, Hash $hash');
 
     if (type == 'recovery' && token != null && email != null && hash != null) {
       return AuthResetPasswordView(
@@ -464,16 +462,18 @@ class NoViewRoute extends GoRouteData {
   }
 }
 
-// @TypedGoRoute<VideoPreviewRoute>(path: '/video_preview')
 class VideoPreviewRoute extends GoRouteData {
   const VideoPreviewRoute();
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
     final Map<String, dynamic> extras = state.extra as Map<String, dynamic>;
-    final VideoContent video = extras['video'];
+    final List<VideoContent> videos = extras['videos'];
+    final int initialIndex = extras['initialIndex'];
+
     return VideoPreviewView(
-      video: video,
+      videos: videos,
+      initialIndex: initialIndex,
     );
   }
 }

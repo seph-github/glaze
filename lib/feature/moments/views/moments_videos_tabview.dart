@@ -35,7 +35,8 @@ class MomentsVideosTabview extends StatelessWidget {
             router.go(
               const VideoPreviewRoute().location,
               extra: {
-                'video': videos?[index],
+                'videos': videos,
+                'initialIndex': index,
               },
             );
           },
