@@ -8,7 +8,7 @@ class ProductServices {
 
   Future<List<ShopProduct>> fetchAvailableProducts() async {
     try {
-      final response = await _supabaseClient.from('shop_products').select();
+      final response = await _supabaseClient.rpc('get_products');
 
       if (response.isEmpty) return [];
 

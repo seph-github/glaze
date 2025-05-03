@@ -122,7 +122,7 @@ class AuthServices {
 
   Future<void> resetPassword(String email) async {
     try {
-      await _supabase.auth.resetPasswordForEmail(email, redirectTo: 'https://glaze-admin.netlify.app/auth/reset-password');
+      await _supabase.auth.resetPasswordForEmail(email, redirectTo: 'myapp://auth/auth/reset-password');
     } on AuthApiException catch (e) {
       log('Error AuthApiException resetting password: $e');
       rethrow;

@@ -57,7 +57,7 @@ GoRouter router(Ref ref) {
   FutureOr<String?> redirect(BuildContext context, GoRouterState state) async {
     final User? user = AuthServices().currentUser;
     final Profile? profile = ref.watch(userProfileProvider).value;
-    print('profile $profile');
+    // print('profile $profile');
 
     final String currentPath = state.matchedLocation;
     final bool hasSplashCompleted = ref.read(splashProvider).completeSplash;

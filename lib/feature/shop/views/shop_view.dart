@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/components/app_bar_with_back_button.dart';
-import 'package:glaze/feature/shop/models/donut/donut.dart';
 import 'package:glaze/feature/shop/provider/products_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -52,15 +51,10 @@ class ShopView extends HookConsumerWidget {
                 SliverList.builder(
                   itemCount: state.shopProduct.length,
                   itemBuilder: (context, index) {
-                    final List<String>? donutIds = state.shopProduct[index].donutIds;
-
-                    final List<Donut> matchingDonuts = donutIds == null ? [] : state.donuts.where((donut) => donutIds.contains(donut.id)).toList();
-
                     return Column(
                       children: [
                         ShopProductsCard(
                           product: state.shopProduct[index],
-                          donuts: matchingDonuts,
                         ),
                         const Gap(8),
                       ],
