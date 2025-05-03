@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
+import 'package:glaze/core/services/secure_storage_services.dart';
 import 'package:glaze/feature/home/provider/video_feed_provider/video_feed_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -170,6 +171,7 @@ class ProfileView extends HookConsumerWidget {
                     ref.invalidate(videoFeedNotifierProvider);
                     await ref.read(initialAppUseProvider).setInitialAppUseComplete(true).then(
                       (_) async {
+                        await SecureCache.clear('user_profile');
                         await ref.read(authNotifierProvider.notifier).signOut();
                       },
                     );

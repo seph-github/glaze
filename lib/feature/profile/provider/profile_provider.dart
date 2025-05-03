@@ -5,6 +5,7 @@ import 'package:glaze/feature/profile/services/profile_services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../config/enum/profile_type.dart';
+import '../../../core/services/secure_storage_services.dart';
 import '../models/profile.dart';
 import '../models/recruiter_profile.dart';
 
@@ -54,7 +55,16 @@ class ProfileNotifier extends _$ProfileNotifier {
         isLoading: false,
       );
     } catch (e) {
-      setError(e);
+      final profile = await SecureCache.load(
+        'user_profile',
+        (json) => Profile.fromJson(json),
+      );
+      state = state.copyWith(
+        isLoading: false,
+        profile: profile,
+      );
+
+      // setError(e);
     }
   }
 

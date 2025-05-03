@@ -7,6 +7,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:glaze/feature/home/models/glaze/glaze.dart';
 import 'package:glaze/feature/home/provider/video_feed_provider/video_feed_provider.dart';
 import 'package:glaze/feature/home/provider/videos_provider/videos_provider.dart';
+import 'package:glaze/feature/templates/loading_layout.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:video_player/video_player.dart';
 import 'package:preload_page_view/preload_page_view.dart';
@@ -361,90 +362,93 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
       },
       color: Colors.white,
       child: RepaintBoundary(
-        child: PreloadPageView.builder(
-          scrollDirection: Axis.vertical,
-          controller: pageController,
-          physics: const AlwaysScrollableScrollPhysics(),
-          itemCount: videos.length,
-          itemBuilder: (context, index) {
-            if (index >= videos.length) return const SizedBox.shrink();
-            final video = videos[index];
+        child: LoadingLayout(
+          isLoading: state.isLoading,
+          child: PreloadPageView.builder(
+            scrollDirection: Axis.vertical,
+            controller: pageController,
+            physics: const AlwaysScrollableScrollPhysics(),
+            itemCount: videos.length,
+            itemBuilder: (context, index) {
+              if (index >= videos.length) return const SizedBox.shrink();
+              final video = videos[index];
 
-            if ((index - currentPage.value).abs() > 1) return const SizedBox.shrink();
+              if ((index - currentPage.value).abs() > 1) return const SizedBox.shrink();
 
-            return FutureBuilder<VideoPlayerController?>(
-              future: getOrCreateController(video),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData || snapshot.data == null) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+              return FutureBuilder<VideoPlayerController?>(
+                future: getOrCreateController(video),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData || snapshot.data == null) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                final controller = snapshot.data!;
+                  final controller = snapshot.data!;
 
-                return Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    GestureDetector(
-                      onTap: () async {
-                        if (!(index == currentPage.value)) {
-                          return;
-                        } else if (controller.value.isPlaying) {
-                          showPlayIcon.value = false;
-                          await controller.pause();
-                        } else {
-                          showPlayIcon.value = true;
-                          await controller.play();
-                        }
-                      },
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          VideoPlayer(controller),
-                          if (!controller.value.isPlaying && !showPlayIcon.value)
-                            Container(
-                              width: 50,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.black.withValues(alpha: 0.3),
-                              ),
-                              child: Center(
-                                child: SvgPicture.asset(Assets.images.svg.playIcon.path),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      child: HomeInteractiveCard(
-                        key: PageStorageKey('HomeInteractiveCard_$index'),
-                        onGlazeLongPress: () => toggleDonutOptions(true),
-                        controller: getController(videos[currentPage.value].id),
-                        glazeCount: videos[index].glazesCount ?? 0,
-                        isGlazed: videos[index].hasGlazed,
-                        onGlazeTap: () async {
-                          final isCurrentlyGlazed = video.hasGlazed;
-                          final newGlazeCount = isCurrentlyGlazed ? (video.glazesCount ?? 0) - 1 : (video.glazesCount ?? 0) + 1;
-
-                          ref.read(videosProvider.notifier).updateVideo(video.id, newGlazeCount, !isCurrentlyGlazed);
-
-                          await ref.read(glazeNotifierProvider.notifier).onGlazed(videoId: video.id);
+                  return Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () async {
+                          if (!(index == currentPage.value)) {
+                            return;
+                          } else if (controller.value.isPlaying) {
+                            showPlayIcon.value = false;
+                            await controller.pause();
+                          } else {
+                            showPlayIcon.value = true;
+                            await controller.play();
+                          }
                         },
-                        onShareTap: () async => await showShareOptions(context),
-                        width: width,
-                        height: height,
-                        video: videos[index],
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            VideoPlayer(controller),
+                            if (!controller.value.isPlaying && !showPlayIcon.value)
+                              Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.black.withValues(alpha: 0.3),
+                                ),
+                                child: Center(
+                                  child: SvgPicture.asset(Assets.images.svg.playIcon.path),
+                                ),
+                              ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                );
-              },
-            );
-          },
-          onPageChanged: (index) => handlePageChange(index),
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: HomeInteractiveCard(
+                          key: PageStorageKey('HomeInteractiveCard_$index'),
+                          onGlazeLongPress: () => toggleDonutOptions(true),
+                          controller: getController(videos[currentPage.value].id),
+                          glazeCount: videos[index].glazesCount ?? 0,
+                          isGlazed: videos[index].hasGlazed,
+                          onGlazeTap: () async {
+                            final isCurrentlyGlazed = video.hasGlazed;
+                            final newGlazeCount = isCurrentlyGlazed ? (video.glazesCount ?? 0) - 1 : (video.glazesCount ?? 0) + 1;
+
+                            ref.read(videosProvider.notifier).updateVideo(video.id, newGlazeCount, !isCurrentlyGlazed);
+
+                            await ref.read(glazeNotifierProvider.notifier).onGlazed(videoId: video.id);
+                          },
+                          onShareTap: () async => await showShareOptions(context),
+                          width: width,
+                          height: height,
+                          video: videos[index],
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+            onPageChanged: (index) => handlePageChange(index),
+          ),
         ),
       ),
     );

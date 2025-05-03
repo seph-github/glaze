@@ -25,6 +25,17 @@
         "--dart-define-from-file=dart-defines/development.json",
       ],
     },
+     {
+      "name": "Development Release",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "program": "lib/main.dart",
+      "args": [
+        "--no-enable-impeller",
+        "--dart-define-from-file=dart-defines/development.json",
+      ],
+    },
     {
       "name": "Production Debug",
       "request": "launch",
@@ -45,9 +56,7 @@
       "flutterMode": "release",
       "program": "lib/main.dart",
       "args": [
-        "--flavor",
-        "production",
-        "-v"
+        "--dart-define-from-file=dart-defines/development.json",
       ],
       "noDebug": true
     }

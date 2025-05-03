@@ -43,8 +43,8 @@ class Interact with _$Interact {
   const factory Interact({
     required String id,
     required String username,
-    @JsonKey(name: 'full_name') required String fullName,
-    @JsonKey(name: 'profile_image_url') required String profileImageUrl,
+    @JsonKey(name: 'full_name') String? fullName,
+    @JsonKey(name: 'profile_image_url') String? profileImageUrl,
   }) = _Interact;
 
   factory Interact.fromJson(Map<String, dynamic> json) => _$InteractFromJson(json);
@@ -69,8 +69,8 @@ class Glazer with _$Glazer {
   const factory Glazer({
     required String id,
     required String username,
-    @JsonKey(name: 'full_name') required String fullName,
-    @JsonKey(name: 'profile_image_url') required String profileImageUrl,
+    @JsonKey(name: 'full_name') String? fullName,
+    @JsonKey(name: 'profile_image_url') String? profileImageUrl,
   }) = _Glazer;
 
   factory Glazer.fromJson(Map<String, dynamic> json) => _$GlazerFromJson(json);

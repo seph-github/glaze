@@ -25,95 +25,82 @@ class ProfileInteractionCard extends StatelessWidget {
         border: Border.all(color: Colors.grey, width: 0.25),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          GestureDetector(
-            onTap: () => router.push(const ProfileInteractiveRoute(
-              initialIndex: 0,
-            ).location),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  following.toString(),
-                  style: const TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const Text(
-                  'Following',
-                  style: TextStyle(
-                    fontSize: 12.0,
-                    color: Colors.grey,
-                  ),
-                ),
-              ],
-            ),
+          _buildInteractiveButton(
+            value: following,
+            label: 'Following',
+            onPressed: () {
+              router.push(const ProfileInteractiveRoute(
+                initialIndex: 0,
+              ).location);
+            },
           ),
-          const VerticalDivider(
-            width: 0.5,
-            thickness: 0.5,
-            color: Colors.grey,
-            endIndent: 20,
-            indent: 20,
-          ),
-          GestureDetector(
-            onTap: () => router.push(const ProfileInteractiveRoute(
+          _buildVerticalDivider(),
+          _buildInteractiveButton(
+            value: followers,
+            label: 'Followers',
+            onPressed: () => router.push(const ProfileInteractiveRoute(
               initialIndex: 1,
             ).location),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  followers.toString(),
-                  style: const TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const Text(
-                  'Followers',
-                  style: TextStyle(
-                    fontSize: 12.0,
-                    color: Colors.grey,
-                  ),
-                ),
-              ],
-            ),
           ),
-          const VerticalDivider(
-            width: 0.5,
-            thickness: 0.5,
-            color: Colors.grey,
-            endIndent: 20,
-            indent: 20,
-          ),
-          GestureDetector(
-            onTap: () => router.push(const ProfileInteractiveRoute(
+          _buildVerticalDivider(),
+          _buildInteractiveButton(
+            value: glazes,
+            label: 'Total Glazes',
+            onPressed: () => router.push(const ProfileInteractiveRoute(
               initialIndex: 2,
             ).location),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  glazes.toString(),
-                  style: const TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const Text(
-                  'Total Glazes',
-                  style: TextStyle(
-                    fontSize: 12.0,
-                    color: Colors.grey,
-                  ),
-                ),
-              ],
-            ),
           ),
         ],
+      ),
+    );
+  }
+
+  VerticalDivider _buildVerticalDivider() {
+    return const VerticalDivider(
+      width: 0.5,
+      thickness: 0.5,
+      color: Colors.grey,
+      endIndent: 20,
+      indent: 20,
+    );
+  }
+
+  Expanded _buildInteractiveButton({
+    VoidCallback? onPressed,
+    int? value,
+    required String label,
+  }) {
+    return Expanded(
+      child: TextButton(
+        onPressed: () {
+          onPressed?.call();
+        },
+        style: TextButton.styleFrom(
+          shape: const RoundedRectangleBorder(),
+          foregroundColor: Colors.grey,
+          fixedSize: const Size.fromWidth(double.infinity),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              value.toString(),
+              style: const TextStyle(
+                fontSize: 16.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 12.0,
+                color: Colors.grey,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -88,7 +88,7 @@ class FollowersListWidget extends HookWidget {
         return ListTile(
           leading: CircleAvatar(
             radius: 24,
-            foregroundImage: CachedNetworkImageProvider(followers[index].profileImageUrl),
+            foregroundImage: CachedNetworkImageProvider(followers[index].profileImageUrl ?? ''),
           ),
           title: Text(
             '@${followers[index].username}',
@@ -98,7 +98,7 @@ class FollowersListWidget extends HookWidget {
                 ),
           ),
           subtitle: Text(
-            followers[index].fullName,
+            followers[index].fullName ?? '',
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
                   color: ColorPallete.hintTextColor,
                   fontWeight: FontWeight.bold,
@@ -158,7 +158,7 @@ class FollowingListWidget extends HookWidget {
         return ListTile(
           leading: CircleAvatar(
             radius: 24,
-            foregroundImage: profileImageUrl.isNotEmpty ? CachedNetworkImageProvider(profileImageUrl) : null,
+            foregroundImage: profileImageUrl != null ? CachedNetworkImageProvider(profileImageUrl) : null,
             backgroundColor: ColorPallete.blackPearl,
             child: SizedBox(
               width: 48,
@@ -177,7 +177,7 @@ class FollowingListWidget extends HookWidget {
                 ),
           ),
           subtitle: Text(
-            following[index].fullName,
+            following[index].fullName ?? '',
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
                   color: ColorPallete.hintTextColor,
                   fontWeight: FontWeight.bold,
@@ -204,7 +204,7 @@ Widget _buildGlazeWidget(List<Glaze> glazes) {
       return ListTile(
         leading: CircleAvatar(
           radius: 24,
-          foregroundImage: profileImageUrl.isNotEmpty ? CachedNetworkImageProvider(profileImageUrl) : null,
+          foregroundImage: profileImageUrl != null ? CachedNetworkImageProvider(profileImageUrl) : null,
           backgroundColor: ColorPallete.blackPearl,
           child: SizedBox(
             width: 48,

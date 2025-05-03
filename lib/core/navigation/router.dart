@@ -56,7 +56,8 @@ GoRouter router(Ref ref) {
 
   FutureOr<String?> redirect(BuildContext context, GoRouterState state) async {
     final User? user = AuthServices().currentUser;
-    final Profile? profile = await ref.read(userProfileProvider.future);
+    final Profile? profile = ref.watch(userProfileProvider).value;
+    print('profile $profile');
 
     final String currentPath = state.matchedLocation;
     final bool hasSplashCompleted = ref.read(splashProvider).completeSplash;
@@ -79,8 +80,11 @@ GoRouter router(Ref ref) {
     return null;
   }
 
+  final session = Supabase.instance.client.auth.currentSession;
+
   final router = GoRouter(
     navigatorKey: _rootNavigatorKey,
+    initialLocation: session == null ? const AuthRoute().location : const HomeRoute().location,
     debugLogDiagnostics: true,
     routes: $appRoutes,
     redirect: redirect,
