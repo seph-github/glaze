@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -8,6 +7,7 @@ import 'package:gap/gap.dart';
 import 'package:glaze/components/app_bar_with_back_button.dart';
 import 'package:glaze/components/buttons/primary_button.dart';
 import 'package:glaze/config/enum/profile_type.dart';
+import 'package:glaze/feature/auth/services/auth_services.dart';
 import 'package:glaze/feature/camera/provider/content_picker_provider.dart';
 import 'package:glaze/feature/profile/provider/profile_provider.dart';
 import 'package:glaze/feature/profile/widgets/interest_choice_chip.dart';
@@ -16,6 +16,7 @@ import 'package:glaze/utils/form_validators.dart';
 import 'package:glaze/utils/throw_error_exception_helper.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../components/dialogs/dialogs.dart';
 import '../../../components/inputs/input_field.dart';
@@ -55,6 +56,9 @@ class ProfileEditForm extends HookConsumerWidget {
     final categories = useState<List<CategoryModel>>([]);
     final updatedSelectedInterests = useState<List<String>>([]);
     final currentImage = useState<String?>(null);
+    final user = useState<User?>(null);
+    final passwordController = useTextEditingController();
+    final confirmPasswordController = useTextEditingController();
 
     const ColorFilter colorFilter = ColorFilter.mode(
       ColorPallete.lightBackgroundColor,
@@ -81,6 +85,13 @@ class ProfileEditForm extends HookConsumerWidget {
       };
     }, []);
 
+    useEffect(() {
+      Future.microtask(() async {
+        user.value = AuthServices().currentUser;
+      });
+      return;
+    }, []);
+
     ref.listen(
       imageState,
       (prev, next) {
@@ -104,7 +115,6 @@ class ProfileEditForm extends HookConsumerWidget {
             title: 'Success',
             content: 'Your Profile Has Been Updated',
             onPressed: () async {
-              // Invalidate providers before popping
               ref.invalidate(imageState);
               ref.invalidate(profileInterestsNotifierProvider);
 
@@ -141,8 +151,6 @@ class ProfileEditForm extends HookConsumerWidget {
 
       return null;
     }, []);
-
-    log('state $state');
 
     return LoadingLayout(
       isLoading: ref.watch(imageState).isLoading || state.isLoading,
@@ -271,6 +279,27 @@ class ProfileEditForm extends HookConsumerWidget {
                     filled: !isLightTheme,
                     validator: validatePhone,
                   ),
+                if ((user.value!.isAnonymous))
+                  Column(
+                    children: [
+                      const Gap(10),
+                      InputField.password(
+                        controller: passwordController,
+                        inputIcon: SvgPicture.asset(Assets.images.svg.passwordIcon.path),
+                        hintText: 'Password',
+                        filled: !isLightTheme,
+                        validator: (value) => validatePassword(value),
+                      ),
+                      const Gap(10),
+                      InputField.password(
+                        controller: confirmPasswordController,
+                        inputIcon: SvgPicture.asset(Assets.images.svg.passwordIcon.path),
+                        hintText: 'Confirm password',
+                        filled: !isLightTheme,
+                        validator: (value) => validatePassword(value),
+                      ),
+                    ],
+                  ),
                 if (state.profile?.role == ProfileType.recruiter.name)
                   Column(
                     children: [
@@ -304,15 +333,29 @@ class ProfileEditForm extends HookConsumerWidget {
                           if (formKey.currentState?.validate() ?? false) {
                             formKey.currentState?.save();
 
+                            if (passwordController.text != confirmPasswordController.text) {
+                              return showAboutDialog(context: context);
+                            }
+
                             final isProfileImageChanged = currentImage.value != state.profile?.profileImageUrl;
 
-                            await ref.read(profileNotifierProvider.notifier).updateProfile(
+                            if (state.profile?.phoneNumber != null && state.profile!.email!.isNotEmpty) {
+                              return await ref.read(profileNotifierProvider.notifier).updateProfile(
+                                    id: id,
+                                    bio: bioController.text.trim(),
+                                    username: usernameController.text.trim(),
+                                    fullName: fullnameController.text.trim(),
+                                    interestList: updatedSelectedInterests.value,
+                                    profileImage: isProfileImageChanged && currentImage.value != null ? File(currentImage.value!) : null,
+                                  );
+                            }
+
+                            return await ref.read(profileNotifierProvider.notifier).updateProfile(
                                   id: id,
                                   bio: bioController.text.trim(),
                                   username: usernameController.text.trim(),
                                   email: emailController.text.trim(),
-                                  fullName: fullnameController.text.trim(),
-                                  phoneNumber: phoneController.text.trim(),
+                                  phoneNumber: '${dialCodeController.text.trim()}${phoneController.text.trim()}',
                                   interestList: updatedSelectedInterests.value,
                                   profileImage: isProfileImageChanged && currentImage.value != null ? File(currentImage.value!) : null,
                                 );

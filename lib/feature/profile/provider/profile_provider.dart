@@ -134,6 +134,7 @@ class ProfileNotifier extends _$ProfileNotifier {
     File? profileImage,
     File? identification,
     ProfileType? role,
+    String? password,
   }) async {
     state = state.copyWith(isLoading: true);
     try {

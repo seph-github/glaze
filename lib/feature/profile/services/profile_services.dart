@@ -112,6 +112,7 @@ class ProfileServices {
     File? profileImage,
     File? identification,
     ProfileType? role,
+    String? password,
   }) async {
     try {
       String? identificationUrl;
@@ -129,6 +130,7 @@ class ProfileServices {
       final UserAttributes userAttributes = UserAttributes(
         email: email,
         phone: phoneNumber,
+        password: password,
       );
 
       final ProfileEntity profileEntity = ProfileEntity(
@@ -169,7 +171,10 @@ class ProfileServices {
             .eq('user_id', id);
       }
 
+      // final result =
       await _supabaseClient.auth.updateUser(userAttributes);
+
+      // if (result.user == null) {}
 
       await _supabaseClient
           .from('profiles')
@@ -194,46 +199,4 @@ class ProfileServices {
       rethrow;
     }
   }
-
-  // Future<UserInteractions> getUserInteractions(String id) async {
-  //   try {
-  //     final response = await _supabaseClient.rpc(
-  //       'get_user_social_stats',
-  //       params: {
-  //         'params_user_id': id,
-  //       },
-  //     );
-
-  //     if (response == null || response is! List<dynamic>) {
-  //       return const UserInteractions(
-  //         followers: [],
-  //         following: [],
-  //         glazes: [],
-  //       );
-  //     }
-
-  //     // Parse the response as a List<dynamic> and extract the first map
-  //     final raw = response.first as Map<String, dynamic>;
-
-  //     // Parse followers
-  //     final followers = (raw['followers'] as List<dynamic>?)?.map((e) => UserInteract.fromJson(e as Map<String, dynamic>)).toList() ?? [];
-
-  //     // Parse following
-  //     final following = (raw['following'] as List<dynamic>?)?.map((e) => UserInteract.fromJson(e as Map<String, dynamic>)).toList() ?? [];
-
-  //     // Parse glazes
-  //     final glazes = (raw['glazes'] as List<dynamic>?)?.map((e) => Glaze.fromJson(e as Map<String, dynamic>)).toList() ?? [];
-
-  //     final userInteractions = UserInteractions(
-  //       followers: followers,
-  //       following: following,
-  //       glazes: glazes,
-  //     );
-
-  //     return userInteractions;
-  //   } catch (e, stackTrace) {
-  //     log('get user interactions error: $e', stackTrace: stackTrace);
-  //     rethrow;
-  //   }
-  // }
 }
