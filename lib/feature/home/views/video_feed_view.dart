@@ -450,7 +450,10 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
-                            VideoPlayer(controller),
+                            AspectRatio(
+                              aspectRatio: controller.value.aspectRatio,
+                              child: VideoPlayer(controller),
+                            ),
                             if (!controller.value.isPlaying)
                               Container(
                                 width: 50,
