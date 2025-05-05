@@ -94,7 +94,7 @@ class HomeInteractiveCard extends HookConsumerWidget {
                   final userId = video.userId;
                   await controller?.pause();
                   router.push(
-                    ViewUserProfileRoute(id: userId).location,
+                    ViewUserProfileRoute(id: userId ?? '').location,
                     extra: {
                       'controller': controller,
                     },

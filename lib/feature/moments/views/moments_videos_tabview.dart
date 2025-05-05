@@ -9,9 +9,17 @@ class MomentsVideosTabview extends StatelessWidget {
   const MomentsVideosTabview({
     super.key,
     this.videos,
-  });
+    bool? primary,
+    bool? shrinkWrap,
+    ScrollPhysics? physics,
+  })  : _physics = physics ?? const AlwaysScrollableScrollPhysics(),
+        _primary = primary ?? true,
+        _shinkWrap = shrinkWrap ?? false;
 
   final List<VideoContent>? videos;
+  final bool _primary;
+  final bool _shinkWrap;
+  final ScrollPhysics? _physics;
 
   @override
   Widget build(BuildContext context) {
@@ -28,11 +36,14 @@ class MomentsVideosTabview extends StatelessWidget {
         childAspectRatio: 9 / 16,
       ),
       padding: const EdgeInsets.only(top: 8.0),
+      primary: _primary,
+      shrinkWrap: _shinkWrap,
+      physics: _physics,
       itemCount: videos?.length ?? 0,
       itemBuilder: (context, index) {
         return GestureDetector(
           onTap: () {
-            router.go(
+            router.push(
               const VideoPreviewRoute().location,
               extra: {
                 'videos': videos,

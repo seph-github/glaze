@@ -47,6 +47,7 @@ class ViewUserProfile extends HookConsumerWidget {
     final viewMode = useState<bool>(false);
     final user = useState<User?>(null);
     final userId = useState<String>('');
+    final isCurrentUser = useState<bool>(user.value?.id == id);
 
     useEffect(() {
       Future.microtask(() async {
@@ -54,7 +55,7 @@ class ViewUserProfile extends HookConsumerWidget {
       });
       user.value = AuthServices().currentUser!;
       userId.value = user.value?.id ?? '';
-      viewMode.value = user.value?.id == id;
+      viewMode.value = isCurrentUser.value;
 
       return null;
     }, []);
@@ -65,7 +66,7 @@ class ViewUserProfile extends HookConsumerWidget {
       isLoading: state.isLoading,
       appBar: AppBarWithBackButton(
         onBackButtonPressed: () async {
-          await controller?.play();
+          // await controller?.play();
           router.pop();
         },
       ),
@@ -153,6 +154,7 @@ class ViewUserProfile extends HookConsumerWidget {
                 return ProfileMomentsCard(
                   isLoading: state.isLoading,
                   videos: state.viewUserProfile?.videos ?? [],
+                  isCurrentUser: isCurrentUser.value,
                 );
               }),
               const SizedBox(height: 20),

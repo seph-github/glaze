@@ -10,6 +10,7 @@ class SettingsMenuTile extends StatelessWidget {
     this.trailing,
     this.onChanged,
     this.value = false,
+    this.onTap,
   });
 
   final Widget? icon;
@@ -17,10 +18,14 @@ class SettingsMenuTile extends StatelessWidget {
   final String label;
   final void Function(bool)? onChanged;
   final bool value;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      onTap: () {
+        onTap?.call();
+      },
       leading: Container(
         height: 40.0,
         width: 40.0,

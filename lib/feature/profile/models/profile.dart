@@ -2,7 +2,7 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../../home/models/videos/videos.dart';
+import '../../home/models/video_content/video_content.dart';
 
 part 'profile.freezed.dart';
 part 'profile.g.dart';
@@ -25,7 +25,7 @@ class Profile with _$Profile {
     @JsonKey(name: 'total_followers') int? totalFollowers,
     @JsonKey(name: 'total_following') int? totalFollowing,
     @JsonKey(name: 'created_at') DateTime? createdAt,
-    @Default([]) List<Videos> videos,
+    @Default([]) List<VideoContent>? videos,
     @JsonKey(name: 'username_id') String? usernameId,
     @JsonKey(name: 'role') String? role,
     @JsonKey(name: 'is_onboarding_completed') bool? isOnboardingCompleted,

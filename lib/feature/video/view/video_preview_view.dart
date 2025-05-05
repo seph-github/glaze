@@ -7,12 +7,13 @@ import 'package:glaze/components/app_bar_with_back_button.dart';
 import 'package:glaze/feature/home/models/video_content/video_content.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lottie/lottie.dart';
 import 'package:preload_page_view/preload_page_view.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../gen/assets.gen.dart';
 import '../../../utils/video_feed_sharing_popup.dart';
-import '../../dashboard/providers/dashboard_tab_controller_provider.dart';
+// import '../../dashboard/providers/dashboard_tab_controller_provider.dart';
 import '../../home/provider/glaze_provider/glaze_provider.dart';
 import '../../home/provider/video_feed_provider/video_feed_provider.dart';
 import '../../home/provider/videos_provider/videos_provider.dart';
@@ -148,10 +149,13 @@ class VideoPreviewView extends HookConsumerWidget with WidgetsBindingObserver {
     Future<void> playController(String videoId) async {
       final controller = controllerCache.value[videoId];
 
-      final tabIndex = ref.read(dashboardTabControllerProvider);
-      if (controller != null && controller.value.isInitialized && !controller.value.isPlaying && tabIndex == 1) {
+      // final tabIndex = ref.read(dashboardTabControllerProvider);
+      if (controller != null && controller.value.isInitialized && !controller.value.isPlaying) {
         try {
           await controller.play();
+          if (controller.value.isPlaying) {
+            showPlayIcon.value = false;
+          }
         } catch (_) {}
       }
     }
@@ -276,45 +280,50 @@ class VideoPreviewView extends HookConsumerWidget with WidgetsBindingObserver {
       };
     }, []);
 
-    useEffect(() {
-      final listener = ref.listenManual<int>(
-        dashboardTabControllerProvider,
-        (prev, next) async {
-          final isActive = next == 1;
+    // useEffect(() {
+    //   final listener = ref.listenManual<int>(
+    //     dashboardTabControllerProvider,
+    //     (prev, next) async {
+    //       final isActive = next == 1;
 
-          final index = currentPage.value;
-          final controller = getController(this.videos[index].id);
+    //       final index = currentPage.value;
+    //       final controller = getController(this.videos[index].id);
 
-          if (controller != null && controller.value.isInitialized) {
-            if (!isActive) {
-              await controller.pause();
-              showPlayIcon.value = false;
-            } else {
-              await controller.play();
-              showPlayIcon.value = true;
-            }
-          }
-        },
-      );
+    //       if (controller != null && controller.value.isInitialized) {
+    //         if (!isActive) {
+    //           await controller.pause();
+    //           showPlayIcon.value = false;
+    //         } else {
+    //           await controller.play();
+    //           showPlayIcon.value = true;
+    //         }
+    //       }
+    //     },
+    //   );
 
-      return listener.close;
-    }, []);
+    //   return listener.close;
+    // }, []);
 
     useEffect(() {
       Future.microtask(() async {
         final state = appLifecycle;
         final wasActive = isAppActive.value;
         isAppActive.value = state == AppLifecycleState.resumed;
+        final currentPath = router.state.path;
 
-        final dashboardIndex = ref.read(dashboardTabControllerProvider);
+        print('preview page -- state: $state, was active: $wasActive, is app active: ${isAppActive.value}, route location: $currentPath');
 
         if (isAppActive.value && !wasActive) {
-          if (dashboardIndex != 1) {
-            await pauseAllControllers();
-          } else {
-            await cleanupAndReinitializeCurrentVideo();
-          }
+          print('preview page -- 1');
+          await cleanupAndReinitializeCurrentVideo();
+          // await pauseAllControllers();
         } else if (!isAppActive.value && wasActive) {
+          print('preview page -- 2');
+          await pauseAllControllers();
+          // } else if (isAppActive.value && !wasActive && currentPath == '/video-preview') {
+        } else {
+          print('preview page -- 3');
+          // await cleanupAndReinitializeCurrentVideo();
           await pauseAllControllers();
         }
       });
@@ -324,99 +333,112 @@ class VideoPreviewView extends HookConsumerWidget with WidgetsBindingObserver {
       appLifecycle
     ]);
 
-    return LoadingLayout(
-      appBar: AppBarWithBackButton(
-        onBackButtonPressed: () async {
-          router.pop();
-        },
-      ),
-      child: RepaintBoundary(
-        child: PreloadPageView.builder(
-          scrollDirection: Axis.vertical,
-          controller: pageController,
-          physics: const AlwaysScrollableScrollPhysics(),
-          itemCount: videos.length,
-          itemBuilder: (context, index) {
-            if (index < 0 || index >= videos.length) return const SizedBox.shrink();
+    return SafeArea(
+      child: LoadingLayout(
+        appBar: AppBarWithBackButton(
+          onBackButtonPressed: () async {
+            router.pop();
+          },
+        ),
+        // bottomNavigationBar: SizedBox.fromSize(
+        //   size: const Size.fromHeight(kBottomNavigationBarHeight * 2),
+        // ),
+        child: RepaintBoundary(
+          child: PreloadPageView.builder(
+            scrollDirection: Axis.vertical,
+            controller: pageController,
+            physics: const AlwaysScrollableScrollPhysics(),
+            itemCount: videos.length,
+            itemBuilder: (context, index) {
+              if (index < 0 || index >= videos.length) return const SizedBox.shrink();
 
-            if ((index - currentPage.value).abs() > 1) return const SizedBox.shrink();
+              if ((index - currentPage.value).abs() > 1) return const SizedBox.shrink();
 
-            final video = videos[index];
+              final video = videos[index];
 
-            return FutureBuilder<VideoPlayerController?>(
-              future: getOrCreateController(video),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData || snapshot.data == null) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                final controller = snapshot.data!;
-                return Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    GestureDetector(
-                      onTap: () async {
-                        if (!(index == currentPage.value)) {
-                          return;
-                        } else if (controller.value.isPlaying) {
-                          await controller.pause();
-                          showPlayerIcon.value = true;
-                        } else {
-                          await controller.play();
-                          showPlayerIcon.value = false;
-                        }
-                      },
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          VideoPlayer(
-                            controller,
-                          ),
-                          if (showPlayerIcon.value)
-                            Container(
-                              width: 50,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.black.withValues(alpha: 0.3),
-                              ),
-                              child: Center(
-                                child: SvgPicture.asset(Assets.images.svg.playIcon.path),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      child: SafeArea(
-                        child: HomeInteractiveCard(
-                          key: PageStorageKey('HomeInteractiveCard_$index'),
-                          video: video,
-                          width: width,
-                          height: height,
-                          controller: getController(video.id),
-                          glazeCount: videos[index].glazesCount ?? 0,
-                          isGlazed: videos[index].hasGlazed,
-                          onGlazeTap: () async {
-                            final isCurrentlyGlazed = video.hasGlazed;
-                            final newGlazeCount = isCurrentlyGlazed ? (video.glazesCount ?? 0) - 1 : (video.glazesCount ?? 0) + 1;
-
-                            ref.read(videosProvider.notifier).updateVideo(video.id, newGlazeCount, !isCurrentlyGlazed);
-
-                            await ref.read(glazeNotifierProvider.notifier).onGlazed(videoId: video.id);
-                          },
-                          onShareTap: () async => await showShareOptions(context),
+              return FutureBuilder<VideoPlayerController?>(
+                future: getOrCreateController(video),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData || snapshot.data == null) {
+                    return Center(
+                      child: SizedBox(
+                        height: 100,
+                        width: 100,
+                        child: Lottie.asset(
+                          Assets.lotties.donutLoading.path,
                         ),
                       ),
-                    )
-                  ],
-                );
-              },
-            );
-          },
-          onPageChanged: (value) => handlePageChange(value),
+                    );
+                  }
+                  final controller = snapshot.data!;
+                  return Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () async {
+                          if (!(index == currentPage.value)) {
+                            return;
+                          } else if (controller.value.isPlaying) {
+                            await controller.pause();
+                            showPlayerIcon.value = true;
+                          } else {
+                            await controller.play();
+                            showPlayerIcon.value = false;
+                          }
+                        },
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            VideoPlayer(
+                              controller,
+                            ),
+                            if (showPlayerIcon.value)
+                              Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.black.withValues(alpha: 0.3),
+                                ),
+                                child: Center(
+                                  child: SvgPicture.asset(Assets.images.svg.playIcon.path),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: SafeArea(
+                          child: HomeInteractiveCard(
+                            key: PageStorageKey('HomeInteractiveCard_$index'),
+                            video: video,
+                            width: width,
+                            height: height,
+                            controller: getController(video.id),
+                            glazeCount: videos[index].glazesCount ?? 0,
+                            isGlazed: videos[index].hasGlazed,
+                            onGlazeTap: () async {
+                              final isCurrentlyGlazed = video.hasGlazed;
+                              final newGlazeCount = isCurrentlyGlazed ? (video.glazesCount ?? 0) - 1 : (video.glazesCount ?? 0) + 1;
+
+                              ref.read(videosProvider.notifier).updateVideo(video.id, newGlazeCount, !isCurrentlyGlazed);
+
+                              await ref.read(glazeNotifierProvider.notifier).onGlazed(videoId: video.id);
+                            },
+                            onShareTap: () async => await showShareOptions(context),
+                          ),
+                        ),
+                      )
+                    ],
+                  );
+                },
+              );
+            },
+            onPageChanged: (value) => handlePageChange(value),
+          ),
         ),
       ),
     );

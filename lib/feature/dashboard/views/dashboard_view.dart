@@ -21,14 +21,6 @@ class DashboardView extends HookConsumerWidget {
     final currentIndex = useState(navigationShell.currentIndex);
 
     void onTabSelected(int index) async {
-      final router = GoRouter.of(context);
-      final currentRoute = router.state.matchedLocation;
-
-      if (router.canPop() && currentRoute.contains('/moments/video-preview')) {
-        router.pop();
-        await Future.delayed(const Duration(milliseconds: 50));
-      }
-
       if (index == 2 && context.mounted) {
         ref.read(dashboardTabControllerProvider.notifier).setTab(index);
         await _showBottomSheet(context);
@@ -42,18 +34,17 @@ class DashboardView extends HookConsumerWidget {
 
         navigationShell.goBranch(
           index,
-          initialLocation: false, // Don't reset navigation stack
+          initialLocation: index == navigationShell.currentIndex,
         );
       }
     }
 
     return LoadingLayout(
       bottomNavigationBar: GlazeNavBar(
-        // currentIndex: currentIndex.value,
         onDestinationSelected: onTabSelected,
         navigationShell: navigationShell,
       ),
-      child: navigationShell, // ✅ Renders current branch automatically
+      child: navigationShell,
     );
   }
 }

@@ -95,7 +95,7 @@ class AuthView extends HookConsumerWidget {
     useEffect(
       () {
         hasCompletedInitialAppUse.value = ref.read(initialAppUseProvider).completedInitialAppUse;
-
+        print('Has completed intial setup ${hasCompletedInitialAppUse.value}');
         return null;
       },
       [],

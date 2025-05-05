@@ -18,12 +18,12 @@ class DateTimeConverter implements JsonConverter<DateTime?, String?> {
 @freezed
 class VideoContent with _$VideoContent {
   const factory VideoContent({
-    @JsonKey(name: 'user_id') required String userId,
-    @JsonKey(name: 'username') required String username,
+    @JsonKey(name: 'user_id') String? userId,
+    @JsonKey(name: 'username') String? username,
     @JsonKey(name: 'video_id') required String id,
     @JsonKey(name: 'video_url') required String videoUrl,
     @JsonKey(name: 'has_glazed') @Default(false) bool hasGlazed,
-    @JsonKey(name: 'thumbnail_url') required String thumbnailUrl,
+    @JsonKey(name: 'thumbnail_url') String? thumbnailUrl,
     @JsonKey(name: 'title') String? title,
     String? caption,
     String? category,

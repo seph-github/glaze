@@ -279,7 +279,7 @@ class ProfileEditForm extends HookConsumerWidget {
                     filled: !isLightTheme,
                     validator: validatePhone,
                   ),
-                if ((user.value!.isAnonymous))
+                if ((user.value?.isAnonymous ?? false))
                   Column(
                     children: [
                       const Gap(10),

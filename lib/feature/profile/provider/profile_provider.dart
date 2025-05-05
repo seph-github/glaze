@@ -69,7 +69,7 @@ class ProfileNotifier extends _$ProfileNotifier {
   }
 
   Future<void> viewUserProfile(String id) async {
-    state = state.copyWith(isLoading: true);
+    state = state.copyWith(isLoading: true, viewUserProfile: null);
     try {
       final profile = await ProfileServices().viewUserProfile(id);
 

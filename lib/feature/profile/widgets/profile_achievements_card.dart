@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:gap/gap.dart';
 
 import '../../../core/styles/color_pallete.dart';
 import '../../../gen/assets.gen.dart';
@@ -24,11 +23,10 @@ class ProfileAchievementsCard extends StatelessWidget {
     ];
 
     return Container(
-      width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -49,8 +47,8 @@ class ProfileAchievementsCard extends StatelessWidget {
                 ),
             ],
           ),
-          const Gap(10),
           GridView.builder(
+            padding: EdgeInsets.zero,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 4,
               childAspectRatio: 1.0,
@@ -62,7 +60,7 @@ class ProfileAchievementsCard extends StatelessWidget {
             itemCount: achievements.length,
             itemBuilder: (_, index) {
               return Transform.scale(
-                scale: 0.9,
+                scale: 0.8,
                 child: SvgPicture.asset(
                   achievements[index],
                   height: 70,
@@ -71,20 +69,6 @@ class ProfileAchievementsCard extends StatelessWidget {
               );
             },
           ),
-          // Wrap(
-          //   alignment: WrapAlignment.spaceBetween,
-          //   direction: Axis.horizontal,
-          //   runAlignment: WrapAlignment.start,
-          //   children: achievements
-          //       .map(
-          //         (achievements) => SvgPicture.asset(
-          //           achievements,
-          //           height: 70,
-          //           fit: BoxFit.cover,
-          //         ),
-          //       )
-          //       .toList(),
-          // ),
         ],
       ),
     );

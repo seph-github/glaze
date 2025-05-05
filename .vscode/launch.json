@@ -32,7 +32,6 @@
       "flutterMode": "release",
       "program": "lib/main.dart",
       "args": [
-        "--no-enable-impeller",
         "--dart-define-from-file=dart-defines/development.json",
       ],
     },

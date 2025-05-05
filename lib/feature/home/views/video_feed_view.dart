@@ -4,10 +4,12 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:glaze/core/navigation/router.dart';
 import 'package:glaze/feature/home/models/glaze/glaze.dart';
 import 'package:glaze/feature/home/provider/video_feed_provider/video_feed_provider.dart';
 import 'package:glaze/feature/home/provider/videos_provider/videos_provider.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:video_player/video_player.dart';
 import 'package:preload_page_view/preload_page_view.dart';
@@ -43,7 +45,7 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
     final accessOrder = useState<List<String>>([]);
     final disposingControllers = useState<Set<String>>({});
     final PreloadPageController pageController = PreloadPageController();
-    final showPlayIcon = useState<bool>(true);
+    final showPlayIcon = useState<bool>(false);
 
     final videos = ref.watch(videosProvider);
     final controllerCreationMap = useState<Map<String, Completer<VideoPlayerController>>>({});
@@ -59,7 +61,10 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
         try {
           if (controller.value.isInitialized && controller.value.isPlaying) {
             await controller.pause();
-            showPlayIcon.value = true;
+            if (!controller.value.isPlaying) {
+              showPlayIcon.value = true;
+            }
+
             await controller.seekTo(Duration.zero);
           }
         } catch (_) {}
@@ -82,7 +87,11 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
           try {
             if (controller.value.isInitialized) {
               await controller.pause();
-              showPlayIcon.value = true;
+              if (!controller.value.isPlaying) {
+                showPlayIcon.value = true;
+              }
+
+              await controller.seekTo(Duration.zero);
             }
 
             await controller.dispose();
@@ -147,10 +156,17 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
       final controller = controllerCache.value[videoId];
       final tabIndex = ref.read(dashboardTabControllerProvider);
 
-      print('tab index $tabIndex');
       if (controller != null && controller.value.isInitialized && !controller.value.isPlaying && tabIndex == 0) {
         try {
           await controller.play();
+          if (controller.value.isPlaying) {
+            showPlayIcon.value = false;
+            // Future.delayed(const Duration(seconds: 1), () {
+            //   if (controller.value.isPlaying) {
+            //     showPlayIcon.value = false;
+            //   }
+            // });
+          }
         } catch (e) {
           log('Play controller error: $e');
         }
@@ -259,7 +275,7 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
 
     useEffect(() {
       WidgetsBinding.instance.addObserver(this);
-      // ref.read(dashboardTabControllerProvider.notifier).setTab(0);
+      showPlayIcon.value = false;
       Future.microtask(
         () async {
           try {
@@ -288,20 +304,35 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
     }, []);
 
     useEffect(() {
-      final state = appLifecycle;
+      final currentLifecycle = appLifecycle;
+      final wasPreviouslyActive = isAppActive.value;
 
-      final wasActive = isAppActive.value;
-      isAppActive.value = state == AppLifecycleState.resumed;
+      isAppActive.value = currentLifecycle == AppLifecycleState.resumed;
+
+      final isNowActive = isAppActive.value;
       final dashboardIndex = ref.watch(dashboardTabControllerProvider);
-      if (isAppActive.value && !wasActive) {
-        if (dashboardIndex != 0) {
-          pauseAllControllers();
-        } else {
-          cleanupAndReinitializeCurrentVideo();
+      final currentPath = GoRouter.of(context).state.path;
+      final isOnHomePage = currentPath == const HomeRoute().location;
+
+      Future<void> handleLifecycleChange() async {
+        if (isNowActive && !wasPreviouslyActive) {
+          // App came to foreground
+          if (dashboardIndex != 0) {
+            await pauseAllControllers();
+            log('[VideoFeedView] Paused controllers (not on dashboard tab)');
+          } else if (isOnHomePage) {
+            await cleanupAndReinitializeCurrentVideo();
+            log('[VideoFeedView] Reinitialized video (resumed on home tab)');
+          }
+        } else if (!isNowActive && wasPreviouslyActive) {
+          // App went to background
+          await pauseAllControllers();
+          log('[VideoFeedView] Paused controllers (app backgrounded)');
         }
-      } else if (!isAppActive.value && wasActive) {
-        pauseAllControllers();
       }
+
+      Future.microtask(handleLifecycleChange);
+
       return null;
     }, [
       appLifecycle
@@ -339,10 +370,14 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
           if (controller != null && controller.value.isInitialized) {
             if (!isActive) {
               await controller.pause();
-              showPlayIcon.value = false;
+              if (!controller.value.isPlaying) {
+                showPlayIcon.value = true;
+              }
+              await controller.seekTo(Duration.zero);
             } else {
               await controller.play();
-              showPlayIcon.value = true;
+              showPlayIcon.value = false;
+              await controller.seekTo(Duration.zero);
             }
           }
         },
@@ -350,6 +385,8 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
 
       return listener.close;
     }, []);
+
+    print('Play icon ${showPlayIcon.value}');
 
     return RefreshIndicator(
       onRefresh: () async {
@@ -384,26 +421,36 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
 
                   final controller = snapshot.data!;
 
+                  if (controller.value.isPlaying) {
+                    showPlayIcon.value = false;
+                  }
+
                   return Stack(
                     alignment: Alignment.center,
                     children: [
                       GestureDetector(
                         onTap: () async {
-                          if (!(index == currentPage.value)) {
-                            return;
-                          } else if (controller.value.isPlaying) {
-                            showPlayIcon.value = false;
+                          if (controller.value.isPlaying) {
                             await controller.pause();
+                            if (!controller.value.isPlaying) {
+                              showPlayIcon.value = true;
+                            }
+
+                            await controller.seekTo(Duration.zero); // Show play icon when paused
                           } else {
-                            showPlayIcon.value = true;
                             await controller.play();
+                            if (controller.value.isPlaying) {
+                              showPlayIcon.value = false;
+                            }
+
+                            await controller.seekTo(Duration.zero); // Hide play icon when playing
                           }
                         },
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
                             VideoPlayer(controller),
-                            if (!controller.value.isPlaying && !showPlayIcon.value)
+                            if (!controller.value.isPlaying)
                               Container(
                                 width: 50,
                                 height: 50,

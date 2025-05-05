@@ -11,7 +11,10 @@ import 'package:glaze/feature/profile/models/profile.dart';
 import 'package:glaze/feature/profile/provider/profile_provider.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
 import 'package:glaze/gen/assets.gen.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import '../../../core/navigation/router.dart';
 
 class ProfileInteractiveView extends HookConsumerWidget {
   const ProfileInteractiveView({
@@ -33,7 +36,7 @@ class ProfileInteractiveView extends HookConsumerWidget {
     final List<Widget> tabViews = [
       FollowingListWidget(following: state.profile?.following ?? []),
       FollowersListWidget(followers: state.profile?.followers ?? [], following: state.profile?.following ?? []),
-      _buildGlazeWidget(state.profile?.glazes ?? []),
+      GlazersListWidget(glazes: state.profile?.glazes ?? []),
     ];
 
     final tabController = useTabController(
@@ -67,6 +70,8 @@ class FollowersListWidget extends HookWidget {
   final List<Interact> following;
   @override
   Widget build(BuildContext context) {
+    final router = GoRouter.of(context);
+
     final followerStates = useState<Map<String, bool>>({
       for (final follower in followers) follower.id: following.any((item) => item.id == follower.id),
     });
@@ -85,44 +90,48 @@ class FollowersListWidget extends HookWidget {
         final follower = followers[index];
         final isFollowed = followerStates.value[follower.id] ?? false;
 
-        return ListTile(
-          leading: CircleAvatar(
-            radius: 24,
-            foregroundImage: CachedNetworkImageProvider(followers[index].profileImageUrl ?? ''),
-          ),
-          title: Text(
-            '@${followers[index].username}',
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
-          subtitle: Text(
-            followers[index].fullName ?? '',
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: ColorPallete.hintTextColor,
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
-          trailing: Consumer(
-            builder: (context, ref, _) {
-              return ElevatedButton(
-                onPressed: () async {
-                  if (!isFollowed) {
-                    await ref.read(followUserNotifierProvider.notifier).onFollowUser(followerId: AuthServices().currentUser?.id ?? '', followingId: follower.id);
-                    toggleFollow(follower.id);
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  fixedSize: const Size.fromWidth(120),
-                  backgroundColor: isFollowed ? ColorPallete.inputFilledColor : ColorPallete.primaryColor,
-                ),
-                child: Text(
-                  isFollowed ? 'Message' : 'Follow',
-                  style: const TextStyle(color: Colors.white),
-                ),
-              );
-            },
+        return Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: ListTile(
+            onTap: () => router.push(ViewUserProfileRoute(id: followers[index].id).location),
+            leading: CircleAvatar(
+              radius: 24,
+              foregroundImage: CachedNetworkImageProvider(followers[index].profileImageUrl ?? ''),
+            ),
+            title: Text(
+              '@${followers[index].username}',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            subtitle: Text(
+              followers[index].fullName ?? '',
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: ColorPallete.hintTextColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            trailing: Consumer(
+              builder: (context, ref, _) {
+                return ElevatedButton(
+                  onPressed: () async {
+                    if (!isFollowed) {
+                      await ref.read(followUserNotifierProvider.notifier).onFollowUser(followerId: AuthServices().currentUser?.id ?? '', followingId: follower.id);
+                      toggleFollow(follower.id);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    fixedSize: const Size.fromWidth(120),
+                    backgroundColor: isFollowed ? ColorPallete.inputFilledColor : ColorPallete.primaryColor,
+                  ),
+                  child: Text(
+                    isFollowed ? 'Message' : 'Follow',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                );
+              },
+            ),
           ),
         );
       },
@@ -136,6 +145,8 @@ class FollowingListWidget extends HookWidget {
   final List<Interact> following;
   @override
   Widget build(BuildContext context) {
+    final router = GoRouter.of(context);
+
     final followedStates = useState<Map<String, bool>>({
       for (final followed in following) followed.id: true,
     });
@@ -144,7 +155,7 @@ class FollowingListWidget extends HookWidget {
       final current = followedStates.value[id] ?? false;
       followedStates.value = {
         ...followedStates.value,
-        id: !current, // toggle the specific user
+        id: !current,
       };
     }
 
@@ -155,40 +166,46 @@ class FollowingListWidget extends HookWidget {
         final followed = following[index];
         final isFollowed = followedStates.value[followed.id] ?? false;
 
-        return ListTile(
-          leading: CircleAvatar(
-            radius: 24,
-            foregroundImage: profileImageUrl != null ? CachedNetworkImageProvider(profileImageUrl) : null,
-            backgroundColor: ColorPallete.blackPearl,
-            child: SizedBox(
-              width: 48,
-              height: 48,
-              child: SvgPicture.asset(
-                Assets.images.svg.profileIcon.path,
-                fit: BoxFit.cover,
+        return Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: ListTile(
+            onTap: () => router.push(
+              ViewUserProfileRoute(id: following[index].id).location,
+            ),
+            leading: CircleAvatar(
+              radius: 24,
+              foregroundImage: profileImageUrl != null ? CachedNetworkImageProvider(profileImageUrl) : null,
+              backgroundColor: ColorPallete.blackPearl,
+              child: SizedBox(
+                width: 48,
+                height: 48,
+                child: SvgPicture.asset(
+                  Assets.images.svg.profileIcon.path,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-          ),
-          title: Text(
-            '@${following[index].username}',
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
-          subtitle: Text(
-            following[index].fullName ?? '',
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: ColorPallete.hintTextColor,
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
-          trailing: _buildFollowButton(
-            id: followed.id,
-            isFollowed: isFollowed,
-            onPressed: () async {
-              toggleFollow(followed.id);
-            },
+            title: Text(
+              '@${following[index].username}',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            subtitle: Text(
+              following[index].fullName ?? '',
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: ColorPallete.hintTextColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            trailing: _buildFollowButton(
+              id: followed.id,
+              isFollowed: isFollowed,
+              onPressed: () async {
+                toggleFollow(followed.id);
+              },
+            ),
           ),
         );
       },
@@ -196,48 +213,62 @@ class FollowingListWidget extends HookWidget {
   }
 }
 
-Widget _buildGlazeWidget(List<Glaze> glazes) {
-  return ListView.builder(
-    itemCount: glazes.length,
-    itemBuilder: (context, index) {
-      final profileImageUrl = glazes[index].glazer.profileImageUrl;
-      return ListTile(
-        leading: CircleAvatar(
-          radius: 24,
-          foregroundImage: profileImageUrl != null ? CachedNetworkImageProvider(profileImageUrl) : null,
-          backgroundColor: ColorPallete.blackPearl,
-          child: SizedBox(
-            width: 48,
-            height: 48,
-            child: SvgPicture.asset(
-              Assets.images.svg.profileIcon.path,
-              fit: BoxFit.cover,
+class GlazersListWidget extends StatelessWidget {
+  const GlazersListWidget({super.key, required this.glazes});
+
+  final List<Glaze> glazes;
+  @override
+  Widget build(BuildContext context) {
+    final router = GoRouter.of(context);
+
+    return ListView.builder(
+      itemCount: glazes.length,
+      itemBuilder: (context, index) {
+        final profileImageUrl = glazes[index].glazer.profileImageUrl;
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ListTile(
+            onTap: () => router.push(
+              ViewUserProfileRoute(id: glazes[index].glazer.id).location,
+            ),
+            leading: CircleAvatar(
+              radius: 24,
+              foregroundImage: profileImageUrl != null ? CachedNetworkImageProvider(profileImageUrl) : null,
+              backgroundColor: ColorPallete.blackPearl,
+              child: SizedBox(
+                width: 48,
+                height: 48,
+                child: SvgPicture.asset(
+                  Assets.images.svg.profileIcon.path,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            title: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: '@${glazes[index].glazer.username}',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  TextSpan(
+                    text: ' has glazed you content showing strong engagements.',
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                          color: ColorPallete.hintTextColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-        title: RichText(
-          text: TextSpan(
-            children: [
-              TextSpan(
-                text: '@${glazes[index].glazer.username}',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-              TextSpan(
-                text: ' has glazed you content showing strong engagements.',
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: ColorPallete.hintTextColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-            ],
-          ),
-        ),
-      );
-    },
-  );
+        );
+      },
+    );
+  }
 }
 
 Widget _buildFollowButton({bool isFollowed = true, VoidCallback? onPressed, required String id}) {

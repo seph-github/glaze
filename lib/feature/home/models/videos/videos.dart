@@ -9,7 +9,10 @@ part 'videos.g.dart';
 class Videos with _$Videos {
   const factory Videos({
     @JsonKey(name: 'video_id') String? videoId,
+    String? title,
     String? caption,
+    String? category,
+    @JsonKey(name: 'glazes_count') int? glazesCount,
     @JsonKey(name: 'thumbnail_url') String? thumbnailUrl,
     @JsonKey(name: 'video_url') String? videoUrl,
     @JsonKey(name: 'created_at') String? createdAt,

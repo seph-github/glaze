@@ -27,6 +27,7 @@ class UserProfileImageWidget extends StatelessWidget {
           height: 100,
           width: 100,
           decoration: BoxDecoration(
+            color: ColorPallete.lightBackgroundColor,
             shape: BoxShape.circle,
             border: Border.all(
               color: ColorPallete.primaryColor,
@@ -38,7 +39,7 @@ class UserProfileImageWidget extends StatelessWidget {
                     image: CachedNetworkImageProvider(
                       imageUrl!,
                     ),
-                    fit: BoxFit.fitHeight,
+                    fit: BoxFit.contain,
                   ),
           ),
           child: imageUrl == null

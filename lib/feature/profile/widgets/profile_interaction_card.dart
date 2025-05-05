@@ -25,7 +25,6 @@ class ProfileInteractionCard extends StatelessWidget {
         border: Border.all(color: Colors.grey, width: 0.25),
       ),
       child: Row(
-        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _buildInteractiveButton(
             value: following,
@@ -57,7 +56,7 @@ class ProfileInteractionCard extends StatelessWidget {
     );
   }
 
-  VerticalDivider _buildVerticalDivider() {
+  Widget _buildVerticalDivider() {
     return const VerticalDivider(
       width: 0.5,
       thickness: 0.5,
@@ -67,7 +66,7 @@ class ProfileInteractionCard extends StatelessWidget {
     );
   }
 
-  Expanded _buildInteractiveButton({
+  Widget _buildInteractiveButton({
     VoidCallback? onPressed,
     int? value,
     required String label,

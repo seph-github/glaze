@@ -6,13 +6,14 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glaze/core/navigation/observer/route_observer_provider.dart';
+import 'package:glaze/feature/auth/providers/auth_provider.dart';
 import 'package:glaze/feature/auth/views/auth_forget_password_view.dart';
 import 'package:glaze/feature/auth/views/auth_reset_password_view.dart';
 import 'package:glaze/feature/dashboard/views/dashboard_view.dart';
-import 'package:glaze/feature/profile/provider/profile_provider.dart';
 import 'package:glaze/feature/profile/provider/user_profile_provider.dart';
 import 'package:glaze/feature/profile/views/profile_edit_form.dart';
 import 'package:glaze/feature/profile/views/profile_interactive_view.dart';
+import 'package:glaze/feature/settings/views/terms_and_condition_view.dart';
 import 'package:glaze/feature/shop/views/shop_view.dart';
 import 'package:glaze/feature/profile/views/profile_view.dart';
 import 'package:glaze/feature/video/view/video_preview_view.dart';
@@ -36,6 +37,7 @@ import '../../feature/onboarding/views/onboarding_view.dart';
 import '../../feature/profile/models/profile.dart';
 import '../../feature/profile/views/profile_completion_form.dart';
 import '../../feature/profile/views/view_user_profile.dart';
+import '../../feature/settings/views/personal_details_view.dart';
 import '../../feature/splash/providers/splash_provider.dart';
 import '../../feature/splash/views/splash_view.dart';
 import '../../feature/settings/views/general_settings_view.dart';
@@ -111,12 +113,18 @@ GoRouter router(Ref ref) {
             break;
           case AuthChangeEvent.signedIn:
             log('signedIn');
-            router.pushReplacement(const HomeRoute().location);
+            router.go(const HomeRoute().location);
             break;
           case AuthChangeEvent.signedOut:
             log('signedOut');
-            ref.invalidate(profileNotifierProvider);
-            router.pushReplacement(const AuthRoute().location);
+            final state = ref.watch(authNotifierProvider);
+
+            if (state.authResponse == null && !state.isLoading) {
+              router.go(
+                const AuthRoute().location,
+              );
+            }
+
             break;
           case AuthChangeEvent.tokenRefreshed:
             log('tokenRefreshed');
@@ -148,9 +156,9 @@ GoRouter router(Ref ref) {
       routes: [
         TypedGoRoute<MomentsRoute>(
           path: '/moments',
-          routes: [
-            TypedGoRoute<VideoPreviewRoute>(path: 'video-preview')
-          ],
+          // routes: [
+          //   TypedGoRoute<VideoPreviewRoute>(path: 'video-preview')
+          // ],
         ),
       ],
     ),
@@ -166,7 +174,18 @@ GoRouter router(Ref ref) {
     ),
     TypedStatefulShellBranch<ProfileShellBranch>(
       routes: [
-        TypedGoRoute<ProfileRoute>(path: '/profile'),
+        TypedGoRoute<ProfileRoute>(
+          path: '/profile',
+          routes: [
+            TypedGoRoute<GeneralSettingsRoute>(
+              path: 'settings',
+              routes: [
+                TypedGoRoute<PersonalDetailsRoute>(path: 'personal_details'),
+                TypedGoRoute<TermsAndConditionRoute>(path: 'terms_and_conditions'),
+              ],
+            )
+          ],
+        ),
       ],
     ),
   ],
@@ -388,8 +407,8 @@ class ViewUserProfileRoute extends GoRouteData {
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    final Map<String, dynamic> extras = state.extra as Map<String, dynamic>;
-    final VideoPlayerController controller = extras['controller'];
+    final Map<String, dynamic>? extras = state.extra as Map<String, dynamic>?;
+    final VideoPlayerController? controller = extras?['controller'];
 
     return ViewUserProfile(
       id: id,
@@ -398,7 +417,6 @@ class ViewUserProfileRoute extends GoRouteData {
   }
 }
 
-@TypedGoRoute<GeneralSettingsRoute>(path: '/general-settings')
 class GeneralSettingsRoute extends GoRouteData {
   const GeneralSettingsRoute();
 
@@ -465,14 +483,15 @@ class NoViewRoute extends GoRouteData {
   }
 }
 
+@TypedGoRoute<VideoPreviewRoute>(path: '/video-preview')
 class VideoPreviewRoute extends GoRouteData {
   const VideoPreviewRoute();
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    final Map<String, dynamic> extras = state.extra as Map<String, dynamic>;
-    final List<VideoContent> videos = extras['videos'];
-    final int initialIndex = extras['initialIndex'];
+    final Map<String, dynamic>? extras = state.extra as Map<String, dynamic>?;
+    final List<VideoContent> videos = extras?['videos'];
+    final int initialIndex = extras?['initialIndex'];
 
     return VideoPreviewView(
       videos: videos,
@@ -494,5 +513,23 @@ class ProfileInteractiveRoute extends GoRouteData {
     return ProfileInteractiveView(
       initialIndex: initialIndex,
     );
+  }
+}
+
+class PersonalDetailsRoute extends GoRouteData {
+  const PersonalDetailsRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const PersonalDetailsView();
+  }
+}
+
+class TermsAndConditionRoute extends GoRouteData {
+  const TermsAndConditionRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const TermsAndConditionsPage();
   }
 }

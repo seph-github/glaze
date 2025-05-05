@@ -17,8 +17,8 @@ class VideoFeedItem extends StatelessWidget {
       children: [
         OptimizedVideoPlayer(controller: controller, videoId: videoItem.id),
         VideoOverlaySection(
-          profileImageUrl: videoItem.thumbnailUrl,
-          username: videoItem.username,
+          profileImageUrl: videoItem.thumbnailUrl ?? '',
+          username: videoItem.username ?? '',
           description: videoItem.caption ?? '',
           isBookmarked: false,
           isLiked: false,

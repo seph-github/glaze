@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
-import 'package:glaze/core/services/secure_storage_services.dart';
-import 'package:glaze/feature/home/provider/video_feed_provider/video_feed_provider.dart';
+import 'package:glaze/feature/profile/widgets/profile_header_section.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -14,25 +13,20 @@ import '../../../config/enum/profile_type.dart';
 import '../../../core/navigation/router.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../gen/assets.gen.dart';
-import '../../../gen/fonts.gen.dart';
-import '../../../providers/initial_app_use.dart';
-import '../../auth/providers/auth_provider.dart';
 import '../../auth/services/auth_services.dart';
-import '../../settings/providers/settings_theme_provider.dart';
+// import '../../settings/providers/settings_theme_provider.dart';
 import '../../templates/loading_layout.dart';
 import '../provider/profile_provider.dart';
 import '../widgets/profile_achievements_card.dart';
 import '../widgets/profile_interaction_card.dart';
 import '../widgets/profile_moments_card.dart';
-import '../widgets/profile_users_interest_list.dart';
-import '../widgets/user_profile_image_widget.dart';
 
 class ProfileView extends HookConsumerWidget {
   const ProfileView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isLightTheme = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
+    // final isLightTheme = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
     final state = ref.watch(profileNotifierProvider);
 
     final router = GoRouter.of(context);
@@ -57,12 +51,7 @@ class ProfileView extends HookConsumerWidget {
       isLoading: state.isLoading,
       appBar: AppBarWithBackButton(
         showBackButton: false,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        centerTitle: false,
-        title: const Text('Profile'),
-        titleTextStyle: Theme.of(context).textTheme.headlineLarge?.copyWith(
-              fontFamily: FontFamily.hitAndRun,
-            ),
+        backgroundColor: Colors.transparent,
         actions: [
           if (state.profile?.role == ProfileType.recruiter.name)
             InkWell(
@@ -103,17 +92,15 @@ class ProfileView extends HookConsumerWidget {
       child: RefreshIndicator(
         onRefresh: () => ref.read(profileNotifierProvider.notifier).fetchProfile(user!.id),
         child: SingleChildScrollView(
+          primary: true,
           child: SafeArea(
+            top: false,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                UserProfileImageWidget(
-                  imageUrl: state.profile?.profileImageUrl,
-                  username: state.profile?.username,
-                  bio: state.profile?.bio,
-                ),
-                ProfileUsersInterestList(
-                  interests: state.profile?.interests ?? [],
+                ProfileHeaderSection(
+                  profile: state.profile,
+                  backgroundColor: ColorPallete.slateViolet,
                 ),
                 const SizedBox(height: 20),
                 Padding(
@@ -159,24 +146,9 @@ class ProfileView extends HookConsumerWidget {
                 ProfileMomentsCard(
                   isLoading: state.isLoading,
                   videos: state.profile?.videos ?? [],
+                  isCurrentUser: state.profile?.id == user?.id,
                 ),
                 const SizedBox(height: 20),
-                const SizedBox(height: 20),
-                const SizedBox(height: 20),
-                PrimaryButton(
-                  label: 'Log Out',
-                  backgroundColor: Colors.transparent,
-                  foregroundColor: isLightTheme ? ColorPallete.backgroundColor : null,
-                  onPressed: () async {
-                    ref.invalidate(videoFeedNotifierProvider);
-                    await ref.read(initialAppUseProvider).setInitialAppUseComplete(true).then(
-                      (_) async {
-                        await SecureCache.clear('user_profile');
-                        await ref.read(authNotifierProvider.notifier).signOut();
-                      },
-                    );
-                  },
-                ),
               ],
             ),
           ),

@@ -71,6 +71,7 @@ class MomentsView extends HookConsumerWidget {
     return LoadingLayout(
       isLoading: state.isLoading,
       appBar: AppBarWithBackButton(
+        backgroundColor: Theme.of(context).colorScheme.surface,
         showBackButton: false,
         centerTitle: false,
         title: const Text('Moments'),
@@ -79,44 +80,90 @@ class MomentsView extends HookConsumerWidget {
             ),
       ),
       child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Column(
-            children: <Widget>[
+        child: NestedScrollView(
+          headerSliverBuilder: (context, innerBoxIsScrolled) {
+            return [
               if (currentIndex.value == 0)
-                SearchField(
-                  controller: keywordsController,
-                  onTap: () async {
-                    await ref.read(momentsNotifierProvider.notifier).search(
-                          keywords: keywordsController.text.trim(),
-                        );
-                  },
-                  onFilterTap: () async {
-                    await _buildFilterModal(
-                      context,
-                      categoryController,
-                      isLightTheme,
-                      categoryState,
-                      resultLimit,
-                    );
-                  },
+                SliverAppBar(
+                  pinned: false,
+                  title: SearchField(
+                    controller: keywordsController,
+                    onTap: () async {
+                      await ref.read(momentsNotifierProvider.notifier).search(
+                            keywords: keywordsController.text.trim(),
+                          );
+                    },
+                    onFilterTap: () async {
+                      await _buildFilterModal(
+                        context,
+                        categoryController,
+                        isLightTheme,
+                        categoryState,
+                        resultLimit,
+                      );
+                    },
+                  ),
                 ),
-              const Gap(10),
-              Expanded(
-                child: CustomTabBar(
-                  length: tabs.length,
-                  controller: tabController,
-                  tabs: tabs,
-                  tabViews: tabViews,
-                  onTap: (value) {
-                    currentIndex.value = value;
-                  },
-                ),
-              ),
-            ],
+            ];
+          },
+          body: CustomTabBar(
+            length: tabs.length,
+            controller: tabController,
+            tabs: tabs,
+            tabViews: tabViews,
+            onTap: (value) {
+              currentIndex.value = value;
+            },
           ),
         ),
       ),
+      // appBar: AppBarWithBackButton(
+      //   showBackButton: false,
+      //   centerTitle: false,
+      //   title: const Text('Moments'),
+      //   titleTextStyle: Theme.of(context).textTheme.headlineLarge?.copyWith(
+      //         fontFamily: FontFamily.hitAndRun,
+      //       ),
+      // ),
+      // child: SafeArea(
+      //   child: Padding(
+      //     padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      //     child: Column(
+      //       children: <Widget>[
+      //         if (currentIndex.value == 0)
+      //           SearchField(
+      //             controller: keywordsController,
+      //             onTap: () async {
+      //               await ref.read(momentsNotifierProvider.notifier).search(
+      //                     keywords: keywordsController.text.trim(),
+      //                   );
+      //             },
+      //             onFilterTap: () async {
+      //               await _buildFilterModal(
+      //                 context,
+      //                 categoryController,
+      //                 isLightTheme,
+      //                 categoryState,
+      //                 resultLimit,
+      //               );
+      //             },
+      //           ),
+      //         const Gap(10),
+      //         Expanded(
+      //           child: CustomTabBar(
+      //             length: tabs.length,
+      //             controller: tabController,
+      //             tabs: tabs,
+      //             tabViews: tabViews,
+      //             onTap: (value) {
+      //               currentIndex.value = value;
+      //             },
+      //           ),
+      //         ),
+      //       ],
+      //     ),
+      //   ),
+      // ),
     );
   }
 

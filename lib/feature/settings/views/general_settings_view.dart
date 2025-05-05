@@ -6,8 +6,13 @@ import 'package:glaze/components/app_bar_with_back_button.dart';
 import 'package:glaze/feature/settings/providers/settings_theme_provider.dart';
 import 'package:glaze/feature/settings/widgets/settings_menu_tile.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import '../../../core/navigation/router.dart';
+import '../../../core/services/secure_storage_services.dart';
 import '../../../gen/assets.gen.dart';
+import '../../../providers/initial_app_use.dart';
+import '../../auth/providers/auth_provider.dart';
 import '../widgets/settings_content_card.dart';
 
 class GeneralSettingsView extends HookConsumerWidget {
@@ -15,6 +20,8 @@ class GeneralSettingsView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(authNotifierProvider);
+    final router = GoRouter.of(context);
     final isLightMode = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
     final lightmode = useState<bool>(isLightMode);
 
@@ -24,7 +31,10 @@ class GeneralSettingsView extends HookConsumerWidget {
     }, []);
 
     return LoadingLayout(
-      appBar: const AppBarWithBackButton(),
+      isLoading: state.isLoading,
+      appBar: AppBarWithBackButton(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+      ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 18.0),
         child: ListView(
@@ -78,7 +88,8 @@ class GeneralSettingsView extends HookConsumerWidget {
               cardLabel: 'Account Settings',
               children: [
                 SettingsMenuTile(
-                  label: 'Personal Details',
+                  onTap: () => router.go(const PersonalDetailsRoute().location),
+                  label: 'Account Details',
                   icon: SvgPicture.asset(Assets.images.svg.personalDetailsIcon.path),
                   trailing: const Icon(
                     Icons.chevron_right_rounded,
@@ -90,8 +101,12 @@ class GeneralSettingsView extends HookConsumerWidget {
                   },
                 ),
                 SettingsMenuTile(
-                  label: 'Donut Shop',
-                  icon: SvgPicture.asset(Assets.images.svg.shopInactiveIcon.path),
+                  label: 'Shop',
+                  icon: const Icon(
+                    Icons.shopping_bag_outlined,
+                    color: Colors.white,
+                    size: 20,
+                  ),
                   trailing: const Icon(
                     Icons.chevron_right_rounded,
                     size: 24.0,
@@ -117,7 +132,11 @@ class GeneralSettingsView extends HookConsumerWidget {
                 ),
                 SettingsMenuTile(
                   label: 'Contact Support',
-                  icon: SvgPicture.asset(Assets.images.svg.phoneIcon.path),
+                  icon: const Icon(
+                    Icons.phone_outlined,
+                    color: Colors.white,
+                    size: 20,
+                  ),
                   trailing: const Icon(
                     Icons.chevron_right_rounded,
                     size: 24.0,
@@ -131,8 +150,34 @@ class GeneralSettingsView extends HookConsumerWidget {
                     Icons.chevron_right_rounded,
                     size: 24.0,
                   ),
-                  onChanged: (value) => {},
+                  onTap: () => router.push(const TermsAndConditionRoute().location),
                 ),
+              ],
+            ),
+            SettingsContentCard(
+              cardLabel: '',
+              children: <Widget>[
+                Consumer(builder: (context, ref, _) {
+                  return SettingsMenuTile(
+                    label: 'Log Out',
+                    icon: const Icon(
+                      Icons.logout_rounded,
+                      color: Colors.white,
+                    ),
+                    trailing: const SizedBox.shrink(),
+                    onTap: () async {
+                      if (context.canPop()) {
+                        await SecureCache.clear('user_profile');
+
+                        await ref.read(initialAppUseProvider).setInitialAppUseComplete(true).then(
+                          (_) async {
+                            await ref.read(authNotifierProvider.notifier).signOut();
+                          },
+                        );
+                      }
+                    },
+                  );
+                }),
               ],
             ),
             const Gap(32.0),

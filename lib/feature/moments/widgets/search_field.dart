@@ -32,6 +32,7 @@ class SearchField extends StatelessWidget {
               child: TextFormField(
                 controller: controller,
                 decoration: InputDecoration(
+                  isDense: true,
                   fillColor: Colors.white10,
                   filled: true,
                   hintText: 'Search for \'Basketball 🏀\'',
@@ -39,6 +40,13 @@ class SearchField extends StatelessWidget {
                     'assets/images/svg/search_icon.svg',
                     fit: BoxFit.scaleDown,
                   ),
+                  suffix: controller?.text != null
+                      ? GestureDetector(
+                          onTap: () {
+                            controller?.clear();
+                          },
+                          child: SvgPicture.asset(Assets.images.svg.closeIcon.path))
+                      : null,
                   hintStyle: TextStyle(
                     color: isLightTheme ? ColorPallete.backgroundColor : ColorPallete.hintTextColor,
                   ),
