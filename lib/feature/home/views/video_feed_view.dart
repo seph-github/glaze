@@ -275,14 +275,15 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
 
     useEffect(() {
       WidgetsBinding.instance.addObserver(this);
-      showPlayIcon.value = false;
       Future.microtask(
         () async {
           try {
             await ref.read(glazeNotifierProvider.notifier).fetchUserGlazes();
             if (state.videos.isNotEmpty) {
               ref.read(videosProvider.notifier).setVideos(state.videos);
-              await initAndPlayVideo(0);
+              WidgetsBinding.instance.addPostFrameCallback((_) async {
+                await initAndPlayVideo(0);
+              });
             }
           } catch (e) {
             log('UseEffect catch error: $e');

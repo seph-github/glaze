@@ -1,11 +1,11 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../models/video_content/video_content.dart';
+import '../../../home/models/video_content/video_content.dart';
 
-part 'videos_provider.g.dart';
+part 'videos_preview_provider.g.dart';
 
 @riverpod
-class Videos extends _$Videos {
+class VideosPreview extends _$VideosPreview {
   @override
   List<VideoContent> build() {
     return [];

@@ -110,6 +110,7 @@ class ViewUserProfile extends HookConsumerWidget {
                       child: Column(
                         children: [
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               PrimaryButton(
                                 isLoading: ref
@@ -132,7 +133,7 @@ class ViewUserProfile extends HookConsumerWidget {
                                         ),
                                       );
                                 },
-                                width: width / 1.25,
+                                width: width * 0.75,
                               ),
                               const Gap(5),
                               SvgPicture.asset(

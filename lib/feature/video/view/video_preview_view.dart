@@ -13,12 +13,12 @@ import 'package:video_player/video_player.dart';
 
 import '../../../gen/assets.gen.dart';
 import '../../../utils/video_feed_sharing_popup.dart';
-// import '../../dashboard/providers/dashboard_tab_controller_provider.dart';
 import '../../home/provider/glaze_provider/glaze_provider.dart';
 import '../../home/provider/video_feed_provider/video_feed_provider.dart';
-import '../../home/provider/videos_provider/videos_provider.dart';
+// import '../../home/provider/videos_provider/videos_provider.dart';
 import '../../home/widgets/home_interactive_card.dart';
 import '../../templates/loading_layout.dart';
+import '../providers/video_preview_provider/videos_preview_provider.dart';
 
 class VideoPreviewView extends HookConsumerWidget with WidgetsBindingObserver {
   const VideoPreviewView({
@@ -43,16 +43,18 @@ class VideoPreviewView extends HookConsumerWidget with WidgetsBindingObserver {
 
     const int maxCacheSize = 3;
     final showPlayerIcon = useState<bool>(false);
-    final PreloadPageController pageController = PreloadPageController(
-      initialPage: initialIndex,
-    );
+    final pageController = useMemoized(() {
+      return PreloadPageController(initialPage: initialIndex);
+    }, [
+      initialIndex
+    ]);
 
-    final videos = ref.watch(videosProvider);
+    final videos = ref.watch(videosPreviewProvider);
     final controllerCache = useState<Map<String, VideoPlayerController>>({});
     final disposingControllers = useState<Set<String>>({});
     final accessOrder = useState<List<String>>([]);
     final controllerCreationMap = useState<Map<String, Completer<VideoPlayerController>>>({});
-    final currentPage = useState<int>(pageController.initialPage);
+    final currentPage = useState<int>(initialIndex);
     final showPlayIcon = useState<bool>(true);
 
     Future<void> pauseAllControllers() async {
@@ -149,7 +151,6 @@ class VideoPreviewView extends HookConsumerWidget with WidgetsBindingObserver {
     Future<void> playController(String videoId) async {
       final controller = controllerCache.value[videoId];
 
-      // final tabIndex = ref.read(dashboardTabControllerProvider);
       if (controller != null && controller.value.isInitialized && !controller.value.isPlaying) {
         try {
           await controller.play();
@@ -261,9 +262,9 @@ class VideoPreviewView extends HookConsumerWidget with WidgetsBindingObserver {
     useEffect(() {
       WidgetsBinding.instance.addObserver(this);
       Future.microtask(() async {
-        ref.read(videosProvider.notifier).setVideos(this.videos);
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          initAndPlayVideo(initialIndex);
+        ref.read(videosPreviewProvider.notifier).setVideos(this.videos);
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          await initAndPlayVideo(initialIndex);
         });
       });
       return;
@@ -273,36 +274,19 @@ class VideoPreviewView extends HookConsumerWidget with WidgetsBindingObserver {
     ]);
 
     useEffect(() {
+      Future.microtask(() {
+        pageController.jumpToPage(initialIndex);
+      });
+      return null;
+    }, []);
+
+    useEffect(() {
       WidgetsBinding.instance.removeObserver(this);
 
       return () {
         disposeAllControllers();
       };
     }, []);
-
-    // useEffect(() {
-    //   final listener = ref.listenManual<int>(
-    //     dashboardTabControllerProvider,
-    //     (prev, next) async {
-    //       final isActive = next == 1;
-
-    //       final index = currentPage.value;
-    //       final controller = getController(this.videos[index].id);
-
-    //       if (controller != null && controller.value.isInitialized) {
-    //         if (!isActive) {
-    //           await controller.pause();
-    //           showPlayIcon.value = false;
-    //         } else {
-    //           await controller.play();
-    //           showPlayIcon.value = true;
-    //         }
-    //       }
-    //     },
-    //   );
-
-    //   return listener.close;
-    // }, []);
 
     useEffect(() {
       Future.microtask(() async {
@@ -424,7 +408,7 @@ class VideoPreviewView extends HookConsumerWidget with WidgetsBindingObserver {
                               final isCurrentlyGlazed = video.hasGlazed;
                               final newGlazeCount = isCurrentlyGlazed ? (video.glazesCount ?? 0) - 1 : (video.glazesCount ?? 0) + 1;
 
-                              ref.read(videosProvider.notifier).updateVideo(video.id, newGlazeCount, !isCurrentlyGlazed);
+                              ref.read(videosPreviewProvider.notifier).updateVideo(video.id, newGlazeCount, !isCurrentlyGlazed);
 
                               await ref.read(glazeNotifierProvider.notifier).onGlazed(videoId: video.id);
                             },
