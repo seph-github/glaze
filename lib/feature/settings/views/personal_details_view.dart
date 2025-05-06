@@ -15,7 +15,6 @@ class PersonalDetailsView extends StatelessWidget {
       final state = ref.watch(profileNotifierProvider);
 
       final profile = state.profile;
-      print('profile $profile');
       return LoadingLayout(
         isLoading: state.isLoading,
         appBar: AppBarWithBackButton(
@@ -25,7 +24,7 @@ class PersonalDetailsView extends StatelessWidget {
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -35,108 +34,25 @@ class PersonalDetailsView extends StatelessWidget {
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 const Gap(8.0),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Table(
-                    children: [
-                      TableRow(
-                        children: [
-                          TableCell(
-                            child: Text(
-                              'Full Name:',
-                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: ColorPallete.hintTextColor),
-                            ),
-                          ),
-                          TableCell(
-                            child: Text(
-                              profile?.fullName ?? '',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                          ),
-                        ],
-                      ),
-                      TableRow(
-                        children: [
-                          TableCell(
-                            child: Text(
-                              'Date of Birth:',
-                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: ColorPallete.hintTextColor),
-                            ),
-                          ),
-                          TableCell(
-                            child: Text(
-                              'July 04, 1989',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                          ),
-                        ],
-                      ),
-                      TableRow(
-                        children: [
-                          TableCell(
-                            child: Text(
-                              'Nationality:',
-                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: ColorPallete.hintTextColor),
-                            ),
-                          ),
-                          TableCell(
-                            child: Text(
-                              'American',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                          ),
-                        ],
-                      ),
-                      TableRow(
-                        children: [
-                          TableCell(
-                            child: Text(
-                              'Address:',
-                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: ColorPallete.hintTextColor),
-                            ),
-                          ),
-                          TableCell(
-                            child: Text(
-                              'California, USA',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                          ),
-                        ],
-                      ),
-                      TableRow(
-                        children: [
-                          TableCell(
-                            child: Text(
-                              'Phone Number:',
-                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: ColorPallete.hintTextColor),
-                            ),
-                          ),
-                          TableCell(
-                            child: Text(
-                              profile?.phoneNumber ?? '',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                          ),
-                        ],
-                      ),
-                      TableRow(
-                        children: [
-                          TableCell(
-                            child: Text(
-                              'Email Address:',
-                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: ColorPallete.hintTextColor),
-                            ),
-                          ),
-                          TableCell(
-                            child: Text(
-                              profile?.email ?? '',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                _buildDetailItem(
+                  context,
+                  label: 'Full Name',
+                  value: profile?.fullName ?? '',
+                ),
+                _buildDetailItem(
+                  context,
+                  label: 'Email',
+                  value: profile?.email ?? '',
+                ),
+                _buildDetailItem(
+                  context,
+                  label: 'Username',
+                  value: profile?.username ?? '',
+                ),
+                _buildDetailItem(
+                  context,
+                  label: 'Contact Number',
+                  value: profile?.phoneNumber ?? '',
                 ),
               ],
             ),
@@ -144,5 +60,34 @@ class PersonalDetailsView extends StatelessWidget {
         ),
       );
     });
+  }
+
+  Widget _buildDetailItem(BuildContext context, {required String label, String? value}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 2.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          const Gap(8.0),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: ColorPallete.white,
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+          const Gap(4.0),
+          Text(
+            value ?? '',
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+          const Divider(
+            height: 4,
+            color: ColorPallete.hintTextColor,
+            thickness: 0.5,
+          ),
+        ],
+      ),
+    );
   }
 }

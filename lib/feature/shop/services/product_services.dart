@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:glaze/feature/shop/models/shop_product.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -8,13 +10,20 @@ class ProductServices {
 
   Future<List<ShopProduct>> fetchAvailableProducts() async {
     try {
-      final response = await _supabaseClient.rpc('get_products');
+      final response = await _supabaseClient.rpc('get_products').timeout(
+        const Duration(seconds: 15),
+        onTimeout: () {
+          throw TimeoutException('Error Server Request');
+        },
+      );
 
       if (response.isEmpty) return [];
 
       final raw = response as List<dynamic>;
 
       return raw.map((product) => ShopProduct.fromJson(product)).toList();
+    } on TimeoutException catch (_) {
+      rethrow;
     } catch (error) {
       rethrow;
     }
