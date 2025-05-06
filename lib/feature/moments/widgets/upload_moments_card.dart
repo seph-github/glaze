@@ -68,7 +68,10 @@ class UploadMomentsCard extends HookConsumerWidget {
         if (next.error != null && next.error != prev?.error) {
           final errorMessage = next.error.toString();
 
-          CustomSnackBar.showSnackBar(context, message: errorMessage);
+          CustomSnackBar.showSnackBar(
+            context,
+            content: Text(errorMessage),
+          );
         } else if (next.response != null && next.response != prev?.response) {
           Dialogs.createContentDialog(
             context,

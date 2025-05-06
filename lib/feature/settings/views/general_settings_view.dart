@@ -42,7 +42,7 @@ class GeneralSettingsView extends HookConsumerWidget {
             Consumer(
               builder: (context, ref, _) {
                 return SettingsContentCard(
-                  cardLabel: 'General Settings',
+                  cardLabel: 'GENERAL SETTINGS',
                   children: [
                     SettingsMenuTile(
                       label: 'Light Mode',
@@ -85,7 +85,7 @@ class GeneralSettingsView extends HookConsumerWidget {
               },
             ),
             SettingsContentCard(
-              cardLabel: 'Account Settings',
+              cardLabel: 'ACCOUNT SETTINGS',
               children: [
                 SettingsMenuTile(
                   onTap: () => router.go(const PersonalDetailsRoute().location),

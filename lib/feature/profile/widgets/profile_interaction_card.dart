@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:glaze/core/navigation/router.dart';
+import 'package:glaze/core/styles/color_pallete.dart';
 import 'package:go_router/go_router.dart';
 
 class ProfileInteractionCard extends StatelessWidget {
@@ -22,7 +23,10 @@ class ProfileInteractionCard extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12.0),
-        border: Border.all(color: Colors.grey, width: 0.25),
+        border: Border.all(
+          color: ColorPallete.primaryColor,
+          width: 0.25,
+        ),
       ),
       child: Row(
         children: [
@@ -60,7 +64,7 @@ class ProfileInteractionCard extends StatelessWidget {
     return const VerticalDivider(
       width: 0.5,
       thickness: 0.5,
-      color: Colors.grey,
+      color: ColorPallete.primaryColor,
       endIndent: 20,
       indent: 20,
     );
@@ -89,13 +93,14 @@ class ProfileInteractionCard extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 16.0,
                 fontWeight: FontWeight.bold,
+                color: ColorPallete.primaryColor,
               ),
             ),
             Text(
               label,
               style: const TextStyle(
                 fontSize: 12.0,
-                color: Colors.grey,
+                color: ColorPallete.primaryColor,
               ),
             ),
           ],

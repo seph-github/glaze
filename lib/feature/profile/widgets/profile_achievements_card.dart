@@ -42,7 +42,7 @@ class ProfileAchievementsCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: ColorPallete.magenta,
+                    color: ColorPallete.primaryColor,
                   ),
                 ),
             ],

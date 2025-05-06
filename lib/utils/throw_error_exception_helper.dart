@@ -21,7 +21,7 @@ void throwAuthExceptionError(BuildContext context, dynamic next) {
   // Show the error message in a SnackBar
   CustomSnackBar.showSnackBar(
     context,
-    message: errorMessage,
+    content: Text(errorMessage),
   );
 }
 
@@ -52,6 +52,6 @@ void throwSupabaseExceptionError(
   // Show the error message in a SnackBar
   CustomSnackBar.showSnackBar(
     context,
-    message: errorMessage,
+    content: Text(errorMessage),
   );
 }

@@ -44,7 +44,12 @@ class AuthForgetPasswordView extends HookConsumerWidget {
         }
         if (next.error != null) {
           if (context.mounted) {
-            CustomSnackBar.showSnackBar(context, message: next.error.toString());
+            CustomSnackBar.showSnackBar(
+              context,
+              content: Text(
+                next.error.toString(),
+              ),
+            );
             ref.read(authNotifierProvider.notifier).clearError();
           }
         }
