@@ -24,6 +24,12 @@ class DashboardView extends HookConsumerWidget with WidgetsBindingObserver {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentIndex = useState(navigationShell.currentIndex);
 
+    final router = GoRouter.of(context);
+    final currentPath = router.state.fullPath;
+    print('current path $currentPath');
+
+    final hideNavBar = useState<bool>(false);
+
     void onTabSelected(int index) async {
       if (index == 2 && context.mounted) {
         ref.read(dashboardTabControllerProvider.notifier).setTab(index);
@@ -78,11 +84,19 @@ class DashboardView extends HookConsumerWidget with WidgetsBindingObserver {
       return sub.close;
     }, []);
 
+    if (currentPath!.contains('/settings')) {
+      hideNavBar.value = true;
+    } else {
+      hideNavBar.value = false;
+    }
+
     return LoadingLayout(
-      bottomNavigationBar: GlazeNavBar(
-        onDestinationSelected: onTabSelected,
-        navigationShell: navigationShell,
-      ),
+      bottomNavigationBar: !hideNavBar.value
+          ? GlazeNavBar(
+              onDestinationSelected: onTabSelected,
+              navigationShell: navigationShell,
+            )
+          : null,
       child: navigationShell,
     );
   }
