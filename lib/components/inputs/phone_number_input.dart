@@ -76,6 +76,7 @@ class PhoneNumberInput extends HookWidget {
             focusNode: focusNode,
             decoration: InputDecoration(
               // labelText: 'Phone Number',
+              isDense: true,
               fillColor: ColorPallete.inputFilledColor,
               filled: filled,
               hintText: 'Phone Number',

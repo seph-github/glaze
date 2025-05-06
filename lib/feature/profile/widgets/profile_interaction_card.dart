@@ -3,17 +3,31 @@ import 'package:glaze/core/navigation/router.dart';
 import 'package:glaze/core/styles/color_pallete.dart';
 import 'package:go_router/go_router.dart';
 
+import '../models/profile.dart';
+
 class ProfileInteractionCard extends StatelessWidget {
   const ProfileInteractionCard({
     super.key,
-    this.followers,
-    this.following,
-    this.glazes,
+    required this.followers,
+    required this.following,
+    required this.glazes,
   });
 
-  final int? followers;
-  final int? following;
-  final int? glazes;
+  final List<Interact> followers;
+  final List<Interact> following;
+  final List<Glaze> glazes;
+
+  void navigateToPage(int initialIndex, GoRouter router) {
+    router.push(
+        ProfileInteractiveRoute(
+          initialIndex: initialIndex,
+        ).location,
+        extra: {
+          'following': following,
+          'followers': followers,
+          'glazes': glazes
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,29 +45,21 @@ class ProfileInteractionCard extends StatelessWidget {
       child: Row(
         children: [
           _buildInteractiveButton(
-            value: following,
+            value: following.length,
             label: 'Following',
-            onPressed: () {
-              router.push(const ProfileInteractiveRoute(
-                initialIndex: 0,
-              ).location);
-            },
+            onPressed: () => navigateToPage(0, router),
           ),
           _buildVerticalDivider(),
           _buildInteractiveButton(
-            value: followers,
+            value: followers.length,
             label: 'Followers',
-            onPressed: () => router.push(const ProfileInteractiveRoute(
-              initialIndex: 1,
-            ).location),
+            onPressed: () => navigateToPage(1, router),
           ),
           _buildVerticalDivider(),
           _buildInteractiveButton(
-            value: glazes,
+            value: glazes.length,
             label: 'Total Glazes',
-            onPressed: () => router.push(const ProfileInteractiveRoute(
-              initialIndex: 2,
-            ).location),
+            onPressed: () => navigateToPage(2, router),
           ),
         ],
       ),
@@ -77,9 +83,7 @@ class ProfileInteractionCard extends StatelessWidget {
   }) {
     return Expanded(
       child: TextButton(
-        onPressed: () {
-          onPressed?.call();
-        },
+        onPressed: onPressed,
         style: TextButton.styleFrom(
           shape: const RoundedRectangleBorder(),
           foregroundColor: Colors.grey,

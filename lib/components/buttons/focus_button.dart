@@ -79,9 +79,7 @@ class FocusButton extends HookWidget {
         prefixIcon: child == null
             ? null
             : !isLoading
-                ? Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                    child: child)
+                ? Padding(padding: const EdgeInsets.symmetric(horizontal: 12.0), child: child)
                 : const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

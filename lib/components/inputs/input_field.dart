@@ -175,6 +175,7 @@ class InputField extends HookWidget {
           TextFormField(
             readOnly: readOnly,
             decoration: InputDecoration(
+              isDense: true,
               hintText: hintText,
               hintStyle: const TextStyle(
                 color: ColorPallete.hintTextColor,

@@ -373,12 +373,13 @@ class VideoPreviewView extends HookConsumerWidget with WidgetsBindingObserver {
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
-                            AspectRatio(
-                              aspectRatio: controller.value.aspectRatio,
-                              child: VideoPlayer(
-                                controller,
+                            if (controller.value.size.height > 640)
+                              VideoPlayer(controller)
+                            else
+                              AspectRatio(
+                                aspectRatio: controller.value.aspectRatio,
+                                child: VideoPlayer(controller),
                               ),
-                            ),
                             if (showPlayerIcon.value)
                               Container(
                                 width: 50,

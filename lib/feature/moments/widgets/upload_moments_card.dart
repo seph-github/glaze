@@ -7,11 +7,13 @@ import 'package:glaze/components/modals/glaze_modals.dart';
 import 'package:glaze/feature/camera/provider/content_picker_provider.dart';
 import 'package:glaze/feature/category/provider/category_provider.dart';
 import 'package:glaze/feature/home/provider/video_content_provider/video_content_provider.dart';
+import 'package:glaze/feature/moments/providers/moments_provider.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
 import 'package:glaze/utils/generate_thumbnail.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:video_player/video_player.dart';
 import 'dart:io';
 
 import '../../../components/buttons/focus_button.dart';
@@ -29,6 +31,17 @@ class UploadMomentsCard extends HookConsumerWidget {
     super.key,
   });
 
+  Future<Duration> _getVideoDuration(File file) async {
+    final controller = VideoPlayerController.file(file);
+
+    try {
+      await controller.initialize();
+      return controller.value.duration;
+    } finally {
+      await controller.dispose();
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isLightTheme = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
@@ -40,9 +53,28 @@ class UploadMomentsCard extends HookConsumerWidget {
       :width,
       :height
     ) = MediaQuery.sizeOf(context);
-    final thumbnailFuture = useMemoized(() => getVideoThumbnail(File(fileState.video?.path ?? '')), [
-      fileState.video
-    ]);
+
+    final thumbnailFuture = useMemoized(
+      () async {
+        final videoFile = File(fileState.video?.path ?? '');
+        final duration = await _getVideoDuration(videoFile);
+
+        if (duration.inSeconds > 15 && context.mounted) {
+          await Dialogs.createContentDialog(
+            context,
+            title: 'Error',
+            content: 'Your video exceeds the maximum allowed duration. Please subscribe or purchase a plan to upload longer videos.',
+            onPressed: () => context.pop(),
+          );
+          throw Exception('Video too long! Max 15 seconds allowed.');
+        } else {
+          return await getVideoThumbnail(File(fileState.video?.path ?? ''));
+        }
+      },
+      [
+        fileState.video
+      ],
+    );
 
     final titleController = useTextEditingController();
     final captionController = useTextEditingController();
@@ -113,29 +145,30 @@ class UploadMomentsCard extends HookConsumerWidget {
     void onSubmit() async {
       if (file.value == null) {
         await showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog.adaptive(
-                title: const Text('Error'),
-                content: const Center(
-                  child: Text('The moment is empty please choose a video from gallery or camera.'),
+          context: context,
+          builder: (context) {
+            return AlertDialog.adaptive(
+              title: const Text('Error'),
+              content: const Center(
+                child: Text('The moment is empty please choose a video from gallery or camera.'),
+              ),
+              actions: [
+                CupertinoActionSheetAction(
+                  onPressed: () {
+                    context.pop();
+                  },
+                  child: const Text('Ok'),
                 ),
-                actions: [
-                  CupertinoActionSheetAction(
-                    onPressed: () {
-                      context.pop();
-                    },
-                    child: const Text('Ok'),
-                  ),
-                ],
-              );
-            });
+              ],
+            );
+          },
+        );
       }
 
       if (formKey.currentState!.validate()) {
         formKey.currentState!.save();
         final thumbnail = await thumbnailFuture;
-        await ref.read(videoContentNotifierProvider.notifier).uploadVideoContent(
+        await ref.read(momentsNotifierProvider.notifier).uploadVideoContent(
               file: file.value ?? File(''),
               thumbnail: thumbnail,
               title: titleController.text,
@@ -252,64 +285,64 @@ class UploadMomentsCard extends HookConsumerWidget {
                           Column(
                             children: [
                               const Gap(26.0),
-                              Stack(
-                                alignment: Alignment.topRight,
-                                children: [
-                                  FutureBuilder<File>(
-                                    future: thumbnailFuture,
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState == ConnectionState.waiting) {
-                                        return const CircularProgressIndicator(); // Show loading indicator
-                                      } else if (snapshot.hasData) {
-                                        return AspectRatio(
+                              FutureBuilder<File>(
+                                future: thumbnailFuture,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                    return const CircularProgressIndicator();
+                                  } else if (snapshot.hasData) {
+                                    return Stack(
+                                      alignment: Alignment.topRight,
+                                      children: [
+                                        AspectRatio(
                                           aspectRatio: 16 / 9,
                                           child: Container(
                                             clipBehavior: Clip.hardEdge,
                                             decoration: BoxDecoration(
                                               border: Border.all(
-                                                color: Colors.white, // Border color
-                                                width: 0.5, // Border width
+                                                color: Colors.white,
+                                                width: 0.5,
                                               ),
-                                              borderRadius: BorderRadius.circular(16.0), // Rounded corners
+                                              borderRadius: BorderRadius.circular(16.0),
                                               image: DecorationImage(
-                                                image: FileImage(snapshot.data!), // Use the thumbnail as a background
-                                                fit: BoxFit.cover, // Adjust the image to cover the container
+                                                image: FileImage(snapshot.data!),
+                                                fit: BoxFit.cover,
                                               ),
                                             ),
                                           ),
-                                        );
-                                      } else {
-                                        return const Text('No thumbnail available'); // Fallback message
-                                      }
-                                    },
-                                  ),
-                                  Positioned(
-                                    right: 8,
-                                    top: 8,
-                                    child: IconButton.filled(
-                                      onPressed: () => ref.invalidate(contentPickerNotifierProvider),
-                                      visualDensity: const VisualDensity(horizontal: -3, vertical: -2),
-                                      focusColor: ColorPallete.primaryColor,
-                                      color: ColorPallete.primaryColor,
-                                      icon: SvgPicture.asset(Assets.images.svg.closeIcon.path),
-                                    ),
-                                  ),
-                                ],
+                                        ),
+                                        Positioned(
+                                          right: 8,
+                                          top: 8,
+                                          child: IconButton.filled(
+                                            onPressed: () => ref.invalidate(contentPickerNotifierProvider),
+                                            visualDensity: const VisualDensity(horizontal: -3, vertical: -2),
+                                            focusColor: ColorPallete.primaryColor,
+                                            color: ColorPallete.primaryColor,
+                                            icon: SvgPicture.asset(Assets.images.svg.closeIcon.path),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  } else {
+                                    return const Text('No thumbnail available');
+                                  }
+                                },
                               ),
                             ],
                           ),
-                        const Gap(26.0),
+                        const Gap(30.0),
                         FocusButton(
                           controller: fileController,
                           borderRadius: 16.0,
                           validator: (value) {
                             if (file.value == null) {
                               return 'Please choose file';
-                            } else {}
+                            }
 
                             final fileSize = File(file.value?.path ?? '').lengthSync();
+
                             if (fileSize > 100 * 1024 * 1024) {
-                              // Check if file size exceeds 100MB
                               return 'File size must not exceed 100MB';
                             }
                             return null;
@@ -324,11 +357,10 @@ class UploadMomentsCard extends HookConsumerWidget {
                             ),
                           ),
                         ),
-                        const Gap(26.0),
+                        const Gap(30.0),
                         PrimaryButton(
                           label: 'Upload Moment',
                           onPressed: onSubmit,
-                          // onPressed: () {},
                         ),
                         const Gap(26.0),
                       ],

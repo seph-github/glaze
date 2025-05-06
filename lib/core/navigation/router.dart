@@ -517,8 +517,16 @@ class ProfileInteractiveRoute extends GoRouteData {
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
+    final Map<String, dynamic> extras = state.extra as Map<String, dynamic>;
+    final List<Interact> followers = extras['followers'];
+    final List<Interact> following = extras['following'];
+    final List<Glaze> glazes = extras['glazes'];
+
     return ProfileInteractiveView(
       initialIndex: initialIndex,
+      followers: followers,
+      following: following,
+      glazes: glazes,
     );
   }
 }

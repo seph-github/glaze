@@ -64,8 +64,6 @@ class VideoContentServices {
         fileName: title,
       );
 
-      // final thumbnailFile = await getVideoThumbnail(file);
-
       final thumbnailUrl = await StorageServices().upload(
         id: userId,
         bucketName: 'thumbnails',

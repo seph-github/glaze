@@ -8,10 +8,8 @@ import 'package:glaze/feature/home/models/video_content/video_content.dart';
 import 'package:glaze/feature/home/services/video_content_services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:video_player/video_player.dart';
 
-import '../../../auth/services/auth_services.dart';
 import '../../models/cached_video_content/cached_video_content.dart';
 
 part 'video_content_provider.freezed.dart';
@@ -117,32 +115,6 @@ class VideoContentNotifier extends _$VideoContentNotifier {
           //   controllers: updatedControllers,
           // ),
           isLoading: false);
-    } catch (e) {
-      _setError(e);
-    }
-  }
-
-  Future<void> uploadVideoContent({
-    required File file,
-    required File thumbnail,
-    required String title,
-    required String caption,
-    required String category,
-  }) async {
-    state = state.copyWith(isLoading: true);
-    try {
-      final User? user = AuthServices().currentUser;
-
-      final response = await VideoContentServices().uploadVideoContent(
-        file: file,
-        thumbnail: thumbnail,
-        userId: user?.id ?? '',
-        title: title,
-        caption: caption,
-        category: category,
-      );
-
-      _setNewResponse(response);
     } catch (e) {
       _setError(e);
     }

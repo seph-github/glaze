@@ -106,9 +106,9 @@ class ProfileView extends HookConsumerWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: padding),
                   child: ProfileInteractionCard(
-                    following: state.profile?.following.length ?? 0,
-                    followers: state.profile?.followers.length ?? 0,
-                    glazes: state.profile?.glazes.length ?? 0,
+                    following: state.profile?.following ?? [],
+                    followers: state.profile?.followers ?? [],
+                    glazes: state.profile?.glazes ?? [],
                   ),
                 ),
                 Padding(

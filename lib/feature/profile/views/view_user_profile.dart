@@ -66,7 +66,6 @@ class ViewUserProfile extends HookConsumerWidget {
       isLoading: state.isLoading,
       appBar: AppBarWithBackButton(
         onBackButtonPressed: () async {
-          // await controller?.play();
           router.pop();
         },
       ),
@@ -87,9 +86,9 @@ class ViewUserProfile extends HookConsumerWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: ProfileInteractionCard(
-                  followers: state.viewUserProfile?.totalFollowers ?? 0,
-                  following: state.viewUserProfile?.totalFollowing ?? 0,
-                  glazes: state.viewUserProfile?.totalGlazes ?? 0,
+                  followers: state.viewUserProfile?.followers ?? [],
+                  following: state.viewUserProfile?.following ?? [],
+                  glazes: state.viewUserProfile?.glazes ?? [],
                 ),
               ),
               const Gap(20),

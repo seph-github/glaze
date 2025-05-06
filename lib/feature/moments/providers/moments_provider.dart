@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:glaze/feature/challenges/models/challenge.dart';
 import 'package:glaze/feature/home/models/video_content/video_content.dart';
@@ -6,6 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase/supabase.dart';
 
 import '../../auth/services/auth_services.dart';
+import '../../home/services/video_content_services.dart';
 
 part 'moments_provider.freezed.dart';
 part 'moments_provider.g.dart';
@@ -13,6 +16,7 @@ part 'moments_provider.g.dart';
 @freezed
 abstract class MomentsState with _$MomentsState {
   const factory MomentsState({
+    @Default(null) String? response,
     @Default([]) List<VideoContent> videos,
     @Default([]) List<Challenge> challenges,
     @Default([]) List<Challenge> upcomingChallenges,
@@ -25,8 +29,17 @@ abstract class MomentsState with _$MomentsState {
 class MomentsNotifier extends _$MomentsNotifier {
   @override
   MomentsState build() {
-    // Future.microtask(() async => await getUpcomingChallenges());
     return const MomentsState();
+  }
+
+  void _setNewResponse(String response) {
+    state = state.copyWith(isLoading: false, response: null);
+    state = state.copyWith(isLoading: false, response: response);
+  }
+
+  void _setError(dynamic error) {
+    state = state.copyWith(error: null);
+    state = state.copyWith(error: error, isLoading: false);
   }
 
   Future<void> search({
@@ -34,7 +47,7 @@ class MomentsNotifier extends _$MomentsNotifier {
     String? filterBy,
     int? pageLimit,
   }) async {
-    state = state.copyWith(isLoading: true);
+    state = state.copyWith(isLoading: true, error: null);
 
     try {
       final response = await MomentsServices().search(
@@ -50,7 +63,7 @@ class MomentsNotifier extends _$MomentsNotifier {
   }
 
   Future<void> getChallenges() async {
-    state = state.copyWith(isLoading: true);
+    state = state.copyWith(isLoading: true, error: null);
     try {
       final challenges = await MomentsServices().fetchAllChallenges();
       state = state.copyWith(challenges: challenges, isLoading: false);
@@ -60,13 +73,39 @@ class MomentsNotifier extends _$MomentsNotifier {
   }
 
   Future<void> getUpcomingChallenges() async {
-    state = state.copyWith(isLoading: true);
+    state = state.copyWith(isLoading: true, error: null);
     try {
       final User? user = AuthServices().currentUser;
       final upcomingChallenges = await MomentsServices().fetchUpcomingChallenges(user!.id);
       state = state.copyWith(upcomingChallenges: upcomingChallenges, isLoading: false);
     } catch (e) {
       state = state.copyWith(error: Exception(e), isLoading: false);
+    }
+  }
+
+  Future<void> uploadVideoContent({
+    required File file,
+    required File thumbnail,
+    required String title,
+    required String caption,
+    required String category,
+  }) async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final User? user = AuthServices().currentUser;
+
+      final response = await VideoContentServices().uploadVideoContent(
+        file: file,
+        thumbnail: thumbnail,
+        userId: user?.id ?? '',
+        title: title,
+        caption: caption,
+        category: category,
+      );
+
+      _setNewResponse(response);
+    } catch (e) {
+      _setError(e);
     }
   }
 }

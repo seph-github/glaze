@@ -20,9 +20,15 @@ class ProfileInteractiveView extends HookConsumerWidget {
   const ProfileInteractiveView({
     super.key,
     this.initialIndex = 0,
+    required this.followers,
+    required this.following,
+    required this.glazes,
   });
 
   final int initialIndex;
+  final List<Interact> followers;
+  final List<Interact> following;
+  final List<Glaze> glazes;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -34,9 +40,9 @@ class ProfileInteractiveView extends HookConsumerWidget {
     ];
 
     final List<Widget> tabViews = [
-      FollowingListWidget(following: state.profile?.following ?? []),
-      FollowersListWidget(followers: state.profile?.followers ?? [], following: state.profile?.following ?? []),
-      GlazersListWidget(glazes: state.profile?.glazes ?? []),
+      FollowingListWidget(following: following),
+      FollowersListWidget(followers: followers, following: following),
+      GlazersListWidget(glazes: glazes),
     ];
 
     final tabController = useTabController(
