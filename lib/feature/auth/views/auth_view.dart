@@ -15,7 +15,7 @@ import '../../../config/enum/profile_type.dart';
 import '../../../core/navigation/router.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../gen/assets.gen.dart';
-import '../../../providers/initial_app_use.dart';
+import '../../../providers/initial_app_use/initial_app_use.dart';
 import '../../settings/providers/settings_theme_provider.dart';
 import '../widgets/auth_header.dart';
 import '../widgets/auth_sso_widget.dart';
@@ -31,10 +31,7 @@ class AuthView extends HookConsumerWidget {
     final passwordController = useTextEditingController();
     final usernameController = useTextEditingController();
 
-    final toggleItems = useState<List<String>>([
-      'Email',
-      'Phone'
-    ]);
+    final toggleItems = useState<List<String>>(['Email', 'Phone']);
 
     final selectedIndex = useState<int>(0);
     final isLogin = useState<bool>(true);
@@ -42,7 +39,8 @@ class AuthView extends HookConsumerWidget {
     final recruitingTalent = useState<bool>(false);
     final hasCompletedInitialAppUse = useState<bool>(false);
 
-    final isLightTheme = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
+    final isLightTheme =
+        ref.watch(settingsThemeProviderProvider) == ThemeData.light();
 
     const ColorFilter colorFilter = ColorFilter.mode(
       ColorPallete.lightBackgroundColor,
@@ -94,7 +92,8 @@ class AuthView extends HookConsumerWidget {
 
     useEffect(
       () {
-        hasCompletedInitialAppUse.value = ref.read(initialAppUseProvider).completedInitialAppUse;
+        hasCompletedInitialAppUse.value =
+            ref.read(initialAppUseProvider).completedInitialAppUse;
         print('Has completed intial setup ${hasCompletedInitialAppUse.value}');
         return null;
       },
@@ -104,7 +103,9 @@ class AuthView extends HookConsumerWidget {
     ref.listen(
       authNotifierProvider,
       (prev, next) {
-        if (next.error != null && next.error != prev?.error && context.mounted) {
+        if (next.error != null &&
+            next.error != prev?.error &&
+            context.mounted) {
           throwAuthExceptionError(context, next);
         }
       },
@@ -221,7 +222,13 @@ class AuthView extends HookConsumerWidget {
                   ),
                 const Gap(30),
                 PrimaryButton(
-                  onPressed: (agreedToTermsAndCon.value && usernameController.text.isNotEmpty && emailController.text.isNotEmpty && passwordController.text.isNotEmpty) || isLogin.value ? () => onSubmit() : null,
+                  onPressed: (agreedToTermsAndCon.value &&
+                              usernameController.text.isNotEmpty &&
+                              emailController.text.isNotEmpty &&
+                              passwordController.text.isNotEmpty) ||
+                          isLogin.value
+                      ? () => onSubmit()
+                      : null,
                   label: isLogin.value ? 'Login' : 'Sign Up',
                 ),
                 const Gap(20),
@@ -266,8 +273,13 @@ class AuthView extends HookConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      isLogin.value ? 'Don\'t have an account?' : 'Already have an account?',
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.grey),
+                      isLogin.value
+                          ? 'Don\'t have an account?'
+                          : 'Already have an account?',
+                      style: Theme.of(context)
+                          .textTheme
+                          .labelLarge
+                          ?.copyWith(color: Colors.grey),
                     ),
                     GestureDetector(
                       onTap: () {

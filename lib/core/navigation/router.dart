@@ -59,7 +59,7 @@ GoRouter router(Ref ref) {
   FutureOr<String?> redirect(BuildContext context, GoRouterState state) async {
     final User? user = AuthServices().currentUser;
     final Profile? profile = ref.watch(userProfileProvider).value;
-    // print('profile $profile');
+    print('profile $profile');
 
     final String currentPath = state.matchedLocation;
     final bool hasSplashCompleted = ref.read(splashProvider).completeSplash;
@@ -75,24 +75,28 @@ GoRouter router(Ref ref) {
       return const AuthRoute().location;
     }
 
-    if (currentPath == const HomeRoute().location && profile?.isCompletedProfile == false) {
-      return ProfileCompletionFormRoute(id: user.id, role: profile?.role ?? ProfileType.user.value).location;
+    if (currentPath == const HomeRoute().location &&
+        profile?.isCompletedProfile == false) {
+      print('should look into here');
+      return ProfileCompletionFormRoute(
+              id: user.id, role: profile?.role ?? ProfileType.user.value)
+          .location;
     }
 
     return null;
   }
 
-  final session = Supabase.instance.client.auth.currentSession;
+  // final session = Supabase.instance.client.auth.currentSession;
 
   final router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: session == null ? const AuthRoute().location : const HomeRoute().location,
+    // initialLocation: session == null
+    //     ? const AuthRoute().location
+    //     : const HomeRoute().location,
     debugLogDiagnostics: true,
     routes: $appRoutes,
     redirect: redirect,
-    observers: [
-      routeObserver
-    ],
+    observers: [routeObserver],
   );
 
   ref.listen(
@@ -101,10 +105,7 @@ GoRouter router(Ref ref) {
       if (next is AsyncError) {
         router.go(const AuthRoute().location);
       }
-      if (next
-          case AsyncData(
-            value: final auth
-          )) {
+      if (next case AsyncData(value: final auth)) {
         switch (auth.event) {
           case AuthChangeEvent.initialSession:
             break;
@@ -113,7 +114,19 @@ GoRouter router(Ref ref) {
             break;
           case AuthChangeEvent.signedIn:
             log('signedIn');
-            router.go(const HomeRoute().location);
+            final profile = await ref.read(userProfileProvider.future);
+
+            if (profile?.isCompletedProfile == false) {
+              router.go(
+                ProfileCompletionFormRoute(
+                        id: auth.session!.user.id,
+                        role: profile!.role ?? ProfileType.user.value)
+                    .location,
+              );
+            } else {
+              router.go(const HomeRoute().location);
+            }
+
             break;
           case AuthChangeEvent.signedOut:
             log('signedOut');
@@ -181,7 +194,8 @@ GoRouter router(Ref ref) {
               path: 'settings',
               routes: [
                 TypedGoRoute<PersonalDetailsRoute>(path: 'personal_details'),
-                TypedGoRoute<TermsAndConditionRoute>(path: 'terms_and_conditions'),
+                TypedGoRoute<TermsAndConditionRoute>(
+                    path: 'terms_and_conditions'),
               ],
             )
           ],
@@ -316,7 +330,8 @@ class AuthVerifyPhoneRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     final extras = state.extra;
-    final Map<String, String>? data = extras is Map<String, String> ? extras : null;
+    final Map<String, String>? data =
+        extras is Map<String, String> ? extras : null;
     final String phoneNumber = data?['phone'] ?? '';
     final String dialCode = data?['dialCode'] ?? '';
     log('AuthVerifyPhoneRoute: phoneNumber: $phoneNumber, dialCode: $dialCode');
@@ -428,7 +443,8 @@ class GeneralSettingsRoute extends GoRouteData {
   const GeneralSettingsRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => const GeneralSettingsView();
+  Widget build(BuildContext context, GoRouterState state) =>
+      const GeneralSettingsView();
 }
 
 @TypedGoRoute<ChallengesRoute>(path: '/challenges')
@@ -436,7 +452,8 @@ class ChallengesRoute extends GoRouteData {
   const ChallengesRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => const ChallengesView();
+  Widget build(BuildContext context, GoRouterState state) =>
+      const ChallengesView();
 }
 
 @TypedGoRoute<OnboardingRoute>(path: '/onboarding/:id')
@@ -462,7 +479,8 @@ class ProfileCompletionFormRoute extends GoRouteData {
   final String role;
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => ProfileCompletionForm(
+  Widget build(BuildContext context, GoRouterState state) =>
+      ProfileCompletionForm(
         userId: id,
         role: role,
       );
