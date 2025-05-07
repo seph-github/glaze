@@ -77,7 +77,7 @@ GoRouter router(Ref ref) {
 
     if (currentPath == const HomeRoute().location &&
         profile?.isCompletedProfile == false) {
-      print('should look into here');
+      // print('should look into here');
       return ProfileCompletionFormRoute(
               id: user.id, role: profile?.role ?? ProfileType.user.value)
           .location;
@@ -86,13 +86,13 @@ GoRouter router(Ref ref) {
     return null;
   }
 
-  // final session = Supabase.instance.client.auth.currentSession;
+  final session = Supabase.instance.client.auth.currentSession;
 
   final router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    // initialLocation: session == null
-    //     ? const AuthRoute().location
-    //     : const HomeRoute().location,
+    initialLocation: session == null
+        ? const AuthRoute().location
+        : const HomeRoute().location,
     debugLogDiagnostics: true,
     routes: $appRoutes,
     redirect: redirect,

@@ -14,6 +14,7 @@ class Profile with _$Profile {
     @JsonKey(name: 'full_name') String? fullName,
     String? username,
     String? email,
+    @JsonKey(name: 'country_code') String? countryCode,
     @JsonKey(name: 'phone_number') String? phoneNumber,
     @JsonKey(name: 'profile_image_url') String? profileImageUrl,
     String? bio,
@@ -35,7 +36,8 @@ class Profile with _$Profile {
     @Default([]) List<Glaze> glazes,
   }) = _Profile;
 
-  factory Profile.fromJson(Map<String, dynamic> json) => _$ProfileFromJson(json);
+  factory Profile.fromJson(Map<String, dynamic> json) =>
+      _$ProfileFromJson(json);
 }
 
 @freezed
@@ -47,7 +49,8 @@ class Interact with _$Interact {
     @JsonKey(name: 'profile_image_url') String? profileImageUrl,
   }) = _Interact;
 
-  factory Interact.fromJson(Map<String, dynamic> json) => _$InteractFromJson(json);
+  factory Interact.fromJson(Map<String, dynamic> json) =>
+      _$InteractFromJson(json);
 }
 
 @freezed

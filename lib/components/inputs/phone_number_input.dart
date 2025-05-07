@@ -94,6 +94,9 @@ class PhoneNumberInput extends HookConsumerWidget {
                     decoration: InputDecoration(
                       hintText: countryCodes?[countryCodes.indexWhere(
                         (code) {
+                          if (dialCodeController!.text.isNotEmpty) {
+                            return code.dialCode == dialCodeController!.text;
+                          }
                           return code.code == "US";
                         },
                       )]

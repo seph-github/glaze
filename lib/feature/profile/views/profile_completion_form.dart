@@ -77,6 +77,8 @@ class ProfileCompletionForm extends HookConsumerWidget {
         if (next.profile != null && next.profile != prev?.profile) {
           fullnameController.text = next.profile?.fullName ?? '';
           emailController.text = next.profile?.email ?? '';
+          codeController.text = next.profile?.countryCode ?? '';
+
           phoneController.text = next.profile?.phoneNumber ?? '';
         }
 
@@ -221,16 +223,6 @@ class ProfileCompletionForm extends HookConsumerWidget {
                     filled: true,
                     validator: validatePhone,
                   ),
-                  // InputField.text(
-                  //   controller: phoneController,
-                  //   readOnly: state.profile?.phoneNumber != null,
-                  //   inputIcon:
-                  //       SvgPicture.asset(Assets.images.svg.phoneIcon.path),
-                  //   keyboardType: TextInputType.phone,
-                  //   hintText: 'Phone number',
-                  //   filled: true,
-                  //   validator: validatePhone,
-                  // ),
                   const Gap(10),
                   if (role == ProfileType.recruiter.name)
                     InputField.text(
