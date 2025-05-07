@@ -22,13 +22,11 @@ class GeneralSettingsView extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(authNotifierProvider);
     final router = GoRouter.of(context);
-    final isLightMode =
-        ref.watch(settingsThemeProviderProvider) == ThemeData.light();
+    final isLightMode = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
     final lightmode = useState<bool>(isLightMode);
 
     useEffect(() {
-      lightmode.value =
-          ref.watch(settingsThemeProviderProvider) == ThemeData.light();
+      lightmode.value = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
       return;
     }, []);
 
@@ -48,20 +46,16 @@ class GeneralSettingsView extends HookConsumerWidget {
                   children: [
                     SettingsMenuTile(
                       label: 'Light Mode',
-                      icon: SvgPicture.asset(
-                          Assets.images.svg.lightModeIcon.path),
+                      icon: SvgPicture.asset(Assets.images.svg.lightModeIcon.path),
                       value: lightmode.value,
                       onChanged: (value) {
                         lightmode.value = value;
-                        ref
-                            .read(settingsThemeProviderProvider.notifier)
-                            .toggleTheme();
+                        ref.read(settingsThemeProviderProvider.notifier).toggleTheme();
                       },
                     ),
                     SettingsMenuTile(
                       label: 'Language',
-                      icon:
-                          SvgPicture.asset(Assets.images.svg.languageIcon.path),
+                      icon: SvgPicture.asset(Assets.images.svg.languageIcon.path),
                       trailing: const Icon(
                         Icons.chevron_right_rounded,
                         size: 24.0,
@@ -70,8 +64,7 @@ class GeneralSettingsView extends HookConsumerWidget {
                     ),
                     SettingsMenuTile(
                       label: 'Notification Settings',
-                      icon: SvgPicture.asset(
-                          Assets.images.svg.notificationSettingsIcon.path),
+                      icon: SvgPicture.asset(Assets.images.svg.notificationSettingsIcon.path),
                       trailing: const Icon(
                         Icons.chevron_right_rounded,
                         size: 24.0,
@@ -80,8 +73,7 @@ class GeneralSettingsView extends HookConsumerWidget {
                     ),
                     SettingsMenuTile(
                       label: 'Privacy and Security',
-                      icon: SvgPicture.asset(
-                          Assets.images.svg.privacySecurityIcon.path),
+                      icon: SvgPicture.asset(Assets.images.svg.privacySecurityIcon.path),
                       trailing: const Icon(
                         Icons.chevron_right_rounded,
                         size: 24.0,
@@ -98,8 +90,7 @@ class GeneralSettingsView extends HookConsumerWidget {
                 SettingsMenuTile(
                   onTap: () => router.go(const PersonalDetailsRoute().location),
                   label: 'Account Details',
-                  icon: SvgPicture.asset(
-                      Assets.images.svg.personalDetailsIcon.path),
+                  icon: SvgPicture.asset(Assets.images.svg.personalDetailsIcon.path),
                   trailing: const Icon(
                     Icons.chevron_right_rounded,
                     size: 24.0,
@@ -154,14 +145,12 @@ class GeneralSettingsView extends HookConsumerWidget {
                 ),
                 SettingsMenuTile(
                   label: 'Terms & Conditions',
-                  icon: SvgPicture.asset(
-                      Assets.images.svg.termsConditionsIcon.path),
+                  icon: SvgPicture.asset(Assets.images.svg.termsConditionsIcon.path),
                   trailing: const Icon(
                     Icons.chevron_right_rounded,
                     size: 24.0,
                   ),
-                  onTap: () =>
-                      router.push(const TermsAndConditionRoute().location),
+                  onTap: () => router.push(const TermsAndConditionRoute().location),
                 ),
               ],
             ),
@@ -180,14 +169,9 @@ class GeneralSettingsView extends HookConsumerWidget {
                       if (context.canPop()) {
                         await SecureCache.clear('user_profile');
 
-                        await ref
-                            .read(initialAppUseProvider)
-                            .setInitialAppUseComplete(true)
-                            .then(
+                        await ref.read(initialAppUseProvider).setInitialAppUseComplete(true).then(
                           (_) async {
-                            await ref
-                                .read(authNotifierProvider.notifier)
-                                .signOut();
+                            await ref.read(authNotifierProvider.notifier).signOut();
                           },
                         );
                       }

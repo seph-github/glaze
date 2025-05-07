@@ -1,7 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../data/local/shared_prefs.dart';
+import '../../../../data/local/shared_prefs.dart';
 
 part 'recruiter_profile_provider.g.dart';
 
@@ -25,6 +25,5 @@ class RecruiterProfileProvider {
     await _preferences.setBool(recruiterProfileCompletedKey, value);
   }
 
-  bool get completeRecruiterProfile =>
-      _preferences.getBool(recruiterProfileCompletedKey) ?? false;
+  bool get completeRecruiterProfile => _preferences.getBool(recruiterProfileCompletedKey) ?? false;
 }

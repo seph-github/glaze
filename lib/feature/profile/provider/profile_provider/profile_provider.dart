@@ -4,10 +4,10 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:glaze/feature/profile/services/profile_services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../config/enum/profile_type.dart';
-import '../../../core/services/secure_storage_services.dart';
-import '../models/profile.dart';
-import '../models/recruiter_profile.dart';
+import '../../../../../config/enum/profile_type.dart';
+import '../../../../../core/services/secure_storage_services.dart';
+import '../../models/profile/profile.dart';
+import '../../models/recruiter_profile/recruiter_profile.dart';
 
 part 'profile_provider.freezed.dart';
 part 'profile_provider.g.dart';
@@ -128,6 +128,7 @@ class ProfileNotifier extends _$ProfileNotifier {
     String? username,
     String? email,
     String? fullName,
+    String? countryCode,
     String? phoneNumber,
     List<String>? interestList,
     String? organization,
@@ -144,6 +145,7 @@ class ProfileNotifier extends _$ProfileNotifier {
         username: username,
         email: email,
         fullName: fullName,
+        countryCode: countryCode,
         phoneNumber: phoneNumber,
         interestList: interestList,
         organization: organization,

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/components/app_bar_with_back_button.dart';
 import 'package:glaze/core/styles/color_pallete.dart';
-import 'package:glaze/feature/profile/provider/profile_provider.dart';
+import 'package:glaze/feature/profile/provider/profile_provider/profile_provider.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
 
 class PersonalDetailsView extends StatelessWidget {

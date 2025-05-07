@@ -2,13 +2,13 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:glaze/feature/profile/entity/profile_entity.dart';
-import 'package:glaze/feature/profile/models/recruiter_profile.dart';
+import 'package:glaze/feature/profile/models/recruiter_profile/recruiter_profile.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../config/enum/profile_type.dart';
 import '../../../core/services/storage_services.dart';
 import '../entity/recruiter_profile_entity.dart';
-import '../models/profile.dart';
+import '../models/profile/profile.dart';
 
 class ProfileServices {
   final SupabaseClient _supabaseClient = Supabase.instance.client;
@@ -106,6 +106,7 @@ class ProfileServices {
     String? username,
     String? email,
     String? fullName,
+    String? countryCode,
     String? phoneNumber,
     List<String>? interestList,
     String? organization,
@@ -127,9 +128,11 @@ class ProfileServices {
         );
       }
 
+      final phone = '$countryCode$phoneNumber';
+
       final UserAttributes userAttributes = UserAttributes(
         email: email,
-        phone: phoneNumber,
+        phone: phone,
         password: password,
       );
 
@@ -138,6 +141,7 @@ class ProfileServices {
         username: username,
         bio: bio,
         fullName: fullName,
+        countryCode: countryCode,
         phoneNumber: phoneNumber,
         email: email,
         profileImageUrl: profileImageUrl,

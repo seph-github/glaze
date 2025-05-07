@@ -13,6 +13,7 @@ class ProfileEntity {
   final int? totalFollowing;
   final String? usernameId;
   final String? role;
+  final String? countryCode;
   final String? phoneNumber;
   final bool? isOnboardingCompleted;
   final String? fullName;
@@ -35,6 +36,7 @@ class ProfileEntity {
     this.totalFollowing,
     this.usernameId,
     this.role,
+    this.countryCode,
     this.phoneNumber,
     this.isOnboardingCompleted,
     this.fullName,
@@ -60,6 +62,7 @@ class ProfileEntity {
       'total_following': totalFollowing,
       'username_id': usernameId,
       'role': role,
+      'country_code': countryCode,
       'phone_number': phoneNumber,
       'is_onboarding_completed': isOnboardingCompleted,
       'full_name': fullName,

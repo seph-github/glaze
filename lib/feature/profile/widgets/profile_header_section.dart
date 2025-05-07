@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:glaze/feature/profile/models/profile.dart';
+import 'package:glaze/feature/profile/models/profile/profile.dart';
 import 'package:glaze/feature/profile/widgets/profile_users_interest_list.dart';
 import 'package:glaze/feature/profile/widgets/user_profile_image_widget.dart';
 

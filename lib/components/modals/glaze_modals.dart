@@ -7,7 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/styles/color_pallete.dart';
 import '../../data/models/category/category_model.dart';
 import '../../feature/category/provider/category_provider.dart';
-import '../../feature/profile/provider/profile_interests_list_provider.dart';
+import '../../feature/profile/provider/profile_interests_list_provider/profile_interests_list_provider.dart';
 
 class GlazeModal {
   static Future<void> showInterestListModal(BuildContext context, List<CategoryModel> interests) {

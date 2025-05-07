@@ -1,16 +1,13 @@
-// ignore_for_file: deprecated_member_use
-
 import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glaze/core/navigation/observer/route_observer_provider.dart';
-import 'package:glaze/feature/auth/providers/auth_provider.dart';
 import 'package:glaze/feature/auth/views/auth_forget_password_view.dart';
 import 'package:glaze/feature/auth/views/auth_reset_password_view.dart';
 import 'package:glaze/feature/dashboard/views/dashboard_view.dart';
-import 'package:glaze/feature/profile/provider/user_profile_provider.dart';
+import 'package:glaze/feature/profile/provider/user_profile_provider/user_profile_provider.dart';
 import 'package:glaze/feature/profile/views/profile_edit_form.dart';
 import 'package:glaze/feature/profile/views/profile_interactive_view.dart';
 import 'package:glaze/feature/settings/views/terms_and_condition_view.dart';
@@ -34,7 +31,7 @@ import '../../feature/home/models/video_content/video_content.dart';
 import '../../feature/home/views/video_feed_view.dart';
 import '../../feature/moments/views/moments_view.dart';
 import '../../feature/onboarding/views/onboarding_view.dart';
-import '../../feature/profile/models/profile.dart';
+import '../../feature/profile/models/profile/profile.dart';
 import '../../feature/profile/views/profile_completion_form.dart';
 import '../../feature/profile/views/view_user_profile.dart';
 import '../../feature/settings/views/personal_details_view.dart';
@@ -58,101 +55,62 @@ GoRouter router(Ref ref) {
 
   FutureOr<String?> redirect(BuildContext context, GoRouterState state) async {
     final User? user = AuthServices().currentUser;
-    final Profile? profile = ref.watch(userProfileProvider).value;
-    print('profile $profile');
-
-    final String currentPath = state.matchedLocation;
-    final bool hasSplashCompleted = ref.read(splashProvider).completeSplash;
+    final hasSplashCompleted = ref.read(splashProvider).completeSplash;
 
     if (!hasSplashCompleted) {
       return const SplashRoute().location;
     }
 
     if (user == null) {
-      if (currentPath.startsWith(const AuthRoute().location)) {
-        return null;
-      }
-      return const AuthRoute().location;
+      return state.matchedLocation.startsWith(const AuthRoute().location) ? null : const AuthRoute().location;
     }
 
-    if (currentPath == const HomeRoute().location &&
-        profile?.isCompletedProfile == false) {
-      // print('should look into here');
-      return ProfileCompletionFormRoute(
-              id: user.id, role: profile?.role ?? ProfileType.user.value)
-          .location;
+    try {
+      final profile = await ref.read(userProfileProvider.future);
+      if (profile?.isCompletedProfile ?? false) {
+        print('Profile is null ${profile == null}');
+        if (state.matchedLocation != ProfileCompletionFormRoute(id: user.id, role: profile?.role ?? ProfileType.user.value).location) {
+          return ProfileCompletionFormRoute(id: user.id, role: profile?.role ?? ProfileType.user.value).location;
+        }
+      }
+    } catch (e) {
+      debugPrint('Error fetching profile: $e');
+      return null; // or handle error case
     }
 
     return null;
   }
 
-  final session = Supabase.instance.client.auth.currentSession;
+  // final session = Supabase.instance.client.auth.currentSession;
 
   final router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: session == null
-        ? const AuthRoute().location
-        : const HomeRoute().location,
+    // initialLocation: session == null
+    //     ? const AuthRoute().location
+    //     : const HomeRoute().location,
     debugLogDiagnostics: true,
     routes: $appRoutes,
     redirect: redirect,
-    observers: [routeObserver],
+    observers: [
+      routeObserver
+    ],
   );
 
-  ref.listen(
+  ref.listen<AsyncValue<AuthState>>(
     authStateChangeProvider,
-    (previous, next) async {
-      if (next is AsyncError) {
-        router.go(const AuthRoute().location);
-      }
-      if (next case AsyncData(value: final auth)) {
-        switch (auth.event) {
-          case AuthChangeEvent.initialSession:
-            break;
-          case AuthChangeEvent.passwordRecovery:
-            log('passwordRecovery');
-            break;
-          case AuthChangeEvent.signedIn:
-            log('signedIn');
-            final profile = await ref.read(userProfileProvider.future);
-
-            if (profile?.isCompletedProfile == false) {
-              router.go(
-                ProfileCompletionFormRoute(
-                        id: auth.session!.user.id,
-                        role: profile!.role ?? ProfileType.user.value)
-                    .location,
-              );
-            } else {
-              router.go(const HomeRoute().location);
-            }
-
-            break;
-          case AuthChangeEvent.signedOut:
-            log('signedOut');
-            final state = ref.watch(authNotifierProvider);
-
-            if (state.authResponse == null && !state.isLoading) {
-              router.go(
-                const AuthRoute().location,
-              );
-            }
-
-            break;
-          case AuthChangeEvent.tokenRefreshed:
-            log('tokenRefreshed');
-            break;
-          case AuthChangeEvent.userUpdated:
-            log('userUpdated');
-            throw UnimplementedError();
-          case AuthChangeEvent.userDeleted:
-            log('userDeleted');
-            break;
-          case AuthChangeEvent.mfaChallengeVerified:
-            log('mfaChallengeVerified');
-            break;
-        }
-      }
+    (_, next) {
+      next.when(
+        data: (auth) {
+          if (auth.event == AuthChangeEvent.signedOut) {
+            router.go(const AuthRoute().location);
+          } else if (auth.event == AuthChangeEvent.signedIn) {
+            // Let the redirect logic handle profile completion
+            router.go(const HomeRoute().location);
+          }
+        },
+        error: (_, __) => router.go(const AuthRoute().location),
+        loading: () {},
+      );
     },
   );
   return router;
@@ -194,8 +152,7 @@ GoRouter router(Ref ref) {
               path: 'settings',
               routes: [
                 TypedGoRoute<PersonalDetailsRoute>(path: 'personal_details'),
-                TypedGoRoute<TermsAndConditionRoute>(
-                    path: 'terms_and_conditions'),
+                TypedGoRoute<TermsAndConditionRoute>(path: 'terms_and_conditions'),
               ],
             )
           ],
@@ -330,8 +287,7 @@ class AuthVerifyPhoneRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     final extras = state.extra;
-    final Map<String, String>? data =
-        extras is Map<String, String> ? extras : null;
+    final Map<String, String>? data = extras is Map<String, String> ? extras : null;
     final String phoneNumber = data?['phone'] ?? '';
     final String dialCode = data?['dialCode'] ?? '';
     log('AuthVerifyPhoneRoute: phoneNumber: $phoneNumber, dialCode: $dialCode');
@@ -443,8 +399,7 @@ class GeneralSettingsRoute extends GoRouteData {
   const GeneralSettingsRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      const GeneralSettingsView();
+  Widget build(BuildContext context, GoRouterState state) => const GeneralSettingsView();
 }
 
 @TypedGoRoute<ChallengesRoute>(path: '/challenges')
@@ -452,8 +407,7 @@ class ChallengesRoute extends GoRouteData {
   const ChallengesRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      const ChallengesView();
+  Widget build(BuildContext context, GoRouterState state) => const ChallengesView();
 }
 
 @TypedGoRoute<OnboardingRoute>(path: '/onboarding/:id')
@@ -479,8 +433,7 @@ class ProfileCompletionFormRoute extends GoRouteData {
   final String role;
 
   @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      ProfileCompletionForm(
+  Widget build(BuildContext context, GoRouterState state) => ProfileCompletionForm(
         userId: id,
         role: role,
       );

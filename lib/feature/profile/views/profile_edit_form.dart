@@ -9,7 +9,7 @@ import 'package:glaze/components/buttons/primary_button.dart';
 import 'package:glaze/config/enum/profile_type.dart';
 import 'package:glaze/feature/auth/services/auth_services.dart';
 import 'package:glaze/feature/camera/provider/content_picker_provider.dart';
-import 'package:glaze/feature/profile/provider/profile_provider.dart';
+import 'package:glaze/feature/profile/provider/profile_provider/profile_provider.dart';
 import 'package:glaze/feature/profile/widgets/interest_choice_chip.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
 import 'package:glaze/utils/form_validators.dart';
@@ -26,7 +26,7 @@ import '../../../data/models/category/category_model.dart';
 import '../../../data/repository/category/category_repository.dart';
 import '../../../gen/assets.gen.dart';
 import '../../settings/providers/settings_theme_provider.dart';
-import '../provider/profile_interests_list_provider.dart';
+import '../provider/profile_interests_list_provider/profile_interests_list_provider.dart';
 
 class ProfileEditForm extends HookConsumerWidget {
   const ProfileEditForm({

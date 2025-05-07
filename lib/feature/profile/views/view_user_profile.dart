@@ -5,7 +5,7 @@ import 'package:gap/gap.dart';
 import 'package:glaze/components/app_bar_with_back_button.dart';
 import 'package:glaze/data/models/follows/follow.dart';
 import 'package:glaze/data/repository/follows_repository/follow_repository_provider.dart';
-import 'package:glaze/feature/profile/provider/profile_provider.dart';
+import 'package:glaze/feature/profile/provider/profile_provider/profile_provider.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

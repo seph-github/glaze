@@ -3,7 +3,7 @@ import 'package:glaze/core/navigation/router.dart';
 import 'package:glaze/core/styles/color_pallete.dart';
 import 'package:go_router/go_router.dart';
 
-import '../models/profile.dart';
+import '../models/profile/profile.dart';
 
 class ProfileInteractionCard extends StatelessWidget {
   const ProfileInteractionCard({

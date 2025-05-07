@@ -4,20 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glaze/app.dart';
 import 'package:glaze/core/initializer.dart';
-import 'package:glaze/data/local/shared_prefs.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   runZonedGuarded(
     () async {
-      await initializer();
-      final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+      final container = await initializer();
 
       runApp(
-        ProviderScope(
-          overrides: [
-            sharedPrefsProvider.overrideWithValue(sharedPreferences),
-          ],
+        UncontrolledProviderScope(
+          container: container,
           child: const App(),
         ),
       );

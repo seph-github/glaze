@@ -2,7 +2,7 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../../home/models/video_content/video_content.dart';
+import '../../../home/models/video_content/video_content.dart';
 
 part 'profile.freezed.dart';
 part 'profile.g.dart';
@@ -36,8 +36,7 @@ class Profile with _$Profile {
     @Default([]) List<Glaze> glazes,
   }) = _Profile;
 
-  factory Profile.fromJson(Map<String, dynamic> json) =>
-      _$ProfileFromJson(json);
+  factory Profile.fromJson(Map<String, dynamic> json) => _$ProfileFromJson(json);
 }
 
 @freezed
@@ -49,8 +48,7 @@ class Interact with _$Interact {
     @JsonKey(name: 'profile_image_url') String? profileImageUrl,
   }) = _Interact;
 
-  factory Interact.fromJson(Map<String, dynamic> json) =>
-      _$InteractFromJson(json);
+  factory Interact.fromJson(Map<String, dynamic> json) => _$InteractFromJson(json);
 }
 
 @freezed

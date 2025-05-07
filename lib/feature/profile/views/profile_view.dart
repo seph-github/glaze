@@ -16,7 +16,7 @@ import '../../../gen/assets.gen.dart';
 import '../../auth/services/auth_services.dart';
 // import '../../settings/providers/settings_theme_provider.dart';
 import '../../templates/loading_layout.dart';
-import '../provider/profile_provider.dart';
+import '../provider/profile_provider/profile_provider.dart';
 import '../widgets/profile_achievements_card.dart';
 import '../widgets/profile_interaction_card.dart';
 import '../widgets/profile_moments_card.dart';
