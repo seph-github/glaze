@@ -124,7 +124,11 @@ class HomeInteractiveCard extends HookConsumerWidget {
                 onTap: onGlazeTap,
                 onLongPress: onGlazeLongPress,
                 size: 45.0,
-                child: SvgPicture.asset(Assets.images.svg.glazeDonutsIcon.path),
+                child: Image.asset(
+                  Assets.images.png.chocolatesprinkles.path,
+                  scale: 0.75,
+                  height: 36,
+                ),
               ),
               const Gap(2),
               Text(
