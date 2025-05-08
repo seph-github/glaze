@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:glaze/gen/assets.gen.dart';
-import 'package:lottie/lottie.dart';
 
 class LoadingLayout extends HookWidget {
   const LoadingLayout({
@@ -43,8 +42,8 @@ class LoadingLayout extends HookWidget {
               child: SizedBox(
                 height: 100,
                 width: 100,
-                child: Lottie.asset(
-                  Assets.lotties.mainScene.path,
+                child: Image.asset(
+                  Assets.images.gif.donutLoading.path,
                 ),
               ),
             ),
