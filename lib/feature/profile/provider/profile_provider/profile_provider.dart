@@ -4,7 +4,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:glaze/feature/profile/services/profile_services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../../config/enum/profile_type.dart';
 import '../../../../../core/services/secure_storage_services.dart';
 import '../../models/profile/profile.dart';
 import '../../models/recruiter_profile/recruiter_profile.dart';
@@ -92,7 +91,8 @@ class ProfileNotifier extends _$ProfileNotifier {
   Future<void> fetchRecruiterProfile(String id) async {
     state = state.copyWith(isLoading: true);
     try {
-      final recruiterProfile = await ProfileServices().fetchRecruiterProfile(id);
+      final recruiterProfile =
+          await ProfileServices().fetchRecruiterProfile(id);
       state = state.copyWith(
         recruiterProfile: recruiterProfile,
         isLoading: false,
@@ -134,7 +134,6 @@ class ProfileNotifier extends _$ProfileNotifier {
     String? organization,
     File? profileImage,
     File? identification,
-    ProfileType? role,
     String? password,
   }) async {
     state = state.copyWith(isLoading: true);
@@ -151,7 +150,6 @@ class ProfileNotifier extends _$ProfileNotifier {
         organization: organization,
         profileImage: profileImage,
         identification: identification,
-        role: role,
       );
       state = state.copyWith(response: 'Created profile', isLoading: false);
     } catch (e) {

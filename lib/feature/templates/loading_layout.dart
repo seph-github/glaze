@@ -44,7 +44,7 @@ class LoadingLayout extends HookWidget {
                 height: 100,
                 width: 100,
                 child: Lottie.asset(
-                  Assets.lotties.donutLoading.path,
+                  Assets.lotties.mainScene.path,
                 ),
               ),
             ),

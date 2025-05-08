@@ -46,6 +46,8 @@ class AuthServices {
         data: {
           'username': username,
           'role': profileType?.value,
+          'is_onboarding_complete': false,
+          'is_profile_complete': false,
         },
         channel: OtpChannel.sms,
       );
@@ -74,7 +76,8 @@ class AuthServices {
     }
   }
 
-  Future<AuthResponse> verifyPhone({required String phone, required String token}) async {
+  Future<AuthResponse> verifyPhone(
+      {required String phone, required String token}) async {
     try {
       final AuthResponse authtResponse = await _supabase.auth.verifyOTP(
         token: token,
@@ -94,7 +97,8 @@ class AuthServices {
 
   Future<AuthResponse> anonymousSignin() async {
     try {
-      final AuthResponse authResponse = await _supabase.auth.signInAnonymously(data: {
+      final AuthResponse authResponse =
+          await _supabase.auth.signInAnonymously(data: {
         'role': ProfileType.user.value,
       });
 
@@ -122,7 +126,8 @@ class AuthServices {
 
   Future<void> resetPassword(String email) async {
     try {
-      await _supabase.auth.resetPasswordForEmail(email, redirectTo: 'myapp://auth/auth/reset-password');
+      await _supabase.auth.resetPasswordForEmail(email,
+          redirectTo: 'myapp://auth/auth/reset-password');
     } on AuthApiException catch (e) {
       log('Error AuthApiException resetting password: $e');
       rethrow;
@@ -142,9 +147,12 @@ class AuthServices {
     String? tokenHash,
   }) async {
     try {
-      final authResponse = await _supabase.auth.verifyOTP(type: OtpType.email, tokenHash: tokenHash);
+      final authResponse = await _supabase.auth
+          .verifyOTP(type: OtpType.email, tokenHash: tokenHash);
 
-      if (authResponse.session!.accessToken.isNotEmpty && !authResponse.session!.isExpired && authResponse.user != null) {
+      if (authResponse.session!.accessToken.isNotEmpty &&
+          !authResponse.session!.isExpired &&
+          authResponse.user != null) {
         final UserAttributes userAttributes = UserAttributes(
           email: email,
           password: password,

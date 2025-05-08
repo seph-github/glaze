@@ -53,3 +53,6 @@ app.*.map.json
 **/ios/Flutter/Dart-Defines.xcconfig
 /supabase
 /lib/gen
+
+# FVM Version Cache
+.fvm/

@@ -28,5 +28,6 @@
     "pubspec.yaml": true,
     "lib/flutter_flow/function_changes.json": true,
     ".vscode/settings.json": true
-  }
+  },
+  "dart.flutterSdkPath": ".fvm/versions/3.27.0"
 }

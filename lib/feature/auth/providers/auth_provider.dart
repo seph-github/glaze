@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:glaze/feature/auth/services/auth_services.dart';
+import 'package:glaze/feature/profile/provider/user_profile_provider/user_profile_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -52,6 +53,14 @@ class AuthNotifier extends _$AuthNotifier {
         email: email,
         password: password,
       );
+
+      if (authResponse.session == null) {
+        throw const AuthException('Error occured during sign in');
+      }
+
+      final userProfile = await ref.watch(userProfileProvider.future);
+      print('auth service user profile $userProfile');
+
       state = state.copyWith(authResponse: authResponse, isLoading: false);
     } catch (e) {
       setError(e as Exception);
@@ -89,7 +98,8 @@ class AuthNotifier extends _$AuthNotifier {
     }
   }
 
-  Future<void> verifyPhone({required String phone, required String token}) async {
+  Future<void> verifyPhone(
+      {required String phone, required String token}) async {
     state = state.copyWith(isLoading: true);
     try {
       final authResponse = await AuthServices().verifyPhone(
@@ -140,7 +150,8 @@ class AuthNotifier extends _$AuthNotifier {
   }) async {
     state = state.copyWith(isLoading: true, error: null, otpSent: false);
     try {
-      final response = await AuthServices().updatePassword(email: email, password: password, token: token, tokenHash: tokenHash);
+      final response = await AuthServices().updatePassword(
+          email: email, password: password, token: token, tokenHash: tokenHash);
       print('response $response');
       state = state.copyWith(isLoading: false, otpSent: true);
     } catch (error) {

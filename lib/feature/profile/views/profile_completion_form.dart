@@ -71,6 +71,19 @@ class ProfileCompletionForm extends HookConsumerWidget {
       },
     );
 
+    useEffect(() {
+      return () {
+        fullnameController.dispose();
+        emailController.dispose();
+        phoneController.dispose();
+        organizationController.dispose();
+        categories.dispose();
+        identification.dispose();
+        profileImage.dispose();
+        codeController.dispose();
+      };
+    }, []);
+
     ref.listen(
       profileNotifierProvider,
       (prev, next) async {
@@ -98,15 +111,6 @@ class ProfileCompletionForm extends HookConsumerWidget {
             onPressed: () async {
               ref.invalidate(profileInterestsNotifierProvider);
 
-              fullnameController.dispose();
-              emailController.dispose();
-              phoneController.dispose();
-              organizationController.dispose();
-              categories.dispose();
-              identification.dispose();
-              profileImage.dispose();
-              codeController.dispose();
-
               router.go(OnboardingRoute(id: userId).location);
             },
           );
@@ -119,9 +123,12 @@ class ProfileCompletionForm extends HookConsumerWidget {
         Future.microtask(
           () async {
             final User? user = AuthServices().currentUser;
-            await ref.read(profileNotifierProvider.notifier).fetchProfile(user!.id);
+            await ref
+                .read(profileNotifierProvider.notifier)
+                .fetchProfile(user!.id);
 
-            categories.value = await ref.watch(categoryRepositoryProvider).fetchCategories();
+            categories.value =
+                await ref.watch(categoryRepositoryProvider).fetchCategories();
           },
         );
 
@@ -144,7 +151,6 @@ class ProfileCompletionForm extends HookConsumerWidget {
               organization: organizationController.text,
               profileImage: profileImage.value,
               identification: identification.value,
-              role: ProfileType.values.byName(role),
             );
       }
     }
@@ -172,7 +178,8 @@ class ProfileCompletionForm extends HookConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  if (role == ProfileType.recruiter.name) const RecruiterHeaderCard(),
+                  if (role == ProfileType.recruiter.name)
+                    const RecruiterHeaderCard(),
                   const Gap(16),
                   if (role == ProfileType.recruiter.name)
                     Text(
@@ -184,7 +191,9 @@ class ProfileCompletionForm extends HookConsumerWidget {
                   _UserProfileAvatar(
                     profileImage: profileImage.value,
                     onPressed: () async {
-                      await ref.read(contentPickerNotifierProvider.notifier).pickImages();
+                      await ref
+                          .read(contentPickerNotifierProvider.notifier)
+                          .pickImages();
                     },
                   ),
                   Text(
@@ -196,7 +205,8 @@ class ProfileCompletionForm extends HookConsumerWidget {
                   InputField.text(
                     controller: fullnameController,
                     readOnly: state.profile?.fullName != null,
-                    inputIcon: SvgPicture.asset(Assets.images.svg.profileIcon.path),
+                    inputIcon:
+                        SvgPicture.asset(Assets.images.svg.profileIcon.path),
                     hintText: 'Full name',
                     filled: true,
                     validator: validateFullname,
@@ -205,7 +215,8 @@ class ProfileCompletionForm extends HookConsumerWidget {
                   InputField.email(
                     controller: emailController,
                     readOnly: state.profile?.email != null,
-                    inputIcon: SvgPicture.asset(Assets.images.svg.emailIcon.path),
+                    inputIcon:
+                        SvgPicture.asset(Assets.images.svg.emailIcon.path),
                     hintText: 'Email address',
                     filled: true,
                     validator: validateEmail,
@@ -221,7 +232,8 @@ class ProfileCompletionForm extends HookConsumerWidget {
                   if (role == ProfileType.recruiter.name)
                     InputField.text(
                       controller: organizationController,
-                      inputIcon: SvgPicture.asset(Assets.images.svg.organizationIcon.path),
+                      inputIcon: SvgPicture.asset(
+                          Assets.images.svg.organizationIcon.path),
                       hintText: 'Organization',
                       filled: true,
                       validator: validateOrganization,
@@ -230,17 +242,23 @@ class ProfileCompletionForm extends HookConsumerWidget {
                   InterestChoiceChip(
                     categories: categories.value,
                     selectedInterests: interestList,
-                    onSelected: (value) => ref.read(profileInterestsNotifierProvider.notifier).addToInterestList(value),
+                    onSelected: (value) => ref
+                        .read(profileInterestsNotifierProvider.notifier)
+                        .addToInterestList(value),
                   ),
                   const Gap(16),
                   if (role == ProfileType.recruiter.name)
                     RecruiterIdentificationCard(
                       imageFile: identification.value,
-                      onTap: () async => await ref.read(contentPickerNotifierProvider.notifier).pickIdentificationImage(),
+                      onTap: () async => await ref
+                          .read(contentPickerNotifierProvider.notifier)
+                          .pickIdentificationImage(),
                       onClear: () => identification.value = null,
                     ),
                   PrimaryButton(
-                    label: role == ProfileType.recruiter.name ? 'Submit Verification' : 'Save',
+                    label: role == ProfileType.recruiter.name
+                        ? 'Submit Verification'
+                        : 'Save',
                     onPressed: handleSubmit,
                   ),
                   const Gap(32),
@@ -312,49 +330,3 @@ class _UserProfileAvatar extends StatelessWidget {
     );
   }
 }
-
-
-
-
-    /*
-      Future<void> showInterestListModal(BuildContext context, List<CategoryModel> interests) {
-        return showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          showDragHandle: true,
-          backgroundColor: ColorPallete.inputFilledColor,
-          builder: (context) {
-            return StatefulBuilder(
-              builder: (context, setState) => Consumer(
-                builder: (context, ref, child) {
-                  final selectedInterests = ref.watch(recruiterInterestsNotifierProvider);
-
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: interests.length,
-                    itemBuilder: (context, index) {
-                      final interestName = interests[index].name;
-                      final isSelected = selectedInterests.contains(interestName);
-
-                      return CheckboxListTile(
-                        value: isSelected,
-                        title: Text(interestName),
-                        checkColor: ColorPallete.backgroundColor,
-                        activeColor: ColorPallete.magenta,
-                        selected: isSelected,
-                        selectedTileColor: ColorPallete.inputFilledColor,
-                        onChanged: (value) {
-                          ref.read(recruiterInterestsNotifierProvider.notifier).addToInterestList(interestName);
-                          setState(() {});
-                        },
-                      );
-                    },
-                  );
-                },
-              ),
-            );
-          },
-        );
-      }
-    */

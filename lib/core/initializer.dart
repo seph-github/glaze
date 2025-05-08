@@ -2,13 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:glaze/core/services/secure_storage_services.dart';
 import 'package:glaze/data/local/shared_prefs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-import '../feature/profile/models/profile/profile.dart';
-import '../feature/profile/provider/user_profile_provider/user_profile_provider.dart';
 
 Future<ProviderContainer> initializer() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,16 +34,17 @@ Future<ProviderContainer> initializer() async {
     ),
   );
 
-  final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  final cachedUser = await SecureCache.load('user_profile', (json) => Profile.fromJson(json));
-  print('🔐 Loaded cached user: $cachedUser');
+  final SharedPreferences sharedPreferences =
+      await SharedPreferences.getInstance();
+  // final cachedUser = await SecureCache.load('user_profile', (json) => Profile.fromJson(json));
+  // print('🔐 Loaded cached user: $cachedUser');
   return ProviderContainer(
     overrides: [
       sharedPrefsProvider.overrideWithValue(sharedPreferences),
-      userProfileProvider.overrideWith((ref) {
-        print('✅ userProfileProvider override used with cachedUser: $cachedUser');
-        return Future.value(cachedUser);
-      }),
+      // userProfileProvider.overrideWith((ref) {
+      //   print('✅ userProfileProvider override used with cachedUser: $cachedUser');
+      //   return Future.value(cachedUser);
+      // }),
     ],
   );
 }

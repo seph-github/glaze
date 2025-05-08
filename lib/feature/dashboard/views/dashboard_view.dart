@@ -26,7 +26,6 @@ class DashboardView extends HookConsumerWidget with WidgetsBindingObserver {
 
     final router = GoRouter.of(context);
     final currentPath = router.state.fullPath;
-    print('current path $currentPath');
 
     final hideNavBar = useState<bool>(false);
 
@@ -53,22 +52,18 @@ class DashboardView extends HookConsumerWidget with WidgetsBindingObserver {
       final sub = ref.listenManual(
         connectivityResultProvider,
         (prev, next) {
-          if (next
-              case AsyncData(
-                :final value
-              )) {
+          if (next case AsyncData(:final value)) {
             final isOffline = value.contains(ConnectivityResult.none);
-            final isOnline = value.contains(ConnectivityResult.wifi) || value.contains(ConnectivityResult.mobile) || value.contains(ConnectivityResult.vpn);
+            final isOnline = value.contains(ConnectivityResult.wifi) ||
+                value.contains(ConnectivityResult.mobile) ||
+                value.contains(ConnectivityResult.vpn);
 
             if (isOffline) {
               CustomSnackBar.showSnackBar(
                 context,
                 content: const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Offline'),
-                    Icon(Icons.wifi_off_rounded)
-                  ],
+                  children: [Text('Offline'), Icon(Icons.wifi_off_rounded)],
                 ),
               );
             } else if (isOnline) {
