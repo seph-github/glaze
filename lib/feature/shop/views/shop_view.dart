@@ -3,7 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/components/app_bar_with_back_button.dart';
 import 'package:glaze/config/enum/product_type.dart';
-import 'package:glaze/feature/shop/provider/products_provider.dart';
+import 'package:glaze/feature/shop/provider/products_provider/products_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

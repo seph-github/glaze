@@ -3,7 +3,7 @@ import 'package:glaze/feature/shop/models/shop_product/shop_product.dart';
 import 'package:glaze/feature/shop/services/product_services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../models/donut/donut.dart';
+import '../../models/donut/donut.dart';
 
 part 'products_provider.freezed.dart';
 part 'products_provider.g.dart';

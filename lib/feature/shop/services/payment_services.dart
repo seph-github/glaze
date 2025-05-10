@@ -5,6 +5,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class PaymentServices {
   Future<void> makePayment(String amount) async {
     try {
+      const merchantDisplayName = String.fromEnvironment('appName', defaultValue: '');
+
       final SupabaseClient supabase = Supabase.instance.client;
       final response = await supabase.functions.invoke('create_payment_intent', body: {
         'amount': amount,
@@ -18,7 +20,7 @@ class PaymentServices {
       await Stripe.instance.initPaymentSheet(
         paymentSheetParameters: SetupPaymentSheetParameters(
           paymentIntentClientSecret: clientSecret,
-          merchantDisplayName: 'Glaze',
+          merchantDisplayName: merchantDisplayName,
         ),
       );
 
