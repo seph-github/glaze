@@ -24,10 +24,10 @@ class DashboardView extends HookConsumerWidget with WidgetsBindingObserver {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentIndex = useState(navigationShell.currentIndex);
 
-    final router = GoRouter.of(context);
-    final currentPath = router.state.fullPath;
+    // final router = GoRouter.of(context);
+    // final currentPath = router.state.fullPath;
 
-    final hideNavBar = useState<bool>(false);
+    // final hideNavBar = useState<bool>(false);
 
     void onTabSelected(int index) async {
       if (index == 2 && context.mounted) {
@@ -52,18 +52,22 @@ class DashboardView extends HookConsumerWidget with WidgetsBindingObserver {
       final sub = ref.listenManual(
         connectivityResultProvider,
         (prev, next) {
-          if (next case AsyncData(:final value)) {
+          if (next
+              case AsyncData(
+                :final value
+              )) {
             final isOffline = value.contains(ConnectivityResult.none);
-            final isOnline = value.contains(ConnectivityResult.wifi) ||
-                value.contains(ConnectivityResult.mobile) ||
-                value.contains(ConnectivityResult.vpn);
+            final isOnline = value.contains(ConnectivityResult.wifi) || value.contains(ConnectivityResult.mobile) || value.contains(ConnectivityResult.vpn);
 
             if (isOffline) {
               CustomSnackBar.showSnackBar(
                 context,
                 content: const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [Text('Offline'), Icon(Icons.wifi_off_rounded)],
+                  children: [
+                    Text('Offline'),
+                    Icon(Icons.wifi_off_rounded)
+                  ],
                 ),
               );
             } else if (isOnline) {
@@ -79,19 +83,21 @@ class DashboardView extends HookConsumerWidget with WidgetsBindingObserver {
       return sub.close;
     }, []);
 
-    if (currentPath!.contains('/settings')) {
-      hideNavBar.value = true;
-    } else {
-      hideNavBar.value = false;
-    }
+    // if (currentPath!.contains('/settings')) {
+    //   hideNavBar.value = true;
+    // } else {
+    //   hideNavBar.value = false;
+    // }
 
     return LoadingLayout(
-      bottomNavigationBar: !hideNavBar.value
-          ? GlazeNavBar(
-              onDestinationSelected: onTabSelected,
-              navigationShell: navigationShell,
-            )
-          : null,
+      bottomNavigationBar:
+          // !hideNavBar.value
+          // ?
+          GlazeNavBar(
+        onDestinationSelected: onTabSelected,
+        navigationShell: navigationShell,
+      ),
+      // : null,
       child: navigationShell,
     );
   }

@@ -21,7 +21,6 @@ class GeneralSettingsView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(authNotifierProvider);
-    final router = GoRouter.of(context);
     final isLightMode = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
     final lightmode = useState<bool>(isLightMode);
 
@@ -88,7 +87,7 @@ class GeneralSettingsView extends HookConsumerWidget {
               cardLabel: 'ACCOUNT SETTINGS',
               children: [
                 SettingsMenuTile(
-                  onTap: () => router.go(const PersonalDetailsRoute().location),
+                  onTap: () async => await const PersonalDetailsRoute().push<void>(context),
                   label: 'Account Details',
                   icon: SvgPicture.asset(Assets.images.svg.personalDetailsIcon.path),
                   trailing: const Icon(
@@ -150,7 +149,7 @@ class GeneralSettingsView extends HookConsumerWidget {
                     Icons.chevron_right_rounded,
                     size: 24.0,
                   ),
-                  onTap: () => router.push(const TermsAndConditionRoute().location),
+                  onTap: () async => await const TermsAndConditionRoute().push<void>(context),
                 ),
               ],
             ),

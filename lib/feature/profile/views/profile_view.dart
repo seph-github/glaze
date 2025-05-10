@@ -13,6 +13,7 @@ import '../../../config/enum/profile_type.dart';
 import '../../../core/navigation/router.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../gen/assets.gen.dart';
+import '../../../gen/fonts.gen.dart';
 import '../../auth/services/auth_services.dart';
 // import '../../settings/providers/settings_theme_provider.dart';
 import '../../templates/loading_layout.dart';
@@ -51,7 +52,11 @@ class ProfileView extends HookConsumerWidget {
       isLoading: state.isLoading,
       appBar: AppBarWithBackButton(
         showBackButton: false,
-        backgroundColor: Colors.transparent,
+        title: const Text('Profile'),
+        titleTextStyle: Theme.of(context).textTheme.headlineLarge?.copyWith(
+              fontFamily: FontFamily.hitAndRun,
+            ),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         actions: [
           if (state.profile?.role == ProfileType.recruiter.name)
             InkWell(
@@ -100,7 +105,6 @@ class ProfileView extends HookConsumerWidget {
               children: [
                 ProfileHeaderSection(
                   profile: state.profile,
-                  backgroundColor: ColorPallete.slateViolet,
                 ),
                 const SizedBox(height: 20),
                 Padding(

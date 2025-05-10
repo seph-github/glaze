@@ -172,15 +172,15 @@ GoRouter router(Ref ref) {
       routes: [
         TypedGoRoute<ProfileRoute>(
           path: '/profile',
-          routes: [
-            TypedGoRoute<GeneralSettingsRoute>(
-              path: 'settings',
-              routes: [
-                TypedGoRoute<PersonalDetailsRoute>(path: 'personal_details'),
-                TypedGoRoute<TermsAndConditionRoute>(path: 'terms_and_conditions'),
-              ],
-            )
-          ],
+          // routes: [
+          //   TypedGoRoute<GeneralSettingsRoute>(
+          //     path: 'settings',
+          //     routes: [
+          //       TypedGoRoute<PersonalDetailsRoute>(path: 'personal_details'),
+          //       TypedGoRoute<TermsAndConditionRoute>(path: 'terms_and_conditions'),
+          //     ],
+          // )
+          // ],
         ),
       ],
     ),
@@ -420,6 +420,7 @@ class ViewUserProfileRoute extends GoRouteData {
 //     TypedGoRoute<TermsAndConditionRoute>(path: 'terms_and_conditions'),
 //   ],
 // )
+@TypedGoRoute<GeneralSettingsRoute>(path: '/general-settings')
 class GeneralSettingsRoute extends GoRouteData {
   const GeneralSettingsRoute();
 
@@ -527,6 +528,7 @@ class ProfileInteractiveRoute extends GoRouteData {
   }
 }
 
+@TypedGoRoute<PersonalDetailsRoute>(path: '/personal-details')
 class PersonalDetailsRoute extends GoRouteData {
   const PersonalDetailsRoute();
 
@@ -536,6 +538,7 @@ class PersonalDetailsRoute extends GoRouteData {
   }
 }
 
+@TypedGoRoute<TermsAndConditionRoute>(path: '/terms-and-conditions')
 class TermsAndConditionRoute extends GoRouteData {
   const TermsAndConditionRoute();
 
