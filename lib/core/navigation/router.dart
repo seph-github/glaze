@@ -12,6 +12,8 @@ import 'package:glaze/feature/dashboard/views/dashboard_view.dart';
 import 'package:glaze/feature/profile/views/profile_edit_form.dart';
 import 'package:glaze/feature/profile/views/profile_interactive_view.dart';
 import 'package:glaze/feature/settings/views/terms_and_condition_view.dart';
+import 'package:glaze/feature/shop/models/shop_product/shop_product.dart';
+import 'package:glaze/feature/shop/views/checkout_view.dart';
 import 'package:glaze/feature/shop/views/shop_view.dart';
 import 'package:glaze/feature/profile/views/profile_view.dart';
 import 'package:glaze/feature/video/view/video_preview_view.dart';
@@ -540,5 +542,18 @@ class TermsAndConditionRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const TermsAndConditionsPage();
+  }
+}
+
+@TypedGoRoute<CheckoutRoute>(path: '/checkout')
+class CheckoutRoute extends GoRouteData {
+  const CheckoutRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    final extra = state.extra as Map<String, dynamic>;
+    final ShopProduct product = extra['product'];
+
+    return CheckoutView(product: product);
   }
 }

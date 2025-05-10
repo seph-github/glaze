@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:glaze/data/local/shared_prefs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -10,6 +11,8 @@ Future<ProviderContainer> initializer() async {
   WidgetsFlutterBinding.ensureInitialized();
   const url = String.fromEnvironment('url', defaultValue: '');
   const apiKey = String.fromEnvironment('apiKey', defaultValue: '');
+
+  Stripe.publishableKey = const String.fromEnvironment('stripe_publishable_key', defaultValue: '');
 
   await Supabase.initialize(
     url: url,
@@ -34,8 +37,7 @@ Future<ProviderContainer> initializer() async {
     ),
   );
 
-  final SharedPreferences sharedPreferences =
-      await SharedPreferences.getInstance();
+  final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   // final cachedUser = await SecureCache.load('user_profile', (json) => Profile.fromJson(json));
   // print('🔐 Loaded cached user: $cachedUser');
   return ProviderContainer(

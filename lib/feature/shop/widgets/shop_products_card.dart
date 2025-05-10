@@ -2,28 +2,27 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
+import 'package:glaze/core/navigation/router.dart';
 import 'package:glaze/feature/challenges/widgets/circle_stack.dart';
-import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../components/buttons/primary_button.dart';
 import '../../../config/enum/product_type.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../gen/assets.gen.dart';
 import '../../../utils/app_timer.dart';
+import '../../../utils/price_formatter.dart';
 import '../models/shop_product/shop_product.dart';
 
 class ShopProductsCard extends StatelessWidget {
   const ShopProductsCard({
     super.key,
     required this.product,
+    this.showBotton = true,
   });
 
   final ShopProduct product;
-
-  String get priceInDollars {
-    final formatCurrency = NumberFormat.currency(symbol: '\$', decimalDigits: 2);
-    return formatCurrency.format(product.priceCents / 100);
-  }
+  final bool showBotton;
 
   Color get backgroundColor {
     if (product.color == null) {
@@ -50,6 +49,8 @@ class ShopProductsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final router = GoRouter.of(context);
+
     return Column(
       children: <Widget>[
         Container(
@@ -129,7 +130,7 @@ class ShopProductsCard extends StatelessWidget {
                     ),
                     const Spacer(),
                     Text(
-                      '$priceInDollars${product.type == ProductType.subscription ? '/month' : ''}',
+                      '${priceInDollars(product.priceCents)}${product.type == ProductType.subscription ? '/month' : ''}',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900, color: Colors.white),
                     ),
                   ],
@@ -162,13 +163,18 @@ class ShopProductsCard extends StatelessWidget {
                     }).toList(),
                   ),
                 const Gap(10),
-                PrimaryButton(
-                  label: buttonText,
-                  foregroundColor: product.type == ProductType.featured ? ColorPallete.blackPearl : Colors.white,
-                  backgroundColor: backgroundColor,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                  onPressed: () {},
-                ),
+                if (showBotton)
+                  PrimaryButton(
+                    label: buttonText,
+                    foregroundColor: product.type == ProductType.featured ? ColorPallete.blackPearl : Colors.white,
+                    backgroundColor: backgroundColor,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    onPressed: () async {
+                      router.push(const CheckoutRoute().location, extra: {
+                        'product': product,
+                      });
+                    },
+                  ),
               ],
             ),
           ),
