@@ -45,83 +45,102 @@ class ChallengesCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final randomColor = lightColors[index % lightColors.length];
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16.0),
-      padding: const EdgeInsets.all(12.0),
-      decoration: BoxDecoration(
-        color: randomColor.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(24.0),
-        border: Border.all(color: randomColor, width: 0.05),
-      ),
-      child: Column(
-        children: <Widget>[
-          _buildTitleSharingSection(randomColor, context),
-          if (challenge.description != null)
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                challenge.description ?? '',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontFamily: FontFamily.robotoRegular,
-                      color: ColorPallete.persianFable,
-                      fontSize: 12.0,
-                    ),
+    return ClipRRect(
+      clipBehavior: Clip.hardEdge,
+      child: Container(
+        padding: const EdgeInsets.all(12.0),
+        decoration: BoxDecoration(
+          color: randomColor.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(24.0),
+          border: Border.all(color: randomColor, width: 0.05),
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: randomColor.withValues(alpha: 0.3),
+                blurRadius: 100,
+                spreadRadius: 0,
               ),
-            ),
-          _buildDurationSection(),
-          const Gap(8),
-          Container(
-            alignment: Alignment.center,
-            height: 40.0,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16.0),
-              color: randomColor.withValues(alpha: 0.4),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Flexible(
+            ],
+          ),
+          child: Column(
+            children: <Widget>[
+              _buildTitleSharingSection(randomColor, context),
+              if (challenge.description != null)
+                Align(
+                  alignment: Alignment.centerLeft,
                   child: Text(
-                    _getPrizeText(challenge.prize ?? ''),
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontFamily: FontFamily.robotoBold,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                    challenge.description ?? '',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontFamily: FontFamily.robotoRegular,
+                          color: ColorPallete.persianFable,
+                          fontSize: 12.0,
                         ),
                   ),
                 ),
-                // Flexible(
-                //   child: Text(
-                //     _getPrizeText(challenge.prize ?? ''),
-                //     overflow: TextOverflow.clip,
-                //     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                //           fontFamily: FontFamily.robotoBold,
-                //           color: Colors.white,
-                //           fontSize: 20.0,
-                //         ),
-                //   ),
-                // ),
-              ],
-            ),
+              _buildDurationSection(),
+              const Gap(8),
+              Container(
+                alignment: Alignment.center,
+                height: 40.0,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16.0),
+                  color: randomColor.withValues(alpha: 0.4),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Flexible(
+                      child: Text(
+                        _getPrizeText(challenge.prize ?? ''),
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontFamily: FontFamily.robotoBold,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                      ),
+                    ),
+                    // Flexible(
+                    //   child: Text(
+                    //     _getPrizeText(challenge.prize ?? ''),
+                    //     overflow: TextOverflow.clip,
+                    //     style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    //           fontFamily: FontFamily.robotoBold,
+                    //           color: Colors.white,
+                    //           fontSize: 20.0,
+                    //         ),
+                    //   ),
+                    // ),
+                  ],
+                ),
+              ),
+              const Gap(12),
+              PrimaryButton(
+                onPressed: () async {
+                  await Dialogs.createContentDialog(
+                    context,
+                    title: 'Warning!',
+                    content: 'Feature Under-Development',
+                    onPressed: () => context.pop(),
+                  );
+                },
+                label: 'Join The Challenge',
+                icon: SvgPicture.asset(
+                  Assets.images.svg.uploadIcon.path,
+                  height: 20.0,
+                ),
+                style: const TextStyle(fontWeight: FontWeight.w800),
+                borderRadius: 16.0,
+                height: 40,
+                backgroundColor: randomColor.withValues(alpha: 0.6),
+              ),
+            ],
           ),
-          const Gap(12),
-          PrimaryButton(
-            onPressed: () async {
-              await Dialogs.createContentDialog(
-                context,
-                title: 'Warning!',
-                content: 'Feature Under-Development',
-                onPressed: () => context.pop(),
-              );
-            },
-            label: 'Join',
-            borderRadius: 16.0,
-            height: 40,
-            backgroundColor: randomColor.withValues(alpha: 0.6),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -129,15 +148,6 @@ class ChallengesCard extends StatelessWidget {
   Widget _buildDurationSection() {
     return Row(
       children: <Widget>[
-        SvgPicture.asset(
-          Assets.images.svg.timerIcon.path,
-          height: 24.0,
-          colorFilter: const ColorFilter.mode(
-            ColorPallete.persianFable,
-            BlendMode.srcIn,
-          ),
-        ),
-        const Gap(8),
         AppTimer(startDate: challenge.startDate, endDate: challenge.endDate),
         const Spacer(),
         const SizedBox(

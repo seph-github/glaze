@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:gap/gap.dart';
+import 'package:glaze/gen/assets.gen.dart';
 
 import '../../../core/styles/color_pallete.dart';
 import '../../../gen/fonts.gen.dart';
@@ -53,18 +56,39 @@ class _ChallengeTimerState extends State<AppTimer> {
 
   @override
   Widget build(BuildContext context) {
+    if (remainingTime == Duration.zero) {
+      return Text(
+        'Expired',
+        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              fontFamily: FontFamily.robotoRegular,
+              color: ColorPallete.parlourRed,
+              fontSize: 16.0,
+            ),
+      );
+    }
+
     final days = remainingTime.inDays;
     final hours = remainingTime.inHours % 24;
     final minutes = remainingTime.inMinutes % 60;
     final seconds = remainingTime.inSeconds % 60;
 
-    return Text(
-      '${days}d:${hours}h:${minutes}m:${seconds}s',
-      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            fontFamily: FontFamily.robotoRegular,
-            color: ColorPallete.persianFable,
-            fontSize: 16.0,
-          ),
+    return Row(
+      children: [
+        SvgPicture.asset(
+          Assets.images.svg.timerIcon.path,
+          height: 24.0,
+        ),
+        const Gap(4),
+        Text(
+          '${days == 0 ? '' : '$days:'}${hours == 0 ? '' : '$hours:'}${minutes == 0 ? '' : '$minutes:'}${seconds}s',
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontFamily: FontFamily.robotoRegular,
+                color: ColorPallete.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 16.0,
+              ),
+        ),
+      ],
     );
   }
 }

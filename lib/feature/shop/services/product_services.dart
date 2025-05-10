@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:glaze/feature/shop/models/shop_product.dart';
+import 'package:glaze/feature/shop/models/shop_product/shop_product.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/donut/donut.dart';
@@ -16,6 +16,8 @@ class ProductServices {
           throw TimeoutException('Error Server Request');
         },
       );
+
+      print('Services $response');
 
       if (response.isEmpty) return [];
 

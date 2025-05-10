@@ -16,6 +16,7 @@ class PrimaryButton extends StatelessWidget {
     this.height,
     this.width,
     this.icon,
+    this.style,
   }) : borderRadius = borderRadius ?? 32.0;
 
   final String label;
@@ -27,6 +28,7 @@ class PrimaryButton extends StatelessWidget {
   final double? height;
   final double? width;
   final Widget? icon;
+  final TextStyle? style;
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +55,10 @@ class PrimaryButton extends StatelessWidget {
                 children: [
                   if (icon != null) icon ?? const SizedBox.shrink(),
                   const Gap(10),
-                  Text(label),
+                  Text(
+                    label,
+                    style: style,
+                  ),
                 ],
               ),
       ),

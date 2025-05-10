@@ -19,14 +19,9 @@ class ChallengesView extends StatelessWidget {
             ),
             Text(
               'Stay tuned for exciting challenges to test your skills!',
-              style: Theme.of(context)
-                  .textTheme
-                  .labelLarge
-                  ?.copyWith(color: Colors.grey),
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.grey),
             ),
             const Gap(10),
-            // const ChallengesCard(),
-            // const ChallengesCard(),
           ],
         ),
       ),

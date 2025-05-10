@@ -55,36 +55,42 @@ class MomentsUpcomingTabview extends HookConsumerWidget {
       );
     }
 
-    return CustomScrollView(
-      slivers: [
-        SliverToBoxAdapter(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                'Upcoming Challenges',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontFamily: FontFamily.robotoBold),
-              ),
-              Text(
-                'Stay tuned for exciting challenges to test your skills!',
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(color: ColorPallete.hintTextColor),
-              ),
-              const Gap(10),
-            ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      child: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  'Upcoming Challenges',
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontFamily: FontFamily.robotoBold),
+                ),
+                Text(
+                  'Stay tuned for exciting challenges to test your skills!',
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(color: ColorPallete.hintTextColor),
+                ),
+                const Gap(10),
+              ],
+            ),
           ),
-        ),
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              return ChallengesCard(
-                challenge: upcomingChallenges[index],
-                index: index,
-              );
-            },
-            childCount: upcomingChallenges.length,
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12.0),
+                  child: ChallengesCard(
+                    challenge: upcomingChallenges[index],
+                    index: index,
+                  ),
+                );
+              },
+              childCount: upcomingChallenges.length,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

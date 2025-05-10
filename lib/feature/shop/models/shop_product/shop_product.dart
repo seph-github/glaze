@@ -1,7 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:glaze/config/enum/product_type.dart';
 
-import 'donut/donut.dart';
+import '../donut/donut.dart';
+import '../features/features.dart';
 
 part 'shop_product.freezed.dart';
 part 'shop_product.g.dart';
@@ -23,7 +24,7 @@ class ShopProduct with _$ShopProduct {
     @Default([]) List<Donut>? donuts,
     @JsonKey(name: 'start_at') DateTime? startAt,
     @JsonKey(name: 'end_at') DateTime? endAt,
-    List<String>? features,
+    List<Features>? features,
     String? color,
   }) = _ShopProduct;
 

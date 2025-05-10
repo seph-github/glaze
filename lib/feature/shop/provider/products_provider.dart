@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:glaze/feature/shop/models/shop_product.dart';
+import 'package:glaze/feature/shop/models/shop_product/shop_product.dart';
 import 'package:glaze/feature/shop/services/product_services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -38,6 +38,9 @@ class ProductsNotifier extends _$ProductsNotifier {
     state = state.copyWith(isLoading: true);
     try {
       final response = await _productServices.fetchAvailableProducts();
+
+      print('respone provider $response');
+
       final donutResponse = await _productServices.fetchAvailableDonuts();
 
       if (response.isEmpty) {
