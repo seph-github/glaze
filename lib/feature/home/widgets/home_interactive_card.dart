@@ -68,7 +68,8 @@ class HomeInteractiveCard extends HookConsumerWidget {
             children: <Widget>[
               MorphismWidget.rounded(
                 onTap: () {
-                  router.push(const ChallengesRoute().location);
+                  // TODO: Challenges screen
+                  // router.push(const ChallengesRoute().location);
                 },
                 width: width / 2,
                 height: 40,

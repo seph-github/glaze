@@ -3,7 +3,9 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class PaymentServices {
-  Future<void> makePayment(String amount) async {
+  const PaymentServices._();
+
+  static Future<void> makePayment(String amount) async {
     try {
       const merchantDisplayName = String.fromEnvironment('appName', defaultValue: '');
 
@@ -12,8 +14,6 @@ class PaymentServices {
         'amount': amount,
       });
       final data = response.data;
-
-      print('data $data');
 
       final clientSecret = data['clientSecret'];
 
@@ -29,6 +29,7 @@ class PaymentServices {
       print('✅ Payment successful!');
     } catch (e) {
       print('❌ Payment failed: $e');
+      rethrow;
     }
   }
 }

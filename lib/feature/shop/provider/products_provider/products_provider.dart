@@ -39,8 +39,6 @@ class ProductsNotifier extends _$ProductsNotifier {
     try {
       final response = await _productServices.fetchAvailableProducts();
 
-      print('respone provider $response');
-
       final donutResponse = await _productServices.fetchAvailableDonuts();
 
       if (response.isEmpty) {

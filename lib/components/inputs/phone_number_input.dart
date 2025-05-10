@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:glaze/providers/json_parser/json_parser.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../core/styles/color_pallete.dart';
+import '../../data/providers/json_parser/json_parser.dart';
 import '../../feature/auth/models/country_code.dart';
 import '../../feature/settings/providers/settings_theme_provider.dart';
 
@@ -34,8 +34,7 @@ class PhoneNumberInput extends HookConsumerWidget {
 
     return Consumer(
       builder: (context, ref, _) {
-        final isLightTheme =
-            ref.watch(settingsThemeProviderProvider) == ThemeData.light();
+        final isLightTheme = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
         final countryCodes = ref.watch(countryCodesProvider).value;
         return Column(
           children: [
@@ -52,34 +51,26 @@ class PhoneNumberInput extends HookConsumerWidget {
                 hintText: 'Phone Number',
                 border: const OutlineInputBorder(),
                 focusedErrorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(
-                      borderRadius ?? defaultBorderRadius),
+                  borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
                   borderSide: const BorderSide(
                     color: ColorPallete.whiteSmoke,
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(
-                      borderRadius ?? defaultBorderRadius),
+                  borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
                   borderSide: BorderSide(
-                    color: isLightTheme
-                        ? lightModeColor ?? ColorPallete.backgroundColor
-                        : ColorPallete.whiteSmoke,
+                    color: isLightTheme ? lightModeColor ?? ColorPallete.backgroundColor : ColorPallete.whiteSmoke,
                   ),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(
-                      borderRadius ?? defaultBorderRadius),
+                  borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
                   borderSide: BorderSide(
                     width: 1 / 4,
-                    color: isLightTheme
-                        ? lightModeColor ?? ColorPallete.backgroundColor
-                        : ColorPallete.persianFable,
+                    color: isLightTheme ? lightModeColor ?? ColorPallete.backgroundColor : ColorPallete.persianFable,
                   ),
                 ),
                 errorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(
-                      borderRadius ?? defaultBorderRadius),
+                  borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
                   borderSide: const BorderSide(
                     width: 1,
                     color: ColorPallete.parlourRed,
@@ -133,16 +124,12 @@ class PhoneNumberInput extends HookConsumerWidget {
       context: context,
       builder: (context) {
         return Consumer(builder: (context, ref, _) {
-          final isLightTheme =
-              ref.watch(settingsThemeProviderProvider) == ThemeData.light();
+          final isLightTheme = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
           return Container(
             height: 300,
             decoration: BoxDecoration(
-              color: isLightTheme
-                  ? Colors.white
-                  : ColorPallete.lightBackgroundColor,
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(16)),
+              color: isLightTheme ? Colors.white : ColorPallete.lightBackgroundColor,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
             ),
             child: Column(
               children: [
@@ -153,11 +140,8 @@ class PhoneNumberInput extends HookConsumerWidget {
                     child: TextButton(
                       onPressed: () => Navigator.pop(context),
                       style: TextButton.styleFrom(
-                        backgroundColor: isLightTheme
-                            ? Colors.white
-                            : ColorPallete.lightBackgroundColor,
-                        foregroundColor:
-                            isLightTheme ? Colors.blue : Colors.white,
+                        backgroundColor: isLightTheme ? Colors.white : ColorPallete.lightBackgroundColor,
+                        foregroundColor: isLightTheme ? Colors.blue : Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -182,8 +166,7 @@ class PhoneNumberInput extends HookConsumerWidget {
                               countryCodes[index].name,
                               style: TextStyle(
                                 fontSize: 20,
-                                color:
-                                    isLightTheme ? Colors.black : Colors.white,
+                                color: isLightTheme ? Colors.black : Colors.white,
                               ),
                             ),
                             const Gap(16.0),
@@ -191,8 +174,7 @@ class PhoneNumberInput extends HookConsumerWidget {
                               countryCodes[index].dialCode,
                               style: TextStyle(
                                 fontSize: 20,
-                                color:
-                                    isLightTheme ? Colors.black : Colors.white,
+                                color: isLightTheme ? Colors.black : Colors.white,
                               ),
                             ),
                           ],

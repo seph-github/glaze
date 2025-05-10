@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/components/morphism_widget.dart';
+import 'package:glaze/core/navigation/router.dart';
 import 'package:glaze/core/styles/color_pallete.dart';
 import 'package:glaze/feature/challenges/models/challenge.dart';
 import 'package:glaze/feature/challenges/widgets/circle_stack.dart';
@@ -9,9 +10,9 @@ import 'package:glaze/gen/fonts.gen.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../components/buttons/primary_button.dart';
-import '../../../components/dialogs/dialogs.dart';
 import '../../../gen/assets.gen.dart';
 import '../../../utils/app_timer.dart';
+import '../../../utils/string_formatter.dart';
 
 class ChallengesCard extends StatelessWidget {
   const ChallengesCard({
@@ -31,18 +32,9 @@ class ChallengesCard extends StatelessWidget {
     Color(0xFF2196F3),
   ];
 
-  String _getPrizeText(String value) {
-    if (value.isEmpty) return '';
-
-    if (int.tryParse(value) is int) {
-      return '\$${value.replaceAll('\$', '')}';
-    } else {
-      return value;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final router = GoRouter.of(context);
     final randomColor = lightColors[index % lightColors.length];
 
     return ClipRRect(
@@ -96,7 +88,7 @@ class ChallengesCard extends StatelessWidget {
                   children: <Widget>[
                     Flexible(
                       child: Text(
-                        _getPrizeText(challenge.prize ?? ''),
+                        getPrizeText(challenge.prize ?? ''),
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               fontFamily: FontFamily.robotoBold,
                               fontWeight: FontWeight.w700,
@@ -121,12 +113,10 @@ class ChallengesCard extends StatelessWidget {
               const Gap(12),
               PrimaryButton(
                 onPressed: () async {
-                  await Dialogs.createContentDialog(
-                    context,
-                    title: 'Warning!',
-                    content: 'Feature Under-Development',
-                    onPressed: () => context.pop(),
-                  );
+                  router.push(const ChallengeDetailsRoute().location, extra: {
+                    'challenge': challenge,
+                    'color': randomColor,
+                  });
                 },
                 label: 'Join The Challenge',
                 icon: SvgPicture.asset(

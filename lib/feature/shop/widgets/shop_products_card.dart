@@ -11,7 +11,7 @@ import '../../../config/enum/product_type.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../gen/assets.gen.dart';
 import '../../../utils/app_timer.dart';
-import '../../../utils/price_formatter.dart';
+import '../../../utils/string_formatter.dart';
 import '../models/shop_product/shop_product.dart';
 
 class ShopProductsCard extends StatelessWidget {

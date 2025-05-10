@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glaze/core/navigation/observer/route_observer_provider.dart';
 import 'package:glaze/feature/auth/views/auth_forget_password_view.dart';
 import 'package:glaze/feature/auth/views/auth_reset_password_view.dart';
+import 'package:glaze/feature/challenges/views/challenge_details_view.dart';
 import 'package:glaze/feature/dashboard/views/dashboard_view.dart';
 import 'package:glaze/feature/profile/views/profile_edit_form.dart';
 import 'package:glaze/feature/profile/views/profile_interactive_view.dart';
@@ -29,7 +30,6 @@ import '../../feature/auth/providers/auth_state_change_provider.dart';
 import '../../feature/auth/services/auth_services.dart';
 import '../../feature/auth/views/auth_phone_sign_in.dart';
 import '../../feature/auth/views/auth_verify_phone.dart';
-import '../../feature/challenges/views/challenges_view.dart';
 import '../../feature/home/models/video_content/video_content.dart';
 import '../../feature/home/views/video_feed_view.dart';
 import '../../feature/moments/views/moments_view.dart';
@@ -413,27 +413,12 @@ class ViewUserProfileRoute extends GoRouteData {
   }
 }
 
-// @TypedGoRoute<GeneralSettingsRoute>(
-//   path: '/general-settings',
-//   routes: [
-//     TypedGoRoute<PersonalDetailsRoute>(path: 'personal_details'),
-//     TypedGoRoute<TermsAndConditionRoute>(path: 'terms_and_conditions'),
-//   ],
-// )
 @TypedGoRoute<GeneralSettingsRoute>(path: '/general-settings')
 class GeneralSettingsRoute extends GoRouteData {
   const GeneralSettingsRoute();
 
   @override
   Widget build(BuildContext context, GoRouterState state) => const GeneralSettingsView();
-}
-
-@TypedGoRoute<ChallengesRoute>(path: '/challenges')
-class ChallengesRoute extends GoRouteData {
-  const ChallengesRoute();
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) => const ChallengesView();
 }
 
 @TypedGoRoute<OnboardingRoute>(path: '/onboarding/:id')
@@ -558,5 +543,21 @@ class CheckoutRoute extends GoRouteData {
     final ShopProduct product = extra['product'];
 
     return CheckoutView(product: product);
+  }
+}
+
+@TypedGoRoute<ChallengeDetailsRoute>(path: '/challenge-details')
+class ChallengeDetailsRoute extends GoRouteData {
+  const ChallengeDetailsRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    final extra = state.extra as Map<String, dynamic>?;
+    final challenge = extra?['challenge'];
+    final useColor = extra?['color'];
+    return ChallengeDetailsView(
+      challenge: challenge,
+      useColor: useColor,
+    );
   }
 }

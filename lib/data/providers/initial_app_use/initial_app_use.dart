@@ -24,5 +24,6 @@ class InitialAppUseProvider {
     await _preferences.setBool(initialAppUseCompletedKey, value);
   }
 
-  bool get completedInitialAppUse => _preferences.getBool(initialAppUseCompletedKey) ?? false;
+  bool get completedInitialAppUse =>
+      _preferences.getBool(initialAppUseCompletedKey) ?? false;
 }

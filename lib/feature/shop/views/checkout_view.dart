@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/components/app_bar_with_back_button.dart';
 import 'package:glaze/components/buttons/primary_button.dart';
+import 'package:glaze/components/dialogs/dialogs.dart';
 import 'package:glaze/feature/shop/models/shop_product/shop_product.dart';
-import 'package:glaze/feature/shop/services/payment_services.dart';
+import 'package:glaze/feature/shop/provider/payment_provider.dart/payment_provider.dart';
 import 'package:glaze/feature/shop/widgets/shop_products_card.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
-import 'package:glaze/utils/price_formatter.dart';
+import 'package:glaze/utils/string_formatter.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class CheckoutView extends StatelessWidget {
+class CheckoutView extends ConsumerWidget {
   const CheckoutView({
     super.key,
     required this.product,
@@ -17,8 +22,24 @@ class CheckoutView extends StatelessWidget {
   final ShopProduct product;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(paymentNotifierProvider);
+
+    ref.listen(paymentNotifierProvider, (prev, next) async {
+      if (next.error != null && prev?.error != next.error) {
+        final error = next.error as StripeException;
+
+        await Dialogs.createContentDialog(
+          context,
+          title: 'Payment Error',
+          content: error.error.message.toString(),
+          onPressed: () => context.pop(),
+        );
+      }
+    });
+
     return LoadingLayout(
+      isLoading: state.isLoading,
       appBar: const AppBarWithBackButton(
         title: Text('Checkout & Payment'),
         centerTitle: true,
@@ -81,9 +102,9 @@ class CheckoutView extends StatelessWidget {
                     PrimaryButton(
                       label: 'Pay With Card',
                       onPressed: () async {
-                        await PaymentServices().makePayment(
-                          product.priceCents.toString(),
-                        );
+                        await ref.read(paymentNotifierProvider.notifier).makePayment(
+                              product.priceCents.toString(),
+                            );
                       },
                     ),
                   ],
