@@ -7,9 +7,12 @@ import 'package:go_router/go_router.dart';
 import '../../core/styles/color_pallete.dart';
 import '../../data/models/category/category_model.dart';
 import '../../feature/category/provider/category_provider.dart';
+import '../../feature/moments/widgets/upload_moments_card.dart';
 import '../../feature/profile/provider/profile_interests_list_provider/profile_interests_list_provider.dart';
 
 class GlazeModal {
+  const GlazeModal._();
+
   static Future<void> showInterestListModal(BuildContext context, List<CategoryModel> interests) {
     return showModalBottomSheet(
       context: context,
@@ -132,6 +135,23 @@ class GlazeModal {
                   ),
                 ],
               ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  static Future<void> showUploadContentModalPopUp(BuildContext context) async {
+    await showCupertinoModalPopup(
+      context: context,
+      builder: (context) {
+        return RepaintBoundary(
+          child: SafeArea(
+            bottom: false,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16.0),
+              child: const UploadMomentsCard(),
             ),
           ),
         );

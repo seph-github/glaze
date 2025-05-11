@@ -115,7 +115,7 @@ class ChallengesCard extends StatelessWidget {
                 onPressed: () async {
                   router.push(const ChallengeDetailsRoute().location, extra: {
                     'challenge': challenge,
-                    'color': randomColor,
+                    'color': randomColor.toARGB32(),
                   });
                 },
                 label: 'Join The Challenge',

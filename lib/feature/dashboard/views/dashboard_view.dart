@@ -1,5 +1,4 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:glaze/components/snack_bar/custom_snack_bar.dart';
@@ -9,7 +8,7 @@ import 'package:glaze/feature/dashboard/providers/dashboard_tab_controller_provi
 import 'package:glaze/feature/templates/loading_layout.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../moments/widgets/upload_moments_card.dart';
+import '../../../components/modals/glaze_modals.dart';
 import '../widgets/glaze_nav_bar.dart';
 
 class DashboardView extends HookConsumerWidget with WidgetsBindingObserver {
@@ -27,7 +26,7 @@ class DashboardView extends HookConsumerWidget with WidgetsBindingObserver {
     void onTabSelected(int index) async {
       if (index == 2 && context.mounted) {
         ref.read(dashboardTabControllerProvider.notifier).setTab(index);
-        await _showBottomSheet(context);
+        await GlazeModal.showUploadContentModalPopUp(context);
 
         return;
       }
@@ -86,21 +85,4 @@ class DashboardView extends HookConsumerWidget with WidgetsBindingObserver {
       child: navigationShell,
     );
   }
-}
-
-Future<void> _showBottomSheet(BuildContext context) async {
-  await showCupertinoModalPopup(
-    context: context,
-    builder: (context) {
-      return RepaintBoundary(
-        child: SafeArea(
-          bottom: false,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16.0),
-            child: const UploadMomentsCard(),
-          ),
-        ),
-      );
-    },
-  );
 }

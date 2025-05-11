@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glaze/core/navigation/observer/route_observer_provider.dart';
 import 'package:glaze/feature/auth/views/auth_forget_password_view.dart';
 import 'package:glaze/feature/auth/views/auth_reset_password_view.dart';
+import 'package:glaze/feature/challenges/models/challenge.dart';
 import 'package:glaze/feature/challenges/views/challenge_details_view.dart';
 import 'package:glaze/feature/dashboard/views/dashboard_view.dart';
 import 'package:glaze/feature/profile/views/profile_edit_form.dart';
@@ -552,12 +553,12 @@ class ChallengeDetailsRoute extends GoRouteData {
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    final extra = state.extra as Map<String, dynamic>?;
-    final challenge = extra?['challenge'];
-    final useColor = extra?['color'];
+    final extra = state.extra as Map<String, Object?>;
+    final challenge = extra['challenge'] as Challenge;
+    final useColor = extra['color'] as int;
     return ChallengeDetailsView(
       challenge: challenge,
-      useColor: useColor,
+      useColor: Color(useColor),
     );
   }
 }

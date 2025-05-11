@@ -63,15 +63,16 @@ class MomentsLiveTabview extends HookConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
+                const Gap(8),
                 Text(
-                  'Upcoming Challenges',
+                  'Live Challenges',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontFamily: FontFamily.robotoBold),
                 ),
                 Text(
-                  'Stay tuned for exciting challenges to test your skills!',
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(color: ColorPallete.hintTextColor),
+                  'Compete in real-time challenges and showcase your skills live!',
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(color: ColorPallete.hintTextColor),
                 ),
-                const Gap(10),
+                const Gap(16),
               ],
             ),
           ),
