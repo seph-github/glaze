@@ -96,27 +96,19 @@ class ChallengesCard extends StatelessWidget {
                             ),
                       ),
                     ),
-                    // Flexible(
-                    //   child: Text(
-                    //     _getPrizeText(challenge.prize ?? ''),
-                    //     overflow: TextOverflow.clip,
-                    //     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    //           fontFamily: FontFamily.robotoBold,
-                    //           color: Colors.white,
-                    //           fontSize: 20.0,
-                    //         ),
-                    //   ),
-                    // ),
                   ],
                 ),
               ),
               const Gap(12),
               PrimaryButton(
                 onPressed: () async {
-                  router.push(const ChallengeDetailsRoute().location, extra: {
-                    'challenge': challenge,
-                    'color': randomColor.toARGB32(),
-                  });
+                  router.push(
+                    const ChallengeDetailsRoute().location,
+                    extra: {
+                      'challenge': challenge,
+                      'color': randomColor.toARGB32(),
+                    },
+                  );
                 },
                 label: 'Join The Challenge',
                 icon: SvgPicture.asset(
@@ -166,8 +158,8 @@ class ChallengesCard extends StatelessWidget {
           width: width * 0.65,
           child: Text(
             challenge.title,
-            overflow: TextOverflow.ellipsis, // Ensures the text is fully visible
-            softWrap: true, // Allows the text to wrap to a new line
+            overflow: TextOverflow.ellipsis,
+            softWrap: true,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontFamily: FontFamily.robotoBold,
                   color: randomColor,

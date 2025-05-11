@@ -39,17 +39,17 @@ class ChallengeDetailsView extends StatelessWidget {
       child: SafeArea(
         child: CustomScrollView(
           slivers: [
-            SliverAppBar(
-              scrolledUnderElevation: 0.0,
-              backgroundColor: Theme.of(context).colorScheme.surface,
-              elevation: 0,
-              pinned: true,
-              centerTitle: false,
-              leading: const SizedBox.shrink(),
-              leadingWidth: 0.0,
-              toolbarHeight: 80,
-              title: _buildHeaderSection(context),
-            ),
+            // SliverAppBar(
+            //   scrolledUnderElevation: 0.0,
+            //   backgroundColor: Theme.of(context).colorScheme.surface,
+            //   elevation: 0,
+            //   pinned: true,
+            //   centerTitle: false,
+            //   leading: const SizedBox.shrink(),
+            //   leadingWidth: 0.0,
+            //   toolbarHeight: 80,
+            //   title: _buildHeaderSection(context),
+            // ),
             SliverFillRemaining(
               hasScrollBody: true,
               child: Padding(
@@ -79,6 +79,7 @@ class ChallengeDetailsView extends StatelessWidget {
                         const Gap(12.0),
                       ],
                     ),
+                    _buildHeaderSection(context),
                     Container(
                       decoration: BoxDecoration(
                         color: ColorPallete.inputFilledColor,
@@ -220,6 +221,7 @@ class ChallengeDetailsView extends StatelessWidget {
   Widget _buildHeaderSection(BuildContext context) {
     return Column(
       children: <Widget>[
+        const Gap(12.0),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -238,6 +240,7 @@ class ChallengeDetailsView extends StatelessWidget {
                 challenge.title,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
+                softWrap: true,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                       height: 1.1,
@@ -277,6 +280,7 @@ class ChallengeDetailsView extends StatelessWidget {
                 ),
           ),
         ),
+        const Gap(16.0),
       ],
     );
   }
