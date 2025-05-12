@@ -34,7 +34,7 @@ class PhoneNumberInput extends HookConsumerWidget {
 
     return Consumer(
       builder: (context, ref, _) {
-        final isLightTheme = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
+        final isLightTheme = ref.watch(settingsThemeProvider) == ThemeData.light();
         final countryCodes = ref.watch(countryCodesProvider).value;
         return Column(
           children: [
@@ -124,7 +124,7 @@ class PhoneNumberInput extends HookConsumerWidget {
       context: context,
       builder: (context) {
         return Consumer(builder: (context, ref, _) {
-          final isLightTheme = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
+          final isLightTheme = ref.watch(settingsThemeProvider) == ThemeData.light();
           return Container(
             height: 300,
             decoration: BoxDecoration(

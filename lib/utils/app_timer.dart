@@ -77,13 +77,16 @@ class _ChallengeTimerState extends State<AppTimer> {
         SvgPicture.asset(
           Assets.images.svg.timerIcon.path,
           height: 24.0,
+          colorFilter: ColorFilter.mode(
+            Theme.of(context).colorScheme.inverseSurface,
+            BlendMode.srcIn,
+          ),
         ),
         const Gap(4),
         Text(
           '${days == 0 ? '' : '$days:'}${hours == 0 ? '' : '$hours:'}${minutes == 0 ? '' : '$minutes:'}${seconds}s',
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 fontFamily: FontFamily.robotoRegular,
-                color: ColorPallete.white,
                 fontWeight: FontWeight.bold,
                 fontSize: 16.0,
               ),

@@ -38,7 +38,7 @@ class ProfileEditForm extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isLightTheme = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
+    final isLightTheme = ref.watch(settingsThemeProvider) == ThemeData.light();
     final state = ref.watch(profileNotifierProvider);
     final imageState = contentPickerNotifierProvider;
 

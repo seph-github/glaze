@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:glaze/core/styles/color_pallete.dart';
-import 'package:glaze/feature/settings/providers/settings_theme_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -19,10 +17,8 @@ class GlazeNavBar extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isLightTheme = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
-
-    const ColorFilter colorFilter = ColorFilter.mode(
-      ColorPallete.lightBackgroundColor,
+    ColorFilter colorFilter = ColorFilter.mode(
+      Theme.of(context).colorScheme.primary,
       BlendMode.srcIn,
     );
 
@@ -38,22 +34,22 @@ class GlazeNavBar extends HookConsumerWidget {
         NavigationDestination(
           icon: SvgPicture.asset(
             Assets.images.svg.homeOutlined.path,
-            colorFilter: isLightTheme ? colorFilter : null,
+            colorFilter: colorFilter,
           ),
           selectedIcon: SvgPicture.asset(
             Assets.images.svg.homeFillIcon.path,
-            colorFilter: isLightTheme ? colorFilter : null,
+            colorFilter: colorFilter,
           ),
           label: 'Home',
         ),
         NavigationDestination(
           icon: SvgPicture.asset(
             Assets.images.svg.momentsInactiveIcon.path,
-            colorFilter: isLightTheme ? colorFilter : null,
+            colorFilter: colorFilter,
           ),
           selectedIcon: SvgPicture.asset(
             Assets.images.svg.momentsFillIcon.path,
-            colorFilter: isLightTheme ? colorFilter : null,
+            colorFilter: colorFilter,
           ),
           label: 'Moments',
         ),
@@ -64,7 +60,7 @@ class GlazeNavBar extends HookConsumerWidget {
             margin: const EdgeInsets.only(top: 30),
             child: SvgPicture.asset(
               Assets.images.svg.addIcon.path,
-              colorFilter: isLightTheme ? colorFilter : null,
+              colorFilter: colorFilter,
             ),
           ),
           label: '',
@@ -72,22 +68,22 @@ class GlazeNavBar extends HookConsumerWidget {
         NavigationDestination(
           icon: SvgPicture.asset(
             Assets.images.svg.shopOutlined.path,
-            colorFilter: isLightTheme ? colorFilter : null,
+            colorFilter: colorFilter,
           ),
           selectedIcon: SvgPicture.asset(
             Assets.images.svg.shopFillIcon.path,
-            colorFilter: isLightTheme ? colorFilter : null,
+            colorFilter: colorFilter,
           ),
           label: 'Shop',
         ),
         NavigationDestination(
           icon: SvgPicture.asset(
             Assets.images.svg.profileIcon.path,
-            colorFilter: isLightTheme ? colorFilter : null,
+            colorFilter: colorFilter,
           ),
           selectedIcon: SvgPicture.asset(
             Assets.images.svg.profileFillIcon.path,
-            colorFilter: isLightTheme ? colorFilter : null,
+            colorFilter: colorFilter,
           ),
           label: 'Profile',
         )

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:glaze/core/navigation/router.dart';
+import 'package:glaze/core/styles/color_pallete.dart';
 import 'package:glaze/feature/home/models/glaze/glaze.dart';
 import 'package:glaze/feature/home/provider/video_feed_provider/video_feed_provider.dart';
 import 'package:glaze/feature/home/provider/videos_provider/videos_provider.dart';
@@ -388,6 +389,7 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
       color: Colors.white,
       child: RepaintBoundary(
         child: LoadingLayout(
+          backgroundColor: ColorPallete.lightBackgroundColor,
           isLoading: state.isLoading,
           child: PreloadPageView.builder(
             scrollDirection: Axis.vertical,

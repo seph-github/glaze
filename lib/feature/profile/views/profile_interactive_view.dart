@@ -2,19 +2,19 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:glaze/components/app_bar_with_back_button.dart';
-import 'package:glaze/components/custom_tab_bar.dart';
-import 'package:glaze/core/styles/color_pallete.dart';
-import 'package:glaze/data/repository/follows_repository/follow_repository_provider.dart';
-import 'package:glaze/feature/auth/services/auth_services.dart';
-import 'package:glaze/feature/profile/models/profile/profile.dart';
-import 'package:glaze/feature/profile/provider/profile_provider/profile_provider.dart';
-import 'package:glaze/feature/templates/loading_layout.dart';
-import 'package:glaze/gen/assets.gen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../../components/app_bar_with_back_button.dart';
+import '../../../components/custom_tab_bar.dart';
 import '../../../core/navigation/router.dart';
+import '../../../core/styles/color_pallete.dart';
+import '../../../data/repository/follows_repository/follow_repository_provider.dart';
+import '../../../gen/assets.gen.dart';
+import '../../auth/services/auth_services.dart';
+import '../../templates/loading_layout.dart';
+import '../models/profile/profile.dart';
+import '../provider/profile_provider/profile_provider.dart';
 
 class ProfileInteractiveView extends HookConsumerWidget {
   const ProfileInteractiveView({
@@ -107,7 +107,6 @@ class FollowersListWidget extends HookWidget {
             title: Text(
               '@${followers[index].username}',
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
             ),
@@ -194,7 +193,6 @@ class FollowingListWidget extends HookWidget {
             title: Text(
               '@${following[index].username}',
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
             ),
@@ -256,7 +254,6 @@ class GlazersListWidget extends StatelessWidget {
                   TextSpan(
                     text: '@${glazes[index].glazer.username}',
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
                   ),

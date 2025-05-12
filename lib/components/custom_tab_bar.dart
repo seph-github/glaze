@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:glaze/feature/settings/providers/settings_theme_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class CustomTabBar extends HookConsumerWidget {
@@ -14,8 +13,6 @@ class CustomTabBar extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isLightTheme = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
-
     return DefaultTabController(
       length: length,
       child: Column(
@@ -25,15 +22,12 @@ class CustomTabBar extends HookConsumerWidget {
             child: TabBar(
               controller: controller,
               onTap: onTap,
-              // onTap: (value) {
-              //   currentIndex = value;
-              // },
               indicator: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    isLightTheme ? Colors.black.withValues(alpha: 0.01) : Colors.white.withValues(alpha: 0.01),
-                    isLightTheme ? Colors.black.withValues(alpha: 0.03) : Colors.white.withValues(alpha: 0.03),
-                    isLightTheme ? Colors.black.withValues(alpha: 0.15) : Colors.white.withValues(alpha: 0.15),
+                    Theme.of(context).colorScheme.inverseSurface.withValues(alpha: 0.02),
+                    Theme.of(context).colorScheme.inverseSurface.withValues(alpha: 0.08),
+                    Theme.of(context).colorScheme.inverseSurface.withValues(alpha: 0.2),
                   ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,

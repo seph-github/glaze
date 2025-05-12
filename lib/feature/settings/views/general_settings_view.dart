@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/components/app_bar_with_back_button.dart';
+import 'package:glaze/core/styles/theme.dart';
 import 'package:glaze/feature/settings/providers/settings_theme_provider.dart';
 import 'package:glaze/feature/settings/widgets/settings_menu_tile.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
@@ -21,11 +22,11 @@ class GeneralSettingsView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(authNotifierProvider);
-    final isLightMode = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
+    final isLightMode = ref.watch(settingsThemeProvider) == lightTheme;
     final lightmode = useState<bool>(isLightMode);
 
     useEffect(() {
-      lightmode.value = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
+      lightmode.value = ref.watch(settingsThemeProvider) == lightTheme;
       return;
     }, []);
 
@@ -49,7 +50,7 @@ class GeneralSettingsView extends HookConsumerWidget {
                       value: lightmode.value,
                       onChanged: (value) {
                         lightmode.value = value;
-                        ref.read(settingsThemeProviderProvider.notifier).toggleTheme();
+                        ref.read(settingsThemeProvider.notifier).toggleTheme();
                       },
                     ),
                     SettingsMenuTile(

@@ -44,7 +44,7 @@ class UploadMomentsCard extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isLightTheme = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
+    final isLightTheme = ref.watch(settingsThemeProvider) == ThemeData.light();
     final fileState = ref.watch(contentPickerNotifierProvider);
     final router = GoRouter.of(context);
     final formKey = GlobalKey<FormState>();

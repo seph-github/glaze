@@ -78,7 +78,12 @@ class HomeInteractiveCard extends HookConsumerWidget {
                   children: <Widget>[
                     SvgPicture.asset(Assets.images.svg.trophyIcon.path),
                     const Gap(10),
-                    Text(video.category ?? ''),
+                    Text(
+                      video.category ?? '',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: Colors.white,
+                          ),
+                    ),
                   ],
                 ),
               ),

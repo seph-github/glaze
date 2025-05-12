@@ -3,8 +3,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:glaze/core/styles/color_pallete.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../feature/settings/providers/settings_theme_provider.dart';
-
 class InputField extends HookWidget {
   InputField({
     super.key,
@@ -155,10 +153,7 @@ class InputField extends HookWidget {
   Widget build(BuildContext context) {
     final isObscured = useState(obscureText);
 
-    const double defaultBorderRadius = 16;
     return Consumer(builder: (context, ref, _) {
-      final isLightTheme = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
-
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -189,38 +184,38 @@ class InputField extends HookWidget {
                     )
                   : null,
               semanticCounterText: 'counter',
-              focusedErrorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
-                borderSide: const BorderSide(
-                  color: ColorPallete.whiteSmoke,
-                ),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
-                borderSide: BorderSide(
-                  color: isLightTheme ? lightModeColor ?? ColorPallete.backgroundColor : ColorPallete.whiteSmoke,
-                ),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
-                borderSide: BorderSide(
-                  width: 1 / 4,
-                  color: isLightTheme ? lightModeColor ?? ColorPallete.backgroundColor : ColorPallete.persianFable,
-                ),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
-                borderSide: const BorderSide(
-                  width: 1,
-                  color: ColorPallete.parlourRed,
-                ),
-              ),
-              suffixIcon: obscureText
-                  ? GestureDetector(
-                      onTap: () => isObscured.value = !isObscured.value,
-                      child: isObscured.value ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off),
-                    )
-                  : null,
+              // focusedErrorBorder: OutlineInputBorder(
+              //   borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
+              //   borderSide: const BorderSide(
+              //     color: ColorPallete.whiteSmoke,
+              //   ),
+              // ),
+              // focusedBorder: OutlineInputBorder(
+              //   borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
+              //   borderSide: BorderSide(
+              //     color: isLightTheme ? lightModeColor ?? ColorPallete.backgroundColor : ColorPallete.whiteSmoke,
+              //   ),
+              // ),
+              // enabledBorder: OutlineInputBorder(
+              //   borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
+              //   borderSide: BorderSide(
+              //     width: 1 / 4,
+              //     color: isLightTheme ? lightModeColor ?? ColorPallete.backgroundColor : ColorPallete.persianFable,
+              //   ),
+              // ),
+              // errorBorder: OutlineInputBorder(
+              //   borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
+              //   borderSide: const BorderSide(
+              //     width: 1,
+              //     color: ColorPallete.parlourRed,
+              //   ),
+              // ),
+              // suffixIcon: obscureText
+              //     ? GestureDetector(
+              //         onTap: () => isObscured.value = !isObscured.value,
+              //         child: isObscured.value ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off),
+              //       )
+              //     : null,
               helper: helper,
             ),
             controller: controller,

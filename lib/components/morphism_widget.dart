@@ -48,7 +48,7 @@ class MorphismWidget extends StatelessWidget {
       filter: ImageFilter.blur(
         sigmaX: 10,
         sigmaY: 10,
-      ), // Glass blur effect
+      ),
       child: Container(
         height: height,
         width: width,

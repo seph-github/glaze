@@ -39,17 +39,6 @@ class ChallengeDetailsView extends StatelessWidget {
       child: SafeArea(
         child: CustomScrollView(
           slivers: [
-            // SliverAppBar(
-            //   scrolledUnderElevation: 0.0,
-            //   backgroundColor: Theme.of(context).colorScheme.surface,
-            //   elevation: 0,
-            //   pinned: true,
-            //   centerTitle: false,
-            //   leading: const SizedBox.shrink(),
-            //   leadingWidth: 0.0,
-            //   toolbarHeight: 80,
-            //   title: _buildHeaderSection(context),
-            // ),
             SliverFillRemaining(
               hasScrollBody: true,
               child: Padding(
@@ -68,6 +57,10 @@ class ChallengeDetailsView extends StatelessWidget {
                           height: 350,
                           width: MediaQuery.sizeOf(context).width * 0.65,
                           decoration: BoxDecoration(
+                            border: Border.all(
+                              width: 1 / 2,
+                              color: Theme.of(context).colorScheme.inverseSurface,
+                            ),
                             borderRadius: BorderRadius.circular(16.0),
                             image: DecorationImage(
                                 image: AssetImage(
@@ -80,48 +73,7 @@ class ChallengeDetailsView extends StatelessWidget {
                       ],
                     ),
                     _buildHeaderSection(context),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: ColorPallete.inputFilledColor,
-                        borderRadius: BorderRadius.circular(24.0),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              left: 12.0,
-                              top: 12.0,
-                            ),
-                            child: Text(
-                              'Challenges rules',
-                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                            ),
-                          ),
-                          _buildChallengeRuleTile(
-                            context,
-                            orderList: '1',
-                            rule: 'Make a video similar to the content creator above',
-                          ),
-                          const Divider(
-                            height: 0,
-                            indent: 12,
-                            endIndent: 12,
-                            thickness: 0.5,
-                          ),
-                          _buildChallengeRuleTile(context, orderList: '2', rule: 'Use the same audio'),
-                          const Divider(
-                            height: 0,
-                            indent: 12,
-                            endIndent: 12,
-                            thickness: 0.5,
-                          ),
-                          _buildChallengeRuleTile(context, orderList: '3', rule: 'Use the hashtags #happy'),
-                        ],
-                      ),
-                    ),
+                    _buildChallengeRuleSection(context),
                     const Gap(12.0),
                     _buildLeaderboardSection(context),
                   ],
@@ -130,6 +82,51 @@ class ChallengeDetailsView extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Container _buildChallengeRuleSection(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(24.0),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(
+              left: 12.0,
+              top: 12.0,
+            ),
+            child: Text(
+              'Challenges rules',
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+          ),
+          _buildChallengeRuleTile(
+            context,
+            orderList: '1',
+            rule: 'Make a video similar to the content creator above',
+          ),
+          const Divider(
+            height: 0,
+            indent: 12,
+            endIndent: 12,
+            thickness: 0.5,
+          ),
+          _buildChallengeRuleTile(context, orderList: '2', rule: 'Use the same audio'),
+          const Divider(
+            height: 0,
+            indent: 12,
+            endIndent: 12,
+            thickness: 0.5,
+          ),
+          _buildChallengeRuleTile(context, orderList: '3', rule: 'Use the hashtags #happy'),
+        ],
       ),
     );
   }
@@ -146,8 +143,8 @@ class ChallengeDetailsView extends StatelessWidget {
         width: 32,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: ColorPallete.inputFilledColor,
-          border: Border.all(color: Colors.white, width: 1),
+          color: Theme.of(context).colorScheme.surface,
+          border: Border.all(color: Theme.of(context).colorScheme.inverseSurface, width: 1),
         ),
         child: Text(
           orderList ?? '',
@@ -190,7 +187,7 @@ class ChallengeDetailsView extends StatelessWidget {
         const Gap(12.0),
         Container(
           decoration: BoxDecoration(
-            color: ColorPallete.inputFilledColor,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(24.0),
           ),
           child: Column(
@@ -263,7 +260,7 @@ class ChallengeDetailsView extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       fontWeight: FontWeight.w500,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.inverseSurface,
                     ),
               ),
             ),
@@ -276,7 +273,7 @@ class ChallengeDetailsView extends StatelessWidget {
             challenge.description ?? '',
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
                   fontFamily: FontFamily.robotoRegular,
-                  color: ColorPallete.persianFable,
+                  color: Theme.of(context).colorScheme.inverseSurface,
                 ),
           ),
         ),
@@ -287,7 +284,7 @@ class ChallengeDetailsView extends StatelessWidget {
 
   Widget _buildAcceptChallenge(BuildContext context) {
     return Container(
-      color: Theme.of(context).colorScheme.surface,
+      color: Theme.of(context).scaffoldBackgroundColor,
       padding: const EdgeInsets.all(12.0),
       child: SafeArea(
         child: PrimaryButton(
@@ -321,8 +318,8 @@ class ChallengeDetailsView extends StatelessWidget {
         width: 42,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: ColorPallete.inputFilledColor,
-          border: Border.all(color: Colors.white, width: 1),
+          color: Theme.of(context).colorScheme.surface,
+          border: Border.all(color: Theme.of(context).colorScheme.inverseSurface, width: 1),
         ),
         child: Text(
           '#1',

@@ -69,7 +69,7 @@ class ShopProductsCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(16.0),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.6),
+                  color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.6),
                   blurRadius: 4,
                   spreadRadius: 2,
                 ),
@@ -131,7 +131,10 @@ class ShopProductsCard extends StatelessWidget {
                     const Spacer(),
                     Text(
                       '${priceInDollars(product.priceCents)}${product.type == ProductType.subscription ? '/month' : ''}',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900, color: Colors.white),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w900,
+                            color: Theme.of(context).colorScheme.inverseSurface,
+                          ),
                     ),
                   ],
                 ),

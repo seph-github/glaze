@@ -3,7 +3,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/components/morphism_widget.dart';
 import 'package:glaze/core/navigation/router.dart';
-import 'package:glaze/core/styles/color_pallete.dart';
 import 'package:glaze/feature/challenges/models/challenge.dart';
 import 'package:glaze/feature/challenges/widgets/circle_stack.dart';
 import 'package:glaze/gen/fonts.gen.dart';
@@ -67,7 +66,7 @@ class ChallengesCard extends StatelessWidget {
                     challenge.description ?? '',
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
                           fontFamily: FontFamily.robotoRegular,
-                          color: ColorPallete.persianFable,
+                          color: Theme.of(context).colorScheme.inverseSurface,
                           fontSize: 12.0,
                         ),
                   ),
@@ -91,8 +90,8 @@ class ChallengesCard extends StatelessWidget {
                         getPrizeText(challenge.prize ?? ''),
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               fontFamily: FontFamily.robotoBold,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                              color: Theme.of(context).colorScheme.inverseSurface,
                             ),
                       ),
                     ),
@@ -115,7 +114,10 @@ class ChallengesCard extends StatelessWidget {
                   Assets.images.svg.uploadIcon.path,
                   height: 20.0,
                 ),
-                style: const TextStyle(fontWeight: FontWeight.w800),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: Theme.of(context).colorScheme.inverseSurface,
+                    ),
                 borderRadius: 16.0,
                 height: 40,
                 backgroundColor: randomColor.withValues(alpha: 0.6),

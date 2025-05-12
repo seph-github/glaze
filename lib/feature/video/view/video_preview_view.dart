@@ -11,11 +11,11 @@ import 'package:lottie/lottie.dart';
 import 'package:preload_page_view/preload_page_view.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../../core/styles/color_pallete.dart';
 import '../../../gen/assets.gen.dart';
 import '../../../utils/video_feed_sharing_popup.dart';
 import '../../home/provider/glaze_provider/glaze_provider.dart';
 import '../../home/provider/video_feed_provider/video_feed_provider.dart';
-// import '../../home/provider/videos_provider/videos_provider.dart';
 import '../../home/widgets/home_interactive_card.dart';
 import '../../templates/loading_layout.dart';
 import '../providers/video_preview_provider/videos_preview_provider.dart';
@@ -319,7 +319,9 @@ class VideoPreviewView extends HookConsumerWidget with WidgetsBindingObserver {
 
     return SafeArea(
       child: LoadingLayout(
+        backgroundColor: ColorPallete.lightBackgroundColor,
         appBar: AppBarWithBackButton(
+          backgroundColor: ColorPallete.lightBackgroundColor,
           onBackButtonPressed: () async {
             router.pop();
           },

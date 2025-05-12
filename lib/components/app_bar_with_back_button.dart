@@ -34,7 +34,7 @@ class AppBarWithBackButton extends HookWidget implements PreferredSizeWidget {
     final router = GoRouter.of(context);
 
     return AppBar(
-      backgroundColor: backgroundColor ?? Colors.transparent,
+      backgroundColor: backgroundColor ?? Theme.of(context).scaffoldBackgroundColor,
       scrolledUnderElevation: 0,
       elevation: 0,
       leading: showBackButton

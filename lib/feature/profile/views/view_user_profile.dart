@@ -16,7 +16,6 @@ import '../../../components/buttons/primary_button.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../gen/assets.gen.dart';
 import '../../auth/services/auth_services.dart';
-import '../../settings/providers/settings_theme_provider.dart';
 import '../widgets/profile_achievements_card.dart';
 import '../widgets/profile_interaction_card.dart';
 import '../widgets/profile_moments_card.dart';
@@ -35,12 +34,6 @@ class ViewUserProfile extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isLightTheme = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
-    const ColorFilter colorFilter = ColorFilter.mode(
-      ColorPallete.lightBackgroundColor,
-      BlendMode.srcIn,
-    );
-
     final GoRouter router = GoRouter.of(context);
     final size = MediaQuery.sizeOf(context);
     final width = size.width;
@@ -65,6 +58,7 @@ class ViewUserProfile extends HookConsumerWidget {
     return LoadingLayout(
       isLoading: state.isLoading,
       appBar: AppBarWithBackButton(
+        backgroundColor: Colors.transparent,
         onBackButtonPressed: () async {
           router.pop();
         },
@@ -137,7 +131,10 @@ class ViewUserProfile extends HookConsumerWidget {
                               const Gap(5),
                               SvgPicture.asset(
                                 Assets.images.svg.messageIcon.path,
-                                colorFilter: isLightTheme ? colorFilter : null,
+                                colorFilter: ColorFilter.mode(
+                                  Theme.of(context).colorScheme.primary,
+                                  BlendMode.srcIn,
+                                ),
                                 width: 48.0,
                               ),
                             ],

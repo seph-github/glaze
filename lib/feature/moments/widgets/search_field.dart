@@ -3,7 +3,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../core/styles/color_pallete.dart';
 import '../../../gen/assets.gen.dart';
 import '../../settings/providers/settings_theme_provider.dart';
 
@@ -23,8 +22,7 @@ class SearchField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer(
       builder: (context, ref, _) {
-        final isLightTheme = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
-        const double borderRadius = 16.0;
+        final theme = ref.watch(settingsThemeProvider);
 
         return Row(
           children: [
@@ -33,49 +31,25 @@ class SearchField extends StatelessWidget {
                 controller: controller,
                 decoration: InputDecoration(
                   isDense: true,
-                  fillColor: Colors.white10,
+                  fillColor: Theme.of(context).colorScheme.surfaceContainerLowest,
                   filled: true,
                   hintText: 'Search for \'Basketball 🏀\'',
                   prefixIcon: SvgPicture.asset(
                     'assets/images/svg/search_icon.svg',
                     fit: BoxFit.scaleDown,
+                    colorFilter: ColorFilter.mode(theme.colorScheme.onSurface.withValues(alpha: 0.6), BlendMode.srcIn),
                   ),
                   suffix: controller?.text != null
                       ? GestureDetector(
                           onTap: () {
                             controller?.clear();
                           },
-                          child: SvgPicture.asset(Assets.images.svg.closeIcon.path))
+                          child: SvgPicture.asset(
+                            Assets.images.svg.closeIcon.path,
+                            colorFilter: ColorFilter.mode(theme.colorScheme.onSurface.withValues(alpha: 0.6), BlendMode.srcIn),
+                          ),
+                        )
                       : null,
-                  hintStyle: TextStyle(
-                    color: isLightTheme ? ColorPallete.backgroundColor : ColorPallete.hintTextColor,
-                  ),
-                  focusedErrorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(borderRadius),
-                    borderSide: BorderSide(
-                      color: isLightTheme ? ColorPallete.backgroundColor : ColorPallete.whiteSmoke,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(borderRadius),
-                    borderSide: BorderSide(
-                      color: isLightTheme ? ColorPallete.backgroundColor : ColorPallete.whiteSmoke,
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(borderRadius),
-                    borderSide: BorderSide(
-                      width: 1 / 4,
-                      color: isLightTheme ? ColorPallete.backgroundColor : ColorPallete.persianFable,
-                    ),
-                  ),
-                  errorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(borderRadius),
-                    borderSide: const BorderSide(
-                      width: 1,
-                      color: ColorPallete.parlourRed,
-                    ),
-                  ),
                 ),
                 onTapOutside: (event) => FocusManager.instance.primaryFocus?.unfocus(),
                 onFieldSubmitted: (value) {
@@ -94,10 +68,15 @@ class SearchField extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: isLightTheme ? ColorPallete.backgroundColor : Colors.white10,
+                  color: Theme.of(context).colorScheme.surfaceContainerLowest,
+                  border: Border.all(
+                    width: 1 / 2,
+                    color: Theme.of(context).colorScheme.inverseSurface,
+                  ),
                 ),
                 child: SvgPicture.asset(
                   Assets.images.svg.filterIcon.path,
+                  colorFilter: ColorFilter.mode(theme.colorScheme.onSurface, BlendMode.srcIn),
                 ),
               ),
             ),

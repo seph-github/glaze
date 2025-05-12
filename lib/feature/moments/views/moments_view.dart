@@ -29,7 +29,7 @@ class MomentsView extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(momentsNotifierProvider);
     final categoryState = ref.watch(categoryNotifierProvider);
-    final isLightTheme = ref.watch(settingsThemeProviderProvider) == ThemeData.light();
+    final isLightTheme = ref.watch(settingsThemeProvider) == ThemeData.light();
     final keywordsController = useTextEditingController();
     final categoryController = useTextEditingController();
     final resultLimit = useState<int>(10);
@@ -71,7 +71,7 @@ class MomentsView extends HookConsumerWidget {
     return LoadingLayout(
       isLoading: state.isLoading,
       appBar: AppBarWithBackButton(
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: null,
         showBackButton: false,
         centerTitle: false,
         title: const Text('Moments'),
@@ -86,6 +86,7 @@ class MomentsView extends HookConsumerWidget {
               if (currentIndex.value == 0)
                 SliverAppBar(
                   pinned: false,
+                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                   title: SearchField(
                     controller: keywordsController,
                     onTap: () async {
@@ -117,53 +118,6 @@ class MomentsView extends HookConsumerWidget {
           ),
         ),
       ),
-      // appBar: AppBarWithBackButton(
-      //   showBackButton: false,
-      //   centerTitle: false,
-      //   title: const Text('Moments'),
-      //   titleTextStyle: Theme.of(context).textTheme.headlineLarge?.copyWith(
-      //         fontFamily: FontFamily.hitAndRun,
-      //       ),
-      // ),
-      // child: SafeArea(
-      //   child: Padding(
-      //     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      //     child: Column(
-      //       children: <Widget>[
-      //         if (currentIndex.value == 0)
-      //           SearchField(
-      //             controller: keywordsController,
-      //             onTap: () async {
-      //               await ref.read(momentsNotifierProvider.notifier).search(
-      //                     keywords: keywordsController.text.trim(),
-      //                   );
-      //             },
-      //             onFilterTap: () async {
-      //               await _buildFilterModal(
-      //                 context,
-      //                 categoryController,
-      //                 isLightTheme,
-      //                 categoryState,
-      //                 resultLimit,
-      //               );
-      //             },
-      //           ),
-      //         const Gap(10),
-      //         Expanded(
-      //           child: CustomTabBar(
-      //             length: tabs.length,
-      //             controller: tabController,
-      //             tabs: tabs,
-      //             tabViews: tabViews,
-      //             onTap: (value) {
-      //               currentIndex.value = value;
-      //             },
-      //           ),
-      //         ),
-      //       ],
-      //     ),
-      //   ),
-      // ),
     );
   }
 
@@ -186,9 +140,9 @@ class MomentsView extends HookConsumerWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 height: 300,
                 width: double.infinity,
-                decoration: const BoxDecoration(
-                  color: ColorPallete.backgroundColor,
-                  borderRadius: BorderRadius.only(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(16.0),
                     topRight: Radius.circular(16.0),
                   ),
@@ -197,7 +151,10 @@ class MomentsView extends HookConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     const Gap(16.0),
-                    const Text('Filter By:'),
+                    Text(
+                      'Filter By:',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
                     InputField(
                       hintText: 'Category',
                       controller: categoryController,
@@ -223,47 +180,6 @@ class MomentsView extends HookConsumerWidget {
                     const Gap(
                       8.0,
                     ),
-                    // Row(
-                    //   crossAxisAlignment: CrossAxisAlignment.start,
-                    //   children: <Widget>[
-                    //     const Text('Limit:'),
-                    //     const Gap(32.0),
-                    //     IconButton(
-                    //       onPressed: () {
-                    //         if (resultLimit.value > 1) {
-                    //           setState(
-                    //             () {
-                    //               resultLimit.value -= 1;
-                    //             },
-                    //           );
-                    //         }
-                    //       },
-                    //       icon: const Icon(Icons.keyboard_arrow_left_rounded),
-                    //     ),
-                    //     Container(
-                    //       alignment: Alignment.center,
-                    //       height: 40.0,
-                    //       width: 60.0,
-                    //       decoration: BoxDecoration(
-                    //         borderRadius: BorderRadius.circular(8.0),
-                    //         border: Border.all(
-                    //           color: Colors.white,
-                    //         ),
-                    //       ),
-                    //       child: Text(
-                    //         resultLimit.value.toString(),
-                    //       ),
-                    //     ),
-                    //     IconButton(
-                    //       onPressed: () {
-                    //         setState(() => resultLimit.value += 1);
-                    //       },
-                    //       icon: const Icon(
-                    //         Icons.keyboard_arrow_right_rounded,
-                    //       ),
-                    //     ),
-                    //   ],
-                    // ),
                     const Gap(16.0),
                     Row(
                       children: [
@@ -284,7 +200,12 @@ class MomentsView extends HookConsumerWidget {
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                             ),
-                            child: const Text('Clear'),
+                            child: Text(
+                              'Clear',
+                              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                    color: Colors.white,
+                                  ),
+                            ),
                           ),
                         ),
                         const Gap(16.0),
@@ -313,7 +234,12 @@ class MomentsView extends HookConsumerWidget {
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
                               ),
-                              child: const Text('Apply'),
+                              child: Text(
+                                'Apply',
+                                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                      color: Colors.white,
+                                    ),
+                              ),
                             ),
                           );
                         }),
