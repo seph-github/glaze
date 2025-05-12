@@ -1,4 +1,3 @@
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:glaze/data/models/follows/follow.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -26,15 +25,11 @@ class FollowUserNotifier extends _$FollowUserNotifier {
       state = const AsyncLoading();
       state = await AsyncValue.guard(
         () async {
-          await ref
-              .read(followRepositoryProvider)
-              .onFollowUser(followerId: followerId, followingId: followingId);
+          await ref.read(followRepositoryProvider).onFollowUser(followerId: followerId, followingId: followingId);
         },
       );
     } catch (e) {
-      Fluttertoast.showToast(
-        msg: e.toString(),
-      );
+      rethrow;
     }
   }
 }
@@ -42,27 +37,21 @@ class FollowUserNotifier extends _$FollowUserNotifier {
 @riverpod
 class FetchFollowedUserNotifier extends _$FetchFollowedUserNotifier {
   @override
-  FutureOr<List<Follow>?> build(String userId) async =>
-      fetchFollowedUsers(userId: userId);
+  FutureOr<List<Follow>?> build(String userId) async => fetchFollowedUsers(userId: userId);
 
   FutureOr<List<Follow>?> fetchFollowedUsers({required String userId}) async {
     try {
       state = const AsyncLoading();
       state = await AsyncValue.guard(
         () async {
-          return await ref
-              .read(followRepositoryProvider)
-              .fetchFollowedUsers(userId: userId);
+          return await ref.read(followRepositoryProvider).fetchFollowedUsers(userId: userId);
         },
       );
 
       return Future.value(state.value);
     } catch (e) {
-      Fluttertoast.showToast(
-        msg: e.toString(),
-      );
+      rethrow;
     }
-    return state.value;
   }
 }
 
@@ -82,16 +71,11 @@ class FollowRepository {
       );
       return response.map((e) => Follow.fromJson(e)).toList();
     } catch (e) {
-      Fluttertoast.showToast(
-        msg: e.toString(),
-      );
-
-      return [];
+      rethrow;
     }
   }
 
-  Future<void> onFollowUser(
-      {required String followerId, required String followingId}) async {
+  Future<void> onFollowUser({required String followerId, required String followingId}) async {
     try {
       await supabaseService.voidFunctionRpc(
         fn: 'following_user',
@@ -101,9 +85,7 @@ class FollowRepository {
         },
       );
     } catch (e) {
-      Fluttertoast.showToast(
-        msg: e.toString(),
-      );
+      rethrow;
     }
   }
 }

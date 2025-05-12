@@ -104,7 +104,6 @@ ThemeData lightTheme = ThemeData(
     onSurface: ColorPallete.black,
     surfaceContainerHighest: ColorPallete.white,
     surfaceContainerLowest: ColorPallete.whiteSmoke,
-    // onPrimaryContainer:
   ),
   inputDecorationTheme: InputDecorationTheme(
     filled: true,

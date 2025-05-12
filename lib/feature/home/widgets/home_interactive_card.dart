@@ -47,7 +47,7 @@ class HomeInteractiveCard extends HookConsumerWidget {
 
     return Container(
       width: width,
-      height: 130,
+      height: 140,
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       decoration: BoxDecoration(
         shape: BoxShape.rectangle,
@@ -107,7 +107,7 @@ class HomeInteractiveCard extends HookConsumerWidget {
                   );
                 },
                 child: Text(
-                  'by @${video.username}',
+                  '@${video.username}',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -115,10 +115,10 @@ class HomeInteractiveCard extends HookConsumerWidget {
                 ),
               ),
               Text(
-                '# Trending',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                video.caption ?? '',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: Colors.grey,
                     ),
               ),
             ],
@@ -139,7 +139,9 @@ class HomeInteractiveCard extends HookConsumerWidget {
               const Gap(2),
               Text(
                 '$glazeCount',
-                style: Theme.of(context).textTheme.labelSmall,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: Colors.white,
+                    ),
               ),
               const Gap(10),
               MorphismWidget.circle(

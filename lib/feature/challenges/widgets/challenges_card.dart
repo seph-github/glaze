@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/components/morphism_widget.dart';
+import 'package:glaze/config/enum/challenge_type.dart';
 import 'package:glaze/core/navigation/router.dart';
 import 'package:glaze/feature/challenges/models/challenge.dart';
 import 'package:glaze/feature/challenges/widgets/circle_stack.dart';
@@ -91,7 +92,6 @@ class ChallengesCard extends StatelessWidget {
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               fontFamily: FontFamily.robotoBold,
                               fontWeight: FontWeight.w800,
-                              color: Theme.of(context).colorScheme.inverseSurface,
                             ),
                       ),
                     ),
@@ -109,14 +109,11 @@ class ChallengesCard extends StatelessWidget {
                     },
                   );
                 },
-                label: 'Join The Challenge',
-                icon: SvgPicture.asset(
-                  Assets.images.svg.uploadIcon.path,
-                  height: 20.0,
-                ),
+                label: challenge.type == ChallengeType.live ? 'Leaderboard' : 'Join the Challenge',
+                icon: null,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w800,
-                      color: Theme.of(context).colorScheme.inverseSurface,
+                      // color: Theme.of(context).colorScheme.inverseSurface,
                     ),
                 borderRadius: 16.0,
                 height: 40,

@@ -54,6 +54,7 @@ Future<void> showShareOptions(
                 'Upload Your Moment',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.w900,
+                      color: Colors.white,
                     ),
               ),
               Text(
