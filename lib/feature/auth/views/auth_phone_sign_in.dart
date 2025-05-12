@@ -64,6 +64,7 @@ class AuthPhoneSignIn extends HookConsumerWidget {
         backgroundColor: Colors.transparent,
         isLoading: state.isLoading,
         appBar: AppBarWithBackButton(
+          backgroundColor: Colors.transparent,
           onBackButtonPressed: () {
             ref.invalidate(authNotifierProvider);
             router.pop();

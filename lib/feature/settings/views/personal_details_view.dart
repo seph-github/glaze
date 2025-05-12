@@ -17,9 +17,8 @@ class PersonalDetailsView extends StatelessWidget {
       final profile = state.profile;
       return LoadingLayout(
         isLoading: state.isLoading,
-        appBar: AppBarWithBackButton(
-          backgroundColor: Theme.of(context).colorScheme.surface,
-          title: const Text('Personal Details'),
+        appBar: const AppBarWithBackButton(
+          title: Text('Personal Details'),
           centerTitle: true,
         ),
         child: SafeArea(

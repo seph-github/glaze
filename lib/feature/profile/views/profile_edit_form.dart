@@ -25,7 +25,6 @@ import '../../../core/styles/color_pallete.dart';
 import '../../../data/models/category/category_model.dart';
 import '../../../data/repository/category/category_repository.dart';
 import '../../../gen/assets.gen.dart';
-import '../../settings/providers/settings_theme_provider.dart';
 import '../provider/profile_interests_list_provider/profile_interests_list_provider.dart';
 
 class ProfileEditForm extends HookConsumerWidget {
@@ -38,7 +37,6 @@ class ProfileEditForm extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isLightTheme = ref.watch(settingsThemeProvider) == ThemeData.light();
     final state = ref.watch(profileNotifierProvider);
     final imageState = contentPickerNotifierProvider;
 
@@ -60,8 +58,8 @@ class ProfileEditForm extends HookConsumerWidget {
     final passwordController = useTextEditingController();
     final confirmPasswordController = useTextEditingController();
 
-    const ColorFilter colorFilter = ColorFilter.mode(
-      ColorPallete.lightBackgroundColor,
+    ColorFilter colorFilter = ColorFilter.mode(
+      Theme.of(context).colorScheme.inverseSurface,
       BlendMode.srcIn,
     );
 
@@ -224,27 +222,24 @@ class ProfileEditForm extends HookConsumerWidget {
                   controller: usernameController,
                   inputIcon: SvgPicture.asset(
                     Assets.images.svg.profileIcon.path,
-                    colorFilter: isLightTheme ? colorFilter : null,
+                    colorFilter: colorFilter,
                   ),
                   hintText: 'Username',
-                  filled: !isLightTheme,
                   validator: validateUsername,
                 ),
                 const Gap(10),
                 InputField.paragraph(
                   controller: bioController,
                   hintText: 'Describe yourself...',
-                  filled: !isLightTheme,
                 ),
                 const Gap(10),
                 InputField.text(
                   controller: fullnameController,
                   inputIcon: SvgPicture.asset(
                     Assets.images.svg.profileIcon.path,
-                    colorFilter: isLightTheme ? colorFilter : null,
+                    colorFilter: colorFilter,
                   ),
                   hintText: 'Full name',
-                  filled: !isLightTheme,
                   validator: validateFullname,
                 ),
                 const Gap(10),
@@ -253,10 +248,9 @@ class ProfileEditForm extends HookConsumerWidget {
                   readOnly: state.profile?.email != null,
                   inputIcon: SvgPicture.asset(
                     Assets.images.svg.emailIcon.path,
-                    colorFilter: isLightTheme ? colorFilter : null,
+                    colorFilter: colorFilter,
                   ),
                   hintText: 'Email address',
-                  filled: !isLightTheme,
                   validator: validateEmail,
                 ),
                 const Gap(10),
@@ -264,7 +258,6 @@ class ProfileEditForm extends HookConsumerWidget {
                   PhoneNumberInput(
                     phoneController: phoneController,
                     dialCodeController: dialCodeController,
-                    filled: !isLightTheme,
                     validator: validatePhone,
                   ),
                 if (state.profile?.phoneNumber != null)
@@ -273,10 +266,9 @@ class ProfileEditForm extends HookConsumerWidget {
                     readOnly: state.profile?.phoneNumber != null,
                     inputIcon: SvgPicture.asset(
                       Assets.images.svg.phoneIcon.path,
-                      colorFilter: isLightTheme ? colorFilter : null,
+                      colorFilter: colorFilter,
                     ),
                     hintText: 'Phone number',
-                    filled: !isLightTheme,
                     validator: validatePhone,
                   ),
                 if ((user.value?.isAnonymous ?? false))
@@ -287,7 +279,6 @@ class ProfileEditForm extends HookConsumerWidget {
                         controller: passwordController,
                         inputIcon: SvgPicture.asset(Assets.images.svg.passwordIcon.path),
                         hintText: 'Password',
-                        filled: !isLightTheme,
                         validator: (value) => validatePassword(value),
                       ),
                       const Gap(10),
@@ -295,7 +286,6 @@ class ProfileEditForm extends HookConsumerWidget {
                         controller: confirmPasswordController,
                         inputIcon: SvgPicture.asset(Assets.images.svg.passwordIcon.path),
                         hintText: 'Confirm password',
-                        filled: !isLightTheme,
                         validator: (value) => validatePassword(value),
                       ),
                     ],
@@ -308,10 +298,9 @@ class ProfileEditForm extends HookConsumerWidget {
                         controller: organizationController,
                         inputIcon: SvgPicture.asset(
                           Assets.images.svg.organizationIcon.path,
-                          colorFilter: isLightTheme ? colorFilter : null,
+                          colorFilter: colorFilter,
                         ),
                         hintText: 'Organization',
-                        filled: !isLightTheme,
                         validator: validateOrganization,
                       ),
                     ],

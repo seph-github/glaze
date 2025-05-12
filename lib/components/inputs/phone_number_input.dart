@@ -30,11 +30,11 @@ class PhoneNumberInput extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    const double defaultBorderRadius = 16;
+    // const double defaultBorderRadius = 16;
 
     return Consumer(
       builder: (context, ref, _) {
-        final isLightTheme = ref.watch(settingsThemeProvider) == ThemeData.light();
+        // final isLightTheme = ref.watch(settingsThemeProvider) == ThemeData.light();
         final countryCodes = ref.watch(countryCodesProvider).value;
         return Column(
           children: [
@@ -50,39 +50,65 @@ class PhoneNumberInput extends HookConsumerWidget {
                 filled: filled,
                 hintText: 'Phone Number',
                 border: const OutlineInputBorder(),
-                focusedErrorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
-                  borderSide: const BorderSide(
-                    color: ColorPallete.whiteSmoke,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
-                  borderSide: BorderSide(
-                    color: isLightTheme ? lightModeColor ?? ColorPallete.backgroundColor : ColorPallete.whiteSmoke,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
-                  borderSide: BorderSide(
-                    width: 1 / 4,
-                    color: isLightTheme ? lightModeColor ?? ColorPallete.backgroundColor : ColorPallete.persianFable,
-                  ),
-                ),
-                errorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
-                  borderSide: const BorderSide(
-                    width: 1,
-                    color: ColorPallete.parlourRed,
-                  ),
-                ),
-                prefixIcon: SizedBox(
+                // focusedErrorBorder: OutlineInputBorder(
+                //   borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
+                //   borderSide: const BorderSide(
+                //     color: ColorPallete.whiteSmoke,
+                //   ),
+                // ),
+                // focusedBorder: OutlineInputBorder(
+                //   borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
+                //   borderSide: BorderSide(
+                //     color: isLightTheme ? lightModeColor ?? ColorPallete.backgroundColor : ColorPallete.whiteSmoke,
+                //   ),
+                // ),
+                // enabledBorder: OutlineInputBorder(
+                //   borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
+                //   borderSide: BorderSide(
+                //     width: 1 / 4,
+                //     color: isLightTheme ? lightModeColor ?? ColorPallete.backgroundColor : ColorPallete.persianFable,
+                //   ),
+                // ),
+                // errorBorder: OutlineInputBorder(
+                //   borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
+                //   borderSide: const BorderSide(
+                //     width: 1,
+                //     color: ColorPallete.parlourRed,
+                //   ),
+                // ),
+                prefixIcon: Container(
+                  alignment: Alignment.center,
                   width: 60,
-                  child: TextFormField(
+                  height: 40,
+                  margin: const EdgeInsets.symmetric(horizontal: 2.0),
+                  child: TextField(
                     controller: dialCodeController,
                     readOnly: true,
-                    textAlign: TextAlign.end,
+                    textAlign: TextAlign.center,
                     decoration: InputDecoration(
+                      isDense: true,
+                      contentPadding: EdgeInsets.zero,
+                      border: InputBorder.none,
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                        borderSide: const BorderSide(color: Colors.transparent),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                        borderSide: const BorderSide(color: Colors.transparent),
+                      ),
+                      errorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                        borderSide: const BorderSide(color: Colors.transparent),
+                      ),
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                        borderSide: const BorderSide(color: Colors.transparent),
+                      ),
+                      disabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                        borderSide: const BorderSide(color: Colors.transparent),
+                      ),
                       hintText: countryCodes?[countryCodes.indexWhere(
                         (code) {
                           if (dialCodeController!.text.isNotEmpty) {
@@ -92,7 +118,6 @@ class PhoneNumberInput extends HookConsumerWidget {
                         },
                       )]
                           .dialCode,
-                      border: InputBorder.none,
                     ),
                     onTap: () async {
                       await _showDialCodeModal(

@@ -22,7 +22,7 @@ class SettingsContentCard extends StatelessWidget {
         Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            color: Colors.white12,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(32.0),
           ),
           child: Column(

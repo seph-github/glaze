@@ -30,9 +30,9 @@ class SettingsMenuTile extends StatelessWidget {
         height: 40.0,
         width: 40.0,
         padding: const EdgeInsets.all(10.0),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: ColorPallete.lightBackgroundColor,
+          color: Theme.of(context).colorScheme.inverseSurface,
         ),
         child: icon,
       ),

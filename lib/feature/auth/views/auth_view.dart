@@ -6,7 +6,6 @@ import 'package:glaze/feature/auth/providers/auth_provider.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
 import 'package:glaze/utils/form_validators.dart';
 import 'package:glaze/utils/throw_error_exception_helper.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../components/buttons/primary_button.dart';
@@ -16,7 +15,6 @@ import '../../../core/navigation/router.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../gen/assets.gen.dart';
 import '../../../providers/initial_app_use/initial_app_use.dart';
-import '../../settings/providers/settings_theme_provider.dart';
 import '../widgets/auth_header.dart';
 import '../widgets/auth_sso_widget.dart';
 
@@ -42,10 +40,8 @@ class AuthView extends HookConsumerWidget {
     final recruitingTalent = useState<bool>(false);
     final hasCompletedInitialAppUse = useState<bool>(false);
 
-    final isLightTheme = ref.watch(settingsThemeProvider) == ThemeData.light();
-
-    const ColorFilter colorFilter = ColorFilter.mode(
-      ColorPallete.lightBackgroundColor,
+    final ColorFilter colorFilter = ColorFilter.mode(
+      Theme.of(context).colorScheme.inverseSurface,
       BlendMode.srcIn,
     );
 
@@ -95,7 +91,7 @@ class AuthView extends HookConsumerWidget {
     useEffect(
       () {
         hasCompletedInitialAppUse.value = ref.read(initialAppUseProvider).completedInitialAppUse;
-        print('Has completed intial setup ${hasCompletedInitialAppUse.value}');
+
         return null;
       },
       [],
@@ -119,7 +115,7 @@ class AuthView extends HookConsumerWidget {
           InputField.email(
             inputIcon: SvgPicture.asset(
               Assets.images.svg.emailIcon.path,
-              colorFilter: isLightTheme ? colorFilter : null,
+              colorFilter: colorFilter,
             ),
             hintText: toggleItems.value[0],
             controller: emailController,
@@ -129,7 +125,7 @@ class AuthView extends HookConsumerWidget {
           InputField.password(
             inputIcon: SvgPicture.asset(
               Assets.images.svg.passwordIcon.path,
-              colorFilter: isLightTheme ? colorFilter : null,
+              colorFilter: colorFilter,
             ),
             hintText: 'Enter your password',
             controller: passwordController,
@@ -146,7 +142,7 @@ class AuthView extends HookConsumerWidget {
           InputField.text(
             inputIcon: SvgPicture.asset(
               Assets.images.svg.profileIcon.path,
-              colorFilter: isLightTheme ? colorFilter : null,
+              colorFilter: colorFilter,
             ),
             hintText: 'Choose a username',
             controller: usernameController,
@@ -156,7 +152,7 @@ class AuthView extends HookConsumerWidget {
           InputField.email(
             inputIcon: SvgPicture.asset(
               Assets.images.svg.emailIcon.path,
-              colorFilter: isLightTheme ? colorFilter : null,
+              colorFilter: colorFilter,
             ),
             hintText: toggleItems.value[0],
             controller: emailController,
@@ -166,7 +162,7 @@ class AuthView extends HookConsumerWidget {
           InputField.password(
             inputIcon: SvgPicture.asset(
               Assets.images.svg.passwordIcon.path,
-              colorFilter: isLightTheme ? colorFilter : null,
+              colorFilter: colorFilter,
             ),
             hintText: 'Enter your password',
             controller: passwordController,
@@ -229,8 +225,8 @@ class AuthView extends HookConsumerWidget {
                 const Gap(20),
                 if (isLogin.value)
                   PrimaryButton(
-                    onPressed: () {
-                      context.go(const AuthPhoneSignInRoute().location);
+                    onPressed: () async {
+                      await const AuthPhoneSignInRoute().push<void>(context);
                     },
                     label: 'Sign in with Phone',
                     backgroundColor: ColorPallete.primaryColor,

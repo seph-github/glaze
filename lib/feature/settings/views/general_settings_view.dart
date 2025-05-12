@@ -30,11 +30,14 @@ class GeneralSettingsView extends HookConsumerWidget {
       return;
     }, []);
 
+    ColorFilter colorFilter = ColorFilter.mode(
+      Theme.of(context).colorScheme.surfaceContainerLowest,
+      BlendMode.srcIn,
+    );
+
     return LoadingLayout(
       isLoading: state.isLoading,
-      appBar: AppBarWithBackButton(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-      ),
+      appBar: const AppBarWithBackButton(),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 18.0),
         child: ListView(
@@ -46,7 +49,10 @@ class GeneralSettingsView extends HookConsumerWidget {
                   children: [
                     SettingsMenuTile(
                       label: 'Light Mode',
-                      icon: SvgPicture.asset(Assets.images.svg.lightModeIcon.path),
+                      icon: SvgPicture.asset(
+                        Assets.images.svg.lightModeIcon.path,
+                        colorFilter: colorFilter,
+                      ),
                       value: lightmode.value,
                       onChanged: (value) {
                         lightmode.value = value;
@@ -55,7 +61,10 @@ class GeneralSettingsView extends HookConsumerWidget {
                     ),
                     SettingsMenuTile(
                       label: 'Language',
-                      icon: SvgPicture.asset(Assets.images.svg.languageIcon.path),
+                      icon: SvgPicture.asset(
+                        Assets.images.svg.languageIcon.path,
+                        colorFilter: colorFilter,
+                      ),
                       trailing: const Icon(
                         Icons.chevron_right_rounded,
                         size: 24.0,
@@ -64,7 +73,10 @@ class GeneralSettingsView extends HookConsumerWidget {
                     ),
                     SettingsMenuTile(
                       label: 'Notification Settings',
-                      icon: SvgPicture.asset(Assets.images.svg.notificationSettingsIcon.path),
+                      icon: SvgPicture.asset(
+                        Assets.images.svg.notificationSettingsIcon.path,
+                        colorFilter: colorFilter,
+                      ),
                       trailing: const Icon(
                         Icons.chevron_right_rounded,
                         size: 24.0,
@@ -73,7 +85,10 @@ class GeneralSettingsView extends HookConsumerWidget {
                     ),
                     SettingsMenuTile(
                       label: 'Privacy and Security',
-                      icon: SvgPicture.asset(Assets.images.svg.privacySecurityIcon.path),
+                      icon: SvgPicture.asset(
+                        Assets.images.svg.privacySecurityIcon.path,
+                        colorFilter: colorFilter,
+                      ),
                       trailing: const Icon(
                         Icons.chevron_right_rounded,
                         size: 24.0,
@@ -90,7 +105,10 @@ class GeneralSettingsView extends HookConsumerWidget {
                 SettingsMenuTile(
                   onTap: () async => await const PersonalDetailsRoute().push<void>(context),
                   label: 'Account Details',
-                  icon: SvgPicture.asset(Assets.images.svg.personalDetailsIcon.path),
+                  icon: SvgPicture.asset(
+                    Assets.images.svg.personalDetailsIcon.path,
+                    colorFilter: colorFilter,
+                  ),
                   trailing: const Icon(
                     Icons.chevron_right_rounded,
                     size: 24.0,
@@ -102,9 +120,9 @@ class GeneralSettingsView extends HookConsumerWidget {
                 ),
                 SettingsMenuTile(
                   label: 'Shop',
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.shopping_bag_outlined,
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.surfaceContainerLowest,
                     size: 20,
                   ),
                   trailing: const Icon(
@@ -120,7 +138,10 @@ class GeneralSettingsView extends HookConsumerWidget {
               children: [
                 SettingsMenuTile(
                   label: 'Help Center',
-                  icon: SvgPicture.asset(Assets.images.svg.helpCenterIcon.path),
+                  icon: SvgPicture.asset(
+                    Assets.images.svg.helpCenterIcon.path,
+                    colorFilter: colorFilter,
+                  ),
                   trailing: const Icon(
                     Icons.chevron_right_rounded,
                     size: 24.0,
@@ -132,9 +153,9 @@ class GeneralSettingsView extends HookConsumerWidget {
                 ),
                 SettingsMenuTile(
                   label: 'Contact Support',
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.phone_outlined,
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.surfaceContainerLowest,
                     size: 20,
                   ),
                   trailing: const Icon(
@@ -145,7 +166,10 @@ class GeneralSettingsView extends HookConsumerWidget {
                 ),
                 SettingsMenuTile(
                   label: 'Terms & Conditions',
-                  icon: SvgPicture.asset(Assets.images.svg.termsConditionsIcon.path),
+                  icon: SvgPicture.asset(
+                    Assets.images.svg.termsConditionsIcon.path,
+                    colorFilter: colorFilter,
+                  ),
                   trailing: const Icon(
                     Icons.chevron_right_rounded,
                     size: 24.0,
@@ -160,9 +184,9 @@ class GeneralSettingsView extends HookConsumerWidget {
                 Consumer(builder: (context, ref, _) {
                   return SettingsMenuTile(
                     label: 'Log Out',
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.logout_rounded,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.surfaceContainerLowest,
                     ),
                     trailing: const SizedBox.shrink(),
                     onTap: () async {

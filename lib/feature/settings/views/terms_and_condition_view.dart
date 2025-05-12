@@ -7,12 +7,11 @@ class TermsAndConditionsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LoadingLayout(
+    return const LoadingLayout(
       appBar: AppBarWithBackButton(
-        title: const Text('Terms & Conditions'),
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: Text('Terms & Conditions'),
       ),
-      child: const SafeArea(
+      child: SafeArea(
         child: Padding(
           padding: EdgeInsets.all(16.0),
           child: SingleChildScrollView(

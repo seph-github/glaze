@@ -130,14 +130,22 @@ class ProfileMomentsCard extends StatelessWidget {
                                         onPressed: () {
                                           Navigator.pop(context);
                                         },
-                                        child: const Text('Edit'),
+                                        child: Text(
+                                          'Edit',
+                                          style: Theme.of(context).textTheme.titleLarge,
+                                        ),
                                       ),
                                       CupertinoActionSheetAction(
                                         onPressed: () {
                                           Navigator.pop(context);
                                         },
                                         isDestructiveAction: true,
-                                        child: const Text('Delete'),
+                                        child: Text(
+                                          'Delete',
+                                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                                color: Colors.red,
+                                              ),
+                                        ),
                                       ),
                                     ],
                                     cancelButton: CupertinoActionSheetAction(
@@ -145,13 +153,19 @@ class ProfileMomentsCard extends StatelessWidget {
                                         Navigator.pop(context);
                                       },
                                       isDefaultAction: true,
-                                      child: const Text('Cancel'),
+                                      child: Text(
+                                        'Cancel',
+                                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                              color: Colors.blue,
+                                            ),
+                                      ),
                                     ),
                                   ),
                                 );
                               },
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.more_horiz,
+                                color: Theme.of(context).colorScheme.inverseSurface,
                               ),
                             ),
                           ),

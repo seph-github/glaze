@@ -62,12 +62,22 @@ GoRouter router(Ref ref) {
     final hasSplashCompleted = ref.read(splashProvider).completeSplash;
     final bool isCompletedProfile = user?.userMetadata?['is_profile_complete'] ?? false;
     final bool isOnBoardingCompleted = user?.userMetadata?['is_onboarding_complete'] ?? false;
+    final destination = state.fullPath;
 
     if (!hasSplashCompleted) {
       return const SplashRoute().location;
     }
 
     if (user == null) {
+      if (destination!.contains('/auth/phone-sign-in')) {
+        return const AuthPhoneSignInRoute().location;
+      } else if (destination.contains('/auth/forget-password')) {
+        return const AuthForgetPasswordRoute().location;
+      } else if (destination.contains('/auth/reset-password')) {
+        return const AuthResetPasswordRoute().location;
+      } else if (destination.contains('/auth/verify-phone')) {
+        return const AuthVerifyPhoneRoute().location;
+      }
       return const AuthRoute().location;
     }
 

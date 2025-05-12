@@ -37,12 +37,12 @@ class ProfileAchievementsCard extends StatelessWidget {
                 style: TextStyle(fontSize: 20),
               ),
               if (achievements.length >= 8)
-                const Text(
+                Text(
                   'View All',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: ColorPallete.primaryColor,
+                    color: Theme.of(context).colorScheme.inverseSurface,
                   ),
                 ),
             ],
