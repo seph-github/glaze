@@ -88,26 +88,50 @@ class GlazeModal {
     CategoryState categoryState,
     TextEditingController categoryController,
   ) {
-    return showCupertinoModalPopup(
+    return showModalBottomSheet(
+      backgroundColor: Colors.transparent,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(16.0),
+          topRight: Radius.circular(16.0),
+        ),
+      ),
       context: context,
+      isScrollControlled: true,
       builder: (ctx) {
         final size = MediaQuery.of(ctx).size;
 
-        return CupertinoPopupSurface(
-          child: Material(
-            child: Container(
-              height: size.height - kToolbarHeight, // Set height to half of the screen
+        return DraggableScrollableSheet(
+          initialChildSize: 0.6,
+          maxChildSize: 0.9,
+          minChildSize: 0.4,
+          builder: (context, controller) => Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+            ),
+            child: SizedBox(
+              height: size.height - kToolbarHeight,
               width: double.infinity,
-
-              color: ColorPallete.backgroundColor,
-
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Gap(16.0),
+                  const SizedBox(height: 12),
+                  Container(
+                    width: 40,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.inverseSurface,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   Text(
                     'Select a Category',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(),
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const Divider(
                     color: Colors.grey,
@@ -115,19 +139,17 @@ class GlazeModal {
                   ),
                   Expanded(
                     child: ListView.builder(
+                      controller: controller,
                       itemCount: categoryState.categories.length,
                       itemBuilder: (ctx, index) {
                         return ListTile(
                           title: Text(
                             categoryState.categories[index].name,
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
+                            style: Theme.of(context).textTheme.bodyLarge,
                           ),
                           onTap: () {
                             categoryController.text = categoryState.categories[index].name;
-                            ctx.pop(ctx);
+                            Navigator.pop(ctx);
                           },
                         );
                       },
