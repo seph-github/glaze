@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
+import 'package:glaze/components/dialogs/dialogs.dart';
 import 'package:glaze/feature/profile/widgets/profile_header_section.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -46,18 +47,64 @@ class ProfileView extends HookConsumerWidget {
       [],
     );
 
-    return LoadingLayout(
-      isLoading: state.isLoading,
-      appBar: AppBarWithBackButton(
-        showBackButton: false,
-        title: const Text('Profile'),
-        titleTextStyle: Theme.of(context).textTheme.headlineLarge?.copyWith(
-              fontFamily: FontFamily.hitAndRun,
-            ),
-        actions: [
-          if (state.profile?.role == ProfileType.recruiter.name)
+    useEffect(() {
+      ref.listenManual(profileNotifierProvider, (prev, next) {
+        if (next.response != null && prev?.response != next.response) {
+          Dialogs.createContentDialog(
+            context,
+            title: 'Success Video Deletion',
+            content: next.response as String,
+            onPressed: () => context.pop(),
+          );
+        }
+
+        if (next.error != null && prev?.error != next.error) {
+          Dialogs.createContentDialog(
+            context,
+            title: 'Error',
+            content: next.error.toString(),
+            onPressed: () => context.pop(),
+          );
+        }
+      });
+
+      return null;
+    }, []);
+
+    return RefreshIndicator(
+      onRefresh: () => ref.read(profileNotifierProvider.notifier).fetchProfile(user!.id),
+      color: Theme.of(context).colorScheme.primary,
+      child: LoadingLayout(
+        isLoading: state.isLoading,
+        appBar: AppBarWithBackButton(
+          showBackButton: false,
+          title: const Text('Profile'),
+          titleTextStyle: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                fontFamily: FontFamily.hitAndRun,
+              ),
+          actions: [
+            if (state.profile?.role == ProfileType.recruiter.name)
+              InkWell(
+                onTap: () {},
+                child: Container(
+                  width: 46.0,
+                  height: width,
+                  padding: const EdgeInsets.all(padding),
+                  decoration: const BoxDecoration(
+                    color: ColorPallete.secondaryColor,
+                    shape: BoxShape.circle,
+                  ),
+                  child: SvgPicture.asset(Assets.images.svg.messageIcon.path),
+                ),
+              ),
+            const Gap(12.0),
             InkWell(
-              onTap: () {},
+              borderRadius: BorderRadius.circular(64.0),
+              radius: 64.0,
+              splashFactory: NoSplash.splashFactory,
+              onTap: () {
+                router.push(const GeneralSettingsRoute().location);
+              },
               child: Container(
                 width: 46.0,
                 height: width,
@@ -66,33 +113,12 @@ class ProfileView extends HookConsumerWidget {
                   color: ColorPallete.secondaryColor,
                   shape: BoxShape.circle,
                 ),
-                child: SvgPicture.asset(Assets.images.svg.messageIcon.path),
+                child: SvgPicture.asset(Assets.images.svg.settingsIcon.path),
               ),
             ),
-          const Gap(12.0),
-          InkWell(
-            borderRadius: BorderRadius.circular(64.0),
-            radius: 64.0,
-            splashFactory: NoSplash.splashFactory,
-            onTap: () {
-              router.push(const GeneralSettingsRoute().location);
-            },
-            child: Container(
-              width: 46.0,
-              height: width,
-              padding: const EdgeInsets.all(padding),
-              decoration: const BoxDecoration(
-                color: ColorPallete.secondaryColor,
-                shape: BoxShape.circle,
-              ),
-              child: SvgPicture.asset(Assets.images.svg.settingsIcon.path),
-            ),
-          ),
-          const Gap(16.0),
-        ],
-      ),
-      child: RefreshIndicator(
-        onRefresh: () => ref.read(profileNotifierProvider.notifier).fetchProfile(user!.id),
+            const Gap(16.0),
+          ],
+        ),
         child: SingleChildScrollView(
           primary: true,
           child: SafeArea(
@@ -145,7 +171,6 @@ class ProfileView extends HookConsumerWidget {
                 const ProfileAchievementsCard(),
                 const SizedBox(height: 20),
                 ProfileMomentsCard(
-                  isLoading: state.isLoading,
                   videos: state.profile?.videos ?? [],
                   isCurrentUser: state.profile?.id == user?.id,
                 ),

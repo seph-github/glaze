@@ -10,6 +10,7 @@ import 'package:glaze/feature/auth/views/auth_forget_password_view.dart';
 import 'package:glaze/feature/auth/views/auth_reset_password_view.dart';
 import 'package:glaze/feature/challenges/models/challenge.dart';
 import 'package:glaze/feature/challenges/views/challenge_details_view.dart';
+import 'package:glaze/feature/challenges/views/challenge_leaderboard_view.dart';
 import 'package:glaze/feature/dashboard/views/dashboard_view.dart';
 import 'package:glaze/feature/profile/views/profile_edit_form.dart';
 import 'package:glaze/feature/profile/views/profile_interactive_view.dart';
@@ -570,5 +571,15 @@ class ChallengeDetailsRoute extends GoRouteData {
       challenge: challenge,
       useColor: Color(useColor),
     );
+  }
+}
+
+@TypedGoRoute<ChallengeLeaderboardRoute>(path: '/leaderboard')
+class ChallengeLeaderboardRoute extends GoRouteData {
+  const ChallengeLeaderboardRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const ChallengeLeaderBoardView();
   }
 }

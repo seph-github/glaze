@@ -3,7 +3,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/components/app_bar_with_back_button.dart';
 import 'package:glaze/components/buttons/primary_button.dart';
-import 'package:glaze/core/styles/color_pallete.dart';
 import 'package:glaze/feature/challenges/models/challenge.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
 import 'package:glaze/gen/assets.gen.dart';
@@ -11,7 +10,9 @@ import 'package:glaze/utils/app_timer.dart';
 import 'package:glaze/utils/string_formatter.dart';
 
 import '../../../components/modals/glaze_modals.dart';
+import '../../../core/navigation/router.dart';
 import '../../../gen/fonts.gen.dart';
+import '../widgets/leaderboard_tile.dart';
 
 class ChallengeDetailsView extends StatelessWidget {
   const ChallengeDetailsView({
@@ -176,11 +177,14 @@ class ChallengeDetailsView extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
             ),
-            Text(
-              'View All',
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.normal,
-                  ),
+            GestureDetector(
+              onTap: () async => await const ChallengeLeaderboardRoute().push<void>(context),
+              child: Text(
+                'View All',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.normal,
+                    ),
+              ),
             ),
           ],
         ),
@@ -192,21 +196,33 @@ class ChallengeDetailsView extends StatelessWidget {
           ),
           child: Column(
             children: [
-              _buildLeaderBoardTile(context),
+              LeaderboardTile(
+                useColor: useColor,
+                username: 'first',
+                rank: 1.toString(),
+              ),
               const Divider(
                 height: 0,
                 indent: 12,
                 endIndent: 12,
                 thickness: 0.5,
               ),
-              _buildLeaderBoardTile(context),
+              LeaderboardTile(
+                useColor: useColor,
+                username: 'second',
+                rank: 2.toString(),
+              ),
               const Divider(
                 height: 0,
                 indent: 12,
                 endIndent: 12,
                 thickness: 0.5,
               ),
-              _buildLeaderBoardTile(context),
+              LeaderboardTile(
+                useColor: useColor,
+                username: 'thirdy',
+                rank: 3.toString(),
+              ),
             ],
           ),
         ),
@@ -292,70 +308,6 @@ class ChallengeDetailsView extends StatelessWidget {
           onPressed: () async {
             await GlazeModal.showUploadContentModalPopUp(context);
           },
-        ),
-      ),
-    );
-  }
-
-  ListTile _buildLeaderBoardTile(BuildContext context) {
-    return ListTile(
-      title: Text(
-        'hoopStar01',
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-      ),
-      subtitle: Text(
-        'You need 30 more glaze to rank up.',
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              fontWeight: FontWeight.normal,
-              color: ColorPallete.hintTextColor,
-            ),
-      ),
-      leading: Container(
-        alignment: Alignment.center,
-        height: 42,
-        width: 42,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Theme.of(context).colorScheme.surface,
-          border: Border.all(color: Theme.of(context).colorScheme.inverseSurface, width: 1),
-        ),
-        child: Text(
-          '#1',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-        ),
-      ),
-      trailing: Container(
-        width: 70.0,
-        height: 36.0,
-        decoration: BoxDecoration(
-          border: Border.all(color: useColor, width: 0.25),
-          color: useColor.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(16.0),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            SvgPicture.asset(
-              Assets.images.svg.glazeDonutsIcon.path,
-              height: 15.0,
-              colorFilter: ColorFilter.mode(
-                useColor,
-                BlendMode.srcIn,
-              ),
-            ),
-            const Gap(6.0),
-            Text(
-              '120',
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: useColor,
-                  ),
-            ),
-          ],
         ),
       ),
     );

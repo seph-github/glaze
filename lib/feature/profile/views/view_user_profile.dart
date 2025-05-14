@@ -149,7 +149,6 @@ class ViewUserProfile extends HookConsumerWidget {
               const SizedBox(height: 20),
               Consumer(builder: (context, ref, _) {
                 return ProfileMomentsCard(
-                  isLoading: state.isLoading,
                   videos: state.viewUserProfile?.videos ?? [],
                   isCurrentUser: isCurrentUser.value,
                 );

@@ -103,11 +103,11 @@ class ProfileCompletionForm extends HookConsumerWidget {
           );
         }
 
-        if (next.response.isNotEmpty && next.response != prev?.response) {
+        if (next.response != null && next.response != prev?.response) {
           await Dialogs.createContentDialog(
             context,
             title: 'Success',
-            content: next.response,
+            content: next.response as String,
             onPressed: () async {
               ref.invalidate(profileInterestsNotifierProvider);
 

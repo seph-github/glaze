@@ -18,11 +18,11 @@ class ContentPickerServices {
     }
   }
 
-  Future<XFile?> takePhoto({required CameraDevice prefferedCameraDevice}) async {
+  Future<XFile?> takePhoto({required CameraDevice preferedCameraDevice}) async {
     try {
       final XFile? image = await _imagePicker.pickImage(
         source: ImageSource.camera,
-        preferredCameraDevice: prefferedCameraDevice,
+        preferredCameraDevice: preferedCameraDevice,
       );
       if (image == null) return null;
 
@@ -41,11 +41,11 @@ class ContentPickerServices {
     }
   }
 
-  Future<XFile?> takeVideo({required CameraDevice prefferedCameraDevice}) async {
+  Future<XFile?> takeVideo({required CameraDevice preferedCameraDevice}) async {
     try {
       final XFile? video = await _imagePicker.pickVideo(
         source: ImageSource.camera,
-        preferredCameraDevice: prefferedCameraDevice,
+        preferredCameraDevice: preferedCameraDevice,
         maxDuration: const Duration(seconds: 15),
       );
 

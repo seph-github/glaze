@@ -1,28 +1,31 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/feature/moments/views/moments_videos_tabview.dart';
+import 'package:glaze/feature/profile/provider/profile_provider/profile_provider.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import '../../../components/dialogs/dialogs.dart';
 import '../../../gen/assets.gen.dart';
 import '../../home/models/video_content/video_content.dart';
 
-class ProfileMomentsCard extends StatelessWidget {
+class ProfileMomentsCard extends ConsumerWidget {
   const ProfileMomentsCard({
     super.key,
     this.videos,
-    this.isLoading = false,
     required this.isCurrentUser,
   });
 
   final List<VideoContent>? videos;
-  final bool isLoading;
   final bool isCurrentUser;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -136,8 +139,23 @@ class ProfileMomentsCard extends StatelessWidget {
                                         ),
                                       ),
                                       CupertinoActionSheetAction(
-                                        onPressed: () {
-                                          Navigator.pop(context);
+                                        onPressed: () async {
+                                          await Dialogs.dualActionContentDialog(
+                                            context,
+                                            title: 'Confirm Video Deletion',
+                                            content: 'This action is permanent and cannot be undone. Deleting the video will remove it from your profile and erase all associated data. Are you sure you want to proceed?',
+                                            onCancel: () => Navigator.of(context).popUntil(
+                                              (route) => route.isFirst,
+                                            ),
+                                            onConfirm: () async {
+                                              if (context.canPop()) {
+                                                Navigator.of(context).popUntil(
+                                                  (route) => route.isFirst,
+                                                );
+                                              }
+                                              await ref.read(profileNotifierProvider.notifier).deleteVideoById(videos![index].id);
+                                            },
+                                          );
                                         },
                                         isDestructiveAction: true,
                                         child: Text(

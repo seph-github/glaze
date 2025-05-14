@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:glaze/feature/home/services/video_content_services.dart';
 import 'package:glaze/feature/profile/services/profile_services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../../core/services/secure_storage_services.dart';
+import '../../../home/models/video_content/video_content.dart';
 import '../../models/profile/profile.dart';
 import '../../models/recruiter_profile/recruiter_profile.dart';
 
@@ -14,7 +16,7 @@ part 'profile_provider.g.dart';
 @freezed
 abstract class ProfileState with _$ProfileState {
   const factory ProfileState({
-    @Default('') String response,
+    @Default(null) String? response,
     @Default(null) Profile? profile,
     @Default(null) Profile? viewUserProfile,
     @Default(null) RecruiterProfile? recruiterProfile,
@@ -91,8 +93,7 @@ class ProfileNotifier extends _$ProfileNotifier {
   Future<void> fetchRecruiterProfile(String id) async {
     state = state.copyWith(isLoading: true);
     try {
-      final recruiterProfile =
-          await ProfileServices().fetchRecruiterProfile(id);
+      final recruiterProfile = await ProfileServices().fetchRecruiterProfile(id);
       state = state.copyWith(
         recruiterProfile: recruiterProfile,
         isLoading: false,
@@ -157,16 +158,22 @@ class ProfileNotifier extends _$ProfileNotifier {
     }
   }
 
-  // Future<void> getUserInteractions() async {
-  //   state = state.copyWith(isLoading: true);
-  //   try {
-  //     final user = AuthServices().currentUser;
-  //     final response = await ProfileServices().getUserInteractions(user!.id);
+  Future<void> deleteVideoById(String id) async {
+    state = state.copyWith(isLoading: true, error: null, response: null);
+    try {
+      final res = await VideoContentServices().deleteVideoById(id);
 
-  //     log('response $response');
-  //     state = state.copyWith(isLoading: false);
-  //   } catch (error) {
-  //     setError(error);
-  //   }
-  // }
+      final updatedVideos = List<VideoContent>.from(state.profile?.videos ?? [])..removeWhere((video) => video.id == id);
+
+      final updatedProfile = state.profile?.copyWith(videos: updatedVideos);
+
+      state = state.copyWith(
+        isLoading: false,
+        response: res ?? '',
+        profile: updatedProfile,
+      );
+    } catch (e) {
+      setError(e);
+    }
+  }
 }

@@ -8,7 +8,6 @@ import 'package:gap/gap.dart';
 import 'package:glaze/components/modals/glaze_modals.dart';
 import 'package:glaze/feature/camera/provider/content_picker_provider.dart';
 import 'package:glaze/feature/category/provider/category_provider.dart';
-import 'package:glaze/feature/home/provider/video_content_provider/video_content_provider.dart';
 import 'package:glaze/feature/moments/providers/moments_provider.dart';
 import 'package:glaze/feature/templates/loading_layout.dart';
 import 'package:glaze/utils/generate_thumbnail.dart';
@@ -26,7 +25,6 @@ import '../../../components/morphism_widget.dart';
 import '../../../components/snack_bar/custom_snack_bar.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../gen/assets.gen.dart';
-import '../../settings/providers/settings_theme_provider.dart';
 
 class UploadMomentsCard extends HookConsumerWidget {
   const UploadMomentsCard({
@@ -46,7 +44,6 @@ class UploadMomentsCard extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isLightTheme = ref.watch(settingsThemeProvider) == ThemeData.light();
     final fileState = ref.watch(contentPickerNotifierProvider);
     final router = GoRouter.of(context);
     final formKey = GlobalKey<FormState>();
@@ -83,7 +80,7 @@ class UploadMomentsCard extends HookConsumerWidget {
     final categoryController = useTextEditingController();
     final fileController = useTextEditingController();
 
-    final state = ref.watch(videoContentNotifierProvider);
+    final state = ref.watch(momentsNotifierProvider);
     final categoryState = ref.watch(categoryNotifierProvider);
 
     useEffect(
@@ -97,7 +94,7 @@ class UploadMomentsCard extends HookConsumerWidget {
     );
 
     ref.listen(
-      videoContentNotifierProvider,
+      momentsNotifierProvider,
       (prev, next) {
         if (next.error != null && next.error != prev?.error) {
           final errorMessage = next.error.toString();
@@ -106,11 +103,13 @@ class UploadMomentsCard extends HookConsumerWidget {
             context,
             content: Text(errorMessage),
           );
-        } else if (next.response != null && next.response != prev?.response) {
+        }
+
+        if (next.response != null && prev?.response != next.response) {
           Dialogs.createContentDialog(
             context,
             title: 'Success',
-            content: state.response ?? '',
+            content: next.response ?? '',
             onPressed: () async {
               titleController.clear();
               captionController.clear();
@@ -119,7 +118,7 @@ class UploadMomentsCard extends HookConsumerWidget {
               file.value = null;
               ref.invalidate(contentPickerNotifierProvider);
 
-              router.pop();
+              return router.pop();
             },
           );
         }
@@ -265,7 +264,6 @@ class UploadMomentsCard extends HookConsumerWidget {
                             InputField.text(
                               controller: titleController,
                               hintText: 'Enter video title',
-                              lightModeColor: isLightTheme ? Colors.white : null,
                               helper: Text(
                                 '* up to 50 characters',
                                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
@@ -284,7 +282,6 @@ class UploadMomentsCard extends HookConsumerWidget {
                               controller: captionController,
                               maxLines: 5,
                               hintText: 'Write video caption',
-                              lightModeColor: isLightTheme ? Colors.white : null,
                               validator: (value) {
                                 if (value!.isEmpty) {
                                   return 'Please enter video caption';
@@ -296,7 +293,6 @@ class UploadMomentsCard extends HookConsumerWidget {
                             InputField(
                               hintText: 'Category',
                               controller: categoryController,
-                              lightModeColor: isLightTheme ? Colors.white : null,
                               validator: (value) {
                                 if (value!.isEmpty) {
                                   return 'Please add a category';
@@ -308,56 +304,7 @@ class UploadMomentsCard extends HookConsumerWidget {
                                 await GlazeModal.showCategoryModalPopup(context, categoryState, categoryController);
                               },
                             ),
-                            if (fileState.video != null)
-                              Column(
-                                children: [
-                                  const Gap(26.0),
-                                  FutureBuilder<File>(
-                                    future: thumbnailFuture,
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState == ConnectionState.waiting) {
-                                        return const CircularProgressIndicator();
-                                      } else if (snapshot.hasData) {
-                                        return Stack(
-                                          alignment: Alignment.topRight,
-                                          children: [
-                                            AspectRatio(
-                                              aspectRatio: 16 / 9,
-                                              child: Container(
-                                                clipBehavior: Clip.hardEdge,
-                                                decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                    color: Colors.white,
-                                                    width: 0.5,
-                                                  ),
-                                                  borderRadius: BorderRadius.circular(16.0),
-                                                  image: DecorationImage(
-                                                    image: FileImage(snapshot.data!),
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Positioned(
-                                              right: 8,
-                                              top: 8,
-                                              child: IconButton.filled(
-                                                onPressed: () => ref.invalidate(contentPickerNotifierProvider),
-                                                visualDensity: const VisualDensity(horizontal: -3, vertical: -2),
-                                                focusColor: ColorPallete.primaryColor,
-                                                color: ColorPallete.primaryColor,
-                                                icon: SvgPicture.asset(Assets.images.svg.closeIcon.path),
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      } else {
-                                        return const Text('No thumbnail available');
-                                      }
-                                    },
-                                  ),
-                                ],
-                              ),
+                            if (fileState.video != null) _buildContentThumbnailPreview(thumbnailFuture, ref),
                             const Gap(30.0),
                             FocusButton(
                               controller: fileController,
@@ -378,9 +325,7 @@ class UploadMomentsCard extends HookConsumerWidget {
                               child: Center(
                                 child: Text(
                                   'Choose a Moment',
-                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                        color: ColorPallete.whiteSmoke,
-                                      ),
+                                  style: Theme.of(context).textTheme.bodyMedium,
                                 ),
                               ),
                             ),
@@ -403,6 +348,58 @@ class UploadMomentsCard extends HookConsumerWidget {
       ),
     );
   }
+
+  Widget _buildContentThumbnailPreview(Future<File> thumbnailFuture, WidgetRef ref) {
+    return Column(
+      children: [
+        const Gap(26.0),
+        FutureBuilder<File>(
+          future: thumbnailFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            } else if (snapshot.hasData) {
+              return Stack(
+                alignment: Alignment.topRight,
+                children: [
+                  AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: Container(
+                      clipBehavior: Clip.hardEdge,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.white,
+                          width: 0.5,
+                        ),
+                        borderRadius: BorderRadius.circular(16.0),
+                        image: DecorationImage(
+                          image: FileImage(snapshot.data!),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    right: 8,
+                    top: 8,
+                    child: IconButton.filled(
+                      onPressed: () => ref.invalidate(contentPickerNotifierProvider),
+                      visualDensity: const VisualDensity(horizontal: -3, vertical: -2),
+                      focusColor: ColorPallete.primaryColor,
+                      color: ColorPallete.primaryColor,
+                      icon: SvgPicture.asset(Assets.images.svg.closeIcon.path),
+                    ),
+                  ),
+                ],
+              );
+            } else {
+              return const Text('No thumbnail available');
+            }
+          },
+        ),
+      ],
+    );
+  }
 }
 
 Future<void> onImageSource(BuildContext ctx, WidgetRef ref) async {
@@ -421,27 +418,38 @@ Future<void> onImageSource(BuildContext ctx, WidgetRef ref) async {
               ctx.pop();
             }
           },
-          child: const Text('Gallery'),
+          child: Text(
+            'Gallery',
+            style: Theme.of(ctx).textTheme.titleLarge,
+          ),
         ),
         CupertinoActionSheetAction(
           isDefaultAction: false,
           onPressed: () async {
             await ref.read(contentPickerNotifierProvider.notifier).takeVideo(
-                  prefferedCameraDevice: CameraDevice.rear,
+                  preferedCameraDevice: CameraDevice.rear,
                 );
 
             if (ctx.mounted) {
               ctx.pop();
             }
           },
-          child: const Text('Camera'),
+          child: Text(
+            'Camera',
+            style: Theme.of(ctx).textTheme.titleLarge,
+          ),
         ),
         CupertinoActionSheetAction(
           isDefaultAction: true,
           onPressed: () {
             ctx.pop();
           },
-          child: const Text('Cancel'),
+          child: Text(
+            'Cancel',
+            style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
+                  color: Colors.red,
+                ),
+          ),
         ),
       ],
     ),

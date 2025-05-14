@@ -43,7 +43,7 @@ class VideoFeedNotifier extends _$VideoFeedNotifier {
   Future<void> loadVideos() async {
     state = state.copyWith(isLoading: true);
     try {
-      final videos = await _videoServices.fetchVideoContents(offset);
+      final videos = await _videoServices.loadVideos(offset);
       final hasMoreVideos = videos.length == 2;
       if (hasMoreVideos) {
         offset += 2;
@@ -63,7 +63,7 @@ class VideoFeedNotifier extends _$VideoFeedNotifier {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final videos = await _videoServices.fetchVideoContents(offset);
+      final videos = await _videoServices.loadVideos(offset);
       final hasMore = videos.length == 2;
       if (hasMore) offset += 2;
 
@@ -93,7 +93,7 @@ class VideoFeedNotifier extends _$VideoFeedNotifier {
 
     try {
       if (state.videos.isNotEmpty) {
-        final List<VideoContent> moreVideos = await _videoServices.fetchVideoContents(offset);
+        final List<VideoContent> moreVideos = await _videoServices.loadVideos(offset);
         final bool hasMoreVideos = moreVideos.length == 2;
         if (hasMoreVideos) {
           offset += 2;

@@ -25,7 +25,7 @@ class VideoContentServices {
     }
   }
 
-  Future<List<VideoContent>> fetchVideoContents(int offset) async {
+  Future<List<VideoContent>> loadVideos(int offset) async {
     try {
       final user = AuthServices().currentUser;
       final response = await _supabaseClient.rpc(
@@ -85,6 +85,20 @@ class VideoContentServices {
           );
 
       return 'Video Uploaded Successfully';
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<String?> deleteVideoById(String id) async {
+    try {
+      final data = await _supabaseClient.from('videos').delete().eq('id', id);
+
+      if (data != null) {
+        throw Exception('Failed to delete video.');
+      }
+
+      return 'Video Deleted Successfully!';
     } catch (e) {
       rethrow;
     }

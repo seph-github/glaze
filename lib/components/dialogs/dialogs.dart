@@ -8,9 +8,6 @@ class Dialogs {
       context: context,
       builder: (context) {
         return CupertinoAlertDialog(
-          // shape: RoundedRectangleBorder(
-          //   borderRadius: BorderRadius.circular(16.0),
-          // ),
           title: Text(
             title,
           ),
@@ -20,7 +17,52 @@ class Dialogs {
               onPressed: () {
                 onPressed?.call();
               },
-              child: const Text('OK'),
+              child: Text(
+                'OK',
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  static Future<void> dualActionContentDialog(
+    BuildContext context, {
+    required String title,
+    required String content,
+    VoidCallback? onConfirm,
+    VoidCallback? onCancel,
+  }) async {
+    return await showDialog(
+      context: context,
+      builder: (context) {
+        return CupertinoAlertDialog(
+          title: Text(
+            title,
+          ),
+          content: Text(content),
+          actions: [
+            TextButton(
+              onPressed: () {
+                onConfirm?.call();
+              },
+              child: Text(
+                'OK',
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                onCancel?.call();
+              },
+              child: Text(
+                'Cancel',
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: Colors.blue,
+                    ),
+              ),
             ),
           ],
         );

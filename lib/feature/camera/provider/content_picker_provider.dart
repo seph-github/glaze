@@ -57,7 +57,7 @@ class ContentPickerNotifier extends _$ContentPickerNotifier {
   Future<void> takePhoto({required CameraDevice prefferedCameraDevice}) async {
     try {
       state = state.copyWith(isLoading: true);
-      final XFile? image = await ContentPickerServices().takePhoto(prefferedCameraDevice: prefferedCameraDevice);
+      final XFile? image = await ContentPickerServices().takePhoto(preferedCameraDevice: prefferedCameraDevice);
       if (image == null) {
         state = state.copyWith(isLoading: false);
         return;
@@ -82,10 +82,10 @@ class ContentPickerNotifier extends _$ContentPickerNotifier {
     }
   }
 
-  Future<void> takeVideo({required CameraDevice prefferedCameraDevice}) async {
+  Future<void> takeVideo({required CameraDevice preferedCameraDevice}) async {
     try {
       state = state.copyWith(isLoading: true);
-      final XFile? video = await ContentPickerServices().takeVideo(prefferedCameraDevice: prefferedCameraDevice);
+      final XFile? video = await ContentPickerServices().takeVideo(preferedCameraDevice: preferedCameraDevice);
       if (video == null) {
         state = state.copyWith(isLoading: false);
         return;

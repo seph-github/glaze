@@ -9,6 +9,7 @@ import 'package:supabase/supabase.dart';
 
 import '../../auth/services/auth_services.dart';
 import '../../home/services/video_content_services.dart';
+import '../../profile/provider/profile_provider/profile_provider.dart';
 
 part 'moments_provider.freezed.dart';
 part 'moments_provider.g.dart';
@@ -32,10 +33,9 @@ class MomentsNotifier extends _$MomentsNotifier {
     return const MomentsState();
   }
 
-  void _setNewResponse(String response) {
-    state = state.copyWith(isLoading: false, response: null);
-    state = state.copyWith(isLoading: false, response: response);
-  }
+  // void _setNewResponse(String response) {
+  //   state = state.copyWith(isLoading: false, response: response);
+  // }
 
   void _setError(dynamic error) {
     state = state.copyWith(error: null);
@@ -90,7 +90,7 @@ class MomentsNotifier extends _$MomentsNotifier {
     required String caption,
     required String category,
   }) async {
-    state = state.copyWith(isLoading: true, error: null);
+    state = state.copyWith(isLoading: true, error: null, response: null);
     try {
       final User? user = AuthServices().currentUser;
 
@@ -102,8 +102,11 @@ class MomentsNotifier extends _$MomentsNotifier {
         caption: caption,
         category: category,
       );
+      print('response video upload $response');
 
-      _setNewResponse(response);
+      await ref.read(profileNotifierProvider.notifier).fetchProfile(user!.id);
+
+      state = state.copyWith(isLoading: false, response: response);
     } catch (e) {
       _setError(e);
     }

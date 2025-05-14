@@ -26,4 +26,7 @@ class ColorPallete {
   static const Color lightBackgroundColor = Color(0xFF161616);
   static const Color borderColor = Color(0xFF9E9E9E);
   static const Color inputFilledColor = Color(0xFF1E1E1E);
+  static const Color gold = Color(0xFFC9B037);
+  static const Color silver = Color(0xFFD7D7D7);
+  static const Color bronze = Color(0xFFCE8946);
 }

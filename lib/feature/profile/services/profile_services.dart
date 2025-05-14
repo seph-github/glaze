@@ -20,7 +20,9 @@ class ProfileServices {
 
       final response = await _supabaseClient.rpc(
         'find_user_by_id',
-        params: {'params_user_id': id},
+        params: {
+          'params_user_id': id
+        },
       );
 
       final raw = response as List<dynamic>;
@@ -41,7 +43,9 @@ class ProfileServices {
 
       final response = await _supabaseClient.rpc(
         'find_user_by_id',
-        params: {'params_user_id': id},
+        params: {
+          'params_user_id': id
+        },
       );
 
       final raw = response as List<dynamic>;
@@ -60,11 +64,7 @@ class ProfileServices {
     try {
       if (id.isEmpty) return null;
 
-      final response = await _supabaseClient
-          .from('recruiters')
-          .select()
-          .eq('user_id', id)
-          .maybeSingle(); // Use maybeSingle to handle cases where no rows are returned
+      final response = await _supabaseClient.from('recruiters').select().eq('user_id', id).maybeSingle(); // Use maybeSingle to handle cases where no rows are returned
 
       if (response == null) return null; // Handle null response gracefully
 
@@ -86,7 +86,9 @@ class ProfileServices {
   }) async {
     try {
       final UserAttributes userAttributes = UserAttributes(
-        data: {'is_onboarding_complete': true},
+        data: {
+          'is_onboarding_complete': true
+        },
       );
 
       await _supabaseClient.auth.updateUser(userAttributes);
@@ -159,8 +161,7 @@ class ProfileServices {
         interests: interestList,
       );
 
-      final RecruiterProfileEntity recruiterProfileEntity =
-          RecruiterProfileEntity(
+      final RecruiterProfileEntity recruiterProfileEntity = RecruiterProfileEntity(
         id: id,
         organization: organization,
         identificationUrl: identificationUrl,
@@ -185,10 +186,7 @@ class ProfileServices {
             .eq('user_id', id);
       }
 
-      // final result =
       await _supabaseClient.auth.updateUser(userAttributes);
-
-      // if (result.user == null) {}
 
       await _supabaseClient
           .from('profiles')

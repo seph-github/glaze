@@ -50,32 +50,6 @@ class FocusButton extends HookWidget {
         ),
         fillColor: ColorPallete.inputFilledColor,
         filled: filled,
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(borderRadius),
-          borderSide: const BorderSide(
-            color: ColorPallete.whiteSmoke,
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(borderRadius),
-          borderSide: const BorderSide(
-            color: ColorPallete.whiteSmoke,
-          ),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(borderRadius),
-          borderSide: const BorderSide(
-            width: 1 / 4,
-            color: ColorPallete.persianFable,
-          ),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(borderRadius),
-          borderSide: const BorderSide(
-            width: 1,
-            color: ColorPallete.parlourRed,
-          ),
-        ),
         prefixIcon: child == null
             ? null
             : !isLoading
@@ -93,9 +67,9 @@ class FocusButton extends HookWidget {
         focusNode.unfocus();
       },
       onChanged: (value) {
-        controller?.text = value; // Ensure the controller is updated
+        controller?.text = value;
         if (value.isNotEmpty) {
-          focusNode.unfocus(); // Optionally unfocus to trigger revalidation
+          focusNode.unfocus();
         }
       },
     );

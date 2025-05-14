@@ -107,7 +107,7 @@ class ProfileEditForm extends HookConsumerWidget {
           throwSupabaseExceptionError(context, next);
         }
 
-        if (next.response.isNotEmpty && next.response != prev?.response) {
+        if (next.response != null && next.response != prev?.response) {
           await Dialogs.createContentDialog(
             context,
             title: 'Success',
