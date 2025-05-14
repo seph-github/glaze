@@ -1,7 +1,7 @@
 import 'package:glaze/core/services/supabase_services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../feature/auth/services/auth_services.dart';
+import '../../../features/auth/services/auth_services.dart';
 import '../../models/glaze/glaze_model.dart';
 
 part 'glaze_repository.g.dart';

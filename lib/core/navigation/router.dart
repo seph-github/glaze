@@ -6,43 +6,44 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glaze/core/navigation/observer/route_observer_provider.dart';
-import 'package:glaze/feature/auth/views/auth_forget_password_view.dart';
-import 'package:glaze/feature/auth/views/auth_reset_password_view.dart';
-import 'package:glaze/feature/challenges/models/challenge.dart';
-import 'package:glaze/feature/challenges/views/challenge_details_view.dart';
-import 'package:glaze/feature/challenges/views/challenge_leaderboard_view.dart';
-import 'package:glaze/feature/dashboard/views/dashboard_view.dart';
-import 'package:glaze/feature/profile/views/profile_edit_form.dart';
-import 'package:glaze/feature/profile/views/profile_interactive_view.dart';
-import 'package:glaze/feature/settings/views/terms_and_condition_view.dart';
-import 'package:glaze/feature/shop/models/shop_product/shop_product.dart';
-import 'package:glaze/feature/shop/views/checkout_view.dart';
-import 'package:glaze/feature/shop/views/shop_view.dart';
-import 'package:glaze/feature/profile/views/profile_view.dart';
-import 'package:glaze/feature/video/view/video_preview_view.dart';
+import 'package:glaze/features/auth/views/auth_forget_password_view.dart';
+import 'package:glaze/features/auth/views/auth_reset_password_view.dart';
+import 'package:glaze/features/challenges/models/challenge/challenge.dart';
+import 'package:glaze/features/challenges/views/challenge_details_view.dart';
+import 'package:glaze/features/challenges/views/challenge_leaderboard_view.dart';
+import 'package:glaze/features/challenges/views/challenge_submit_entry.dart';
+import 'package:glaze/features/dashboard/views/dashboard_view.dart';
+import 'package:glaze/features/profile/views/profile_edit_form.dart';
+import 'package:glaze/features/profile/views/profile_interactive_view.dart';
+import 'package:glaze/features/settings/views/terms_and_condition_view.dart';
+import 'package:glaze/features/shop/models/shop_product/shop_product.dart';
+import 'package:glaze/features/shop/views/checkout_view.dart';
+import 'package:glaze/features/shop/views/shop_view.dart';
+import 'package:glaze/features/profile/views/profile_view.dart';
+import 'package:glaze/features/video/view/video_preview_view.dart';
 import 'package:go_router/go_router.dart';
-import 'package:glaze/feature/auth/views/auth_view.dart';
+import 'package:glaze/features/auth/views/auth_view.dart';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:video_player/video_player.dart';
 
-import '../../feature/auth/providers/auth_provider.dart';
-import '../../feature/auth/providers/auth_state_change_provider.dart';
-import '../../feature/auth/services/auth_services.dart';
-import '../../feature/auth/views/auth_phone_sign_in.dart';
-import '../../feature/auth/views/auth_verify_phone.dart';
-import '../../feature/home/models/video_content/video_content.dart';
-import '../../feature/home/views/video_feed_view.dart';
-import '../../feature/moments/views/moments_view.dart';
-import '../../feature/onboarding/views/onboarding_view.dart';
-import '../../feature/profile/models/profile/profile.dart';
-import '../../feature/profile/views/profile_completion_form.dart';
-import '../../feature/profile/views/view_user_profile.dart';
-import '../../feature/settings/views/personal_details_view.dart';
-import '../../feature/splash/providers/splash_provider.dart';
-import '../../feature/splash/views/splash_view.dart';
-import '../../feature/settings/views/general_settings_view.dart';
+import '../../features/auth/providers/auth_provider.dart';
+import '../../features/auth/providers/auth_state_change_provider.dart';
+import '../../features/auth/services/auth_services.dart';
+import '../../features/auth/views/auth_phone_sign_in.dart';
+import '../../features/auth/views/auth_verify_phone.dart';
+import '../../features/home/models/video_content/video_content.dart';
+import '../../features/home/views/video_feed_view.dart';
+import '../../features/moments/views/moments_view.dart';
+import '../../features/onboarding/views/onboarding_view.dart';
+import '../../features/profile/models/profile/profile.dart';
+import '../../features/profile/views/profile_completion_form.dart';
+import '../../features/profile/views/view_user_profile.dart';
+import '../../features/settings/views/personal_details_view.dart';
+import '../../features/splash/providers/splash_provider.dart';
+import '../../features/splash/views/splash_view.dart';
+import '../../features/settings/views/general_settings_view.dart';
 
 part 'router.g.dart';
 
@@ -581,5 +582,19 @@ class ChallengeLeaderboardRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const ChallengeLeaderBoardView();
+  }
+}
+
+@TypedGoRoute<ChallengeSubmitEntryRoute>(path: '/submit-entry')
+class ChallengeSubmitEntryRoute extends GoRouteData {
+  const ChallengeSubmitEntryRoute({
+    required this.challengeId,
+  });
+
+  final String challengeId;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return ChallengeSubmitEntry(challengeId: challengeId);
   }
 }

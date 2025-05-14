@@ -3,7 +3,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:glaze/data/models/glaze/glaze_model.dart';
 
-import '../../../feature/home/models/videos/videos.dart';
+import '../../../features/home/models/videos/videos.dart';
 
 part 'user_model.freezed.dart';
 part 'user_model.g.dart';

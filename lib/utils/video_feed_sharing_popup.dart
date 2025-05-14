@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../components/morphism_widget.dart';
 import '../core/styles/color_pallete.dart';
-import '../feature/home/widgets/share_option_button.dart';
+import '../features/home/widgets/share_option_button.dart';
 import '../gen/assets.gen.dart';
 
 Future<void> showShareOptions(

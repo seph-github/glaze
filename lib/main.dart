@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glaze/app.dart';
 import 'package:glaze/core/initializer.dart';
-import 'package:glaze/feature/home/provider/video_feed_provider/video_feed_provider.dart';
+import 'package:glaze/features/home/provider/video_feed_provider/video_feed_provider.dart';
 
 Future<void> main() async {
   runZonedGuarded(

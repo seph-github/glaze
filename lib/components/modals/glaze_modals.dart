@@ -4,9 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/styles/color_pallete.dart';
 import '../../data/models/category/category_model.dart';
-import '../../feature/category/provider/category_provider.dart';
-import '../../feature/moments/widgets/upload_moments_card.dart';
-import '../../feature/profile/provider/profile_interests_list_provider/profile_interests_list_provider.dart';
+import '../../features/category/provider/category_provider.dart';
+import '../../features/moments/widgets/upload_moments_card.dart';
+import '../../features/profile/provider/profile_interests_list_provider/profile_interests_list_provider.dart';
 
 class GlazeModal {
   const GlazeModal._();

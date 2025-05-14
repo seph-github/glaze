@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../feature/auth/models/country_code.dart';
+import '../../../features/auth/models/country_code.dart';
 import '../../../gen/assets.gen.dart';
 
 part 'json_parser.g.dart';

@@ -5,8 +5,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../core/styles/color_pallete.dart';
 import '../../data/providers/json_parser/json_parser.dart';
-import '../../feature/auth/models/country_code.dart';
-import '../../feature/settings/providers/settings_theme_provider.dart';
+import '../../features/auth/models/country_code.dart';
+import '../../features/settings/providers/settings_theme_provider.dart';
 
 class PhoneNumberInput extends HookConsumerWidget {
   const PhoneNumberInput({

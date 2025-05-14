@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glaze/core/navigation/router.dart';
 // import 'package:glaze/core/styles/theme.dart';
-import 'package:glaze/feature/settings/providers/settings_theme_provider.dart';
+import 'package:glaze/features/settings/providers/settings_theme_provider.dart';
 import 'package:glaze/l10n/l10n.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
