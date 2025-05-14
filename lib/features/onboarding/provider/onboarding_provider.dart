@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../data/local/shared_prefs.dart';
+import '../../../gen/assets.gen.dart';
 
 part 'onboarding_provider.g.dart';
 
@@ -36,27 +37,27 @@ class OnboardingProvider {
     {
       'title': 'Complete Your Profile',
       'subtitle': 'Start by setting up your profile\nwith a username and bio.',
-      'image': 'assets/images/svg/complete_your_profile_illustration.svg',
+      'image': Assets.images.png.profileComplete.path,
     },
     {
       'title': 'Upload Your First Moment',
       'subtitle': 'Share your talent with the community\nby uploading a video.',
-      'image': 'assets/images/svg/upload_your_first_moment_illustration.svg',
+      'image': Assets.images.png.uploadFirstMoment.path,
     },
     {
       'title': 'Discover Moments',
       'subtitle': 'Find amazing content from other\ncreators in your area.',
-      'image': 'assets/images/svg/discover_moments_illustrations.svg',
+      'image': Assets.images.png.discoverAndExplore.path,
     },
     {
       'title': 'Enter Challenges',
       'subtitle': 'Participate in contests to win\nprizes and get recognized.',
-      'image': 'assets/images/svg/enter_challenges_illustrations.svg',
+      'image': Assets.images.png.joinChallenge.path,
     },
     {
       'title': 'Invite Friends',
       'subtitle': 'Grow your network by inviting\nfriends to join Glaze.',
-      'image': 'assets/images/svg/invite_friends_illustrations.svg',
+      'image': Assets.images.png.friendInvite.path,
     }
   ];
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
+
 import 'package:gap/gap.dart';
 import 'package:glaze/features/auth/services/auth_services.dart';
 import 'package:glaze/features/profile/provider/profile_provider/profile_provider.dart';
@@ -25,7 +25,7 @@ class OnboardingView extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final router = GoRouter.of(context);
-    final Size size = MediaQuery.sizeOf(context);
+    // final Size size = MediaQuery.sizeOf(context);
 
     return Consumer(
       builder: (context, ref, _) {
@@ -98,43 +98,52 @@ class OnboardingView extends HookWidget {
               ],
             ),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: <Widget>[
-                Container(
-                  height: size.height * 0.5,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16.0),
-                    color: ColorPallete.lightBackgroundColor,
-                    border: Border.all(
-                      color: ColorPallete.borderColor,
-                      width: 0.25,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: <Widget>[
+                  const Gap(20.0),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16.0),
+                      border: Border.all(
+                        color: ColorPallete.parlourRed,
+                        width: 1 / 4,
+                      ),
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16.0),
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      child: Image.asset(
+                        state[index]['image'] as String,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
-                  child: SvgPicture.asset(state[index]['image'] as String),
-                ),
-                const Gap(24.0),
-                Text(
-                  state[index]['title'] as String,
-                  style: Theme.of(context).textTheme.headlineLarge!.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                Text(
-                  state[index]['subtitle'] as String,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                        color: ColorPallete.hintTextColor,
-                      ),
-                ),
-                const Gap(32.0),
-                PrimaryButton(
-                  label: 'Continue',
-                  onPressed: handleContinue,
-                ),
-              ],
+                  const Gap(24.0),
+                  Text(
+                    state[index]['title'] as String,
+                    style: Theme.of(context).textTheme.headlineLarge!.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  Text(
+                    state[index]['subtitle'] as String,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                          color: ColorPallete.hintTextColor,
+                        ),
+                  ),
+                  const Gap(32.0),
+                  PrimaryButton(
+                    label: 'Continue',
+                    onPressed: handleContinue,
+                  ),
+                ],
+              ),
             ),
           ),
         );

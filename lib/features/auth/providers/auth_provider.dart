@@ -35,7 +35,6 @@ class AuthNotifier extends _$AuthNotifier {
 
   void setPhoneSentError(Exception error) {
     state = state.copyWith(error: null);
-    print(error);
     state = state.copyWith(error: error, isLoading: false, otpSent: false);
   }
 
@@ -58,8 +57,8 @@ class AuthNotifier extends _$AuthNotifier {
         throw const AuthException('Error occured during sign in');
       }
 
-      final userProfile = await ref.watch(userProfileProvider.future);
-      print('auth service user profile $userProfile');
+      // final userProfile =
+      await ref.watch(userProfileProvider.future);
 
       state = state.copyWith(authResponse: authResponse, isLoading: false);
     } catch (e) {
@@ -149,8 +148,9 @@ class AuthNotifier extends _$AuthNotifier {
   }) async {
     state = state.copyWith(isLoading: true, error: null, otpSent: false);
     try {
-      final response = await AuthServices().updatePassword(email: email, password: password, token: token, tokenHash: tokenHash);
-      print('response $response');
+      // final response =
+      await AuthServices().updatePassword(email: email, password: password, token: token, tokenHash: tokenHash);
+
       state = state.copyWith(isLoading: false, otpSent: true);
     } catch (error) {
       setPhoneSentError(error as Exception);
