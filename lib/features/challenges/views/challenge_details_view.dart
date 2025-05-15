@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/components/app_bar_with_back_button.dart';
 import 'package:glaze/components/buttons/primary_button.dart';
+import 'package:glaze/core/styles/color_pallete.dart';
 import 'package:glaze/features/challenges/models/challenge/challenge.dart';
+import 'package:glaze/features/challenges/providers/challenge_provider.dart';
 import 'package:glaze/features/templates/loading_layout.dart';
 import 'package:glaze/gen/assets.gen.dart';
 import 'package:glaze/utils/app_timer.dart';
 import 'package:glaze/utils/string_formatter.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../../core/navigation/router.dart';
 import '../../../gen/fonts.gen.dart';
 import '../widgets/leaderboard_tile.dart';
 
-class ChallengeDetailsView extends StatelessWidget {
+class ChallengeDetailsView extends HookConsumerWidget {
   const ChallengeDetailsView({
     super.key,
     required this.challenge,
@@ -24,7 +29,16 @@ class ChallengeDetailsView extends StatelessWidget {
   final Color useColor;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    useEffect(() {
+      Future.microtask(() async {
+        await ref.read(challengeNotifierProvider.notifier).getChallengeEntries(challenge.id);
+      });
+      return null;
+    }, []);
+
+    debugPrint('Challenge details page ${ref.watch(challengeNotifierProvider)}');
+
     return LoadingLayout(
       appBar: AppBarWithBackButton(
         actions: [
@@ -59,8 +73,7 @@ class ChallengeDetailsView extends StatelessWidget {
                           decoration: BoxDecoration(
                             border: Border.all(
                               width: 1 / 2,
-                              color:
-                                  Theme.of(context).colorScheme.inverseSurface,
+                              color: Theme.of(context).colorScheme.inverseSurface,
                             ),
                             borderRadius: BorderRadius.circular(16.0),
                             image: DecorationImage(
@@ -74,8 +87,7 @@ class ChallengeDetailsView extends StatelessWidget {
                       ],
                     ),
                     _buildHeaderSection(context),
-                    if (challenge.rules != null)
-                      _buildChallengeRuleSection(context),
+                    if (challenge.rules != null) _buildChallengeRuleSection(context),
                     const Gap(12.0),
                     _buildLeaderboardSection(context),
                   ],
@@ -152,8 +164,7 @@ class ChallengeDetailsView extends StatelessWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: Theme.of(context).colorScheme.surface,
-          border: Border.all(
-              color: Theme.of(context).colorScheme.inverseSurface, width: 1),
+          border: Border.all(color: Theme.of(context).colorScheme.inverseSurface, width: 1),
         ),
         child: Text(
           orderList ?? '',
@@ -173,75 +184,103 @@ class ChallengeDetailsView extends StatelessWidget {
   }
 
   Widget _buildLeaderboardSection(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Leaderboard',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            GestureDetector(
-              onTap: () =>
-                  const ChallengeLeaderboardRoute().push<void>(context),
-              child: Text(
-                'View All',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.normal,
+    return Consumer(
+      builder: (context, ref, _) {
+        final state = ref.watch(challengeNotifierProvider);
+        return Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  'Leaderboard',
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                if (state.entries.isNotEmpty)
+                  GestureDetector(
+                    onTap: () => const ChallengeLeaderboardRoute().push<void>(context),
+                    child: Text(
+                      'View All',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.normal,
+                          ),
                     ),
-              ),
-            ),
-          ],
-        ),
-        const Gap(12.0),
-        if (!challenge.isDefault)
-          const Center(
-            child: Text('Be the first to participate'),
-          )
-        else
-          Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(24.0),
-            ),
-            child: Column(
-              children: [
-                LeaderboardTile(
-                  useColor: useColor,
-                  username: 'first',
-                  rank: 1.toString(),
-                ),
-                const Divider(
-                  height: 0,
-                  indent: 12,
-                  endIndent: 12,
-                  thickness: 0.5,
-                ),
-                LeaderboardTile(
-                  useColor: useColor,
-                  username: 'second',
-                  rank: 2.toString(),
-                ),
-                const Divider(
-                  height: 0,
-                  indent: 12,
-                  endIndent: 12,
-                  thickness: 0.5,
-                ),
-                LeaderboardTile(
-                  useColor: useColor,
-                  username: 'thirdy',
-                  rank: 3.toString(),
-                ),
+                  ),
               ],
             ),
-          ),
-        const Gap(12.0),
-      ],
+            if (state.isLoading) ...[
+              Column(
+                children: List.generate(
+                  3,
+                  (index) {
+                    return Shimmer.fromColors(
+                      period: Duration(seconds: index + 3),
+                      baseColor: ColorPallete.lightBackgroundColor,
+                      highlightColor: ColorPallete.inputFilledColor,
+                      child: Container(
+                        height: 48.0,
+                        margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 2.0),
+                        decoration: BoxDecoration(
+                          color: ColorPallete.lightBackgroundColor,
+                          borderRadius: BorderRadius.circular(16.0),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ] else if (state.entries.isEmpty)
+              const SizedBox(
+                height: 80.0,
+                child: Center(
+                  child: Text('Be the first to participate'),
+                ),
+              )
+            else
+              Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(24.0),
+                ),
+                child: Column(
+                  children: [
+                    LeaderboardTile(
+                      useColor: useColor,
+                      username: 'first',
+                      rank: 1.toString(),
+                    ),
+                    const Divider(
+                      height: 0,
+                      indent: 12,
+                      endIndent: 12,
+                      thickness: 0.5,
+                    ),
+                    LeaderboardTile(
+                      useColor: useColor,
+                      username: 'second',
+                      rank: 2.toString(),
+                    ),
+                    const Divider(
+                      height: 0,
+                      indent: 12,
+                      endIndent: 12,
+                      thickness: 0.5,
+                    ),
+                    LeaderboardTile(
+                      useColor: useColor,
+                      username: 'thirdy',
+                      rank: 3.toString(),
+                    ),
+                  ],
+                ),
+              ),
+            const Gap(12.0),
+          ],
+        );
+      },
     );
   }
 
@@ -310,8 +349,7 @@ class ChallengeDetailsView extends StatelessWidget {
             children: challenge.tags!.map((tag) {
               return Container(
                 height: 24,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 decoration: BoxDecoration(
                   color: useColor.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(16.0),
@@ -337,9 +375,7 @@ class ChallengeDetailsView extends StatelessWidget {
       child: SafeArea(
         child: PrimaryButton(
           label: 'Accept Challenge',
-          onPressed: () async =>
-              ChallengeSubmitEntryRoute(challengeId: challenge.id)
-                  .push<void>(context),
+          onPressed: () async => ChallengeSubmitEntryRoute(challengeId: challenge.id).push<void>(context),
         ),
       ),
     );

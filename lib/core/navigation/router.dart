@@ -62,10 +62,8 @@ GoRouter router(Ref ref) {
   FutureOr<String?> redirect(BuildContext context, GoRouterState state) async {
     final User? user = AuthServices().currentUser;
     final hasSplashCompleted = ref.read(splashProvider).completeSplash;
-    final bool isCompletedProfile =
-        user?.userMetadata?['is_profile_complete'] ?? false;
-    final bool isOnBoardingCompleted =
-        user?.userMetadata?['is_onboarding_complete'] ?? false;
+    final bool isCompletedProfile = user?.userMetadata?['is_profile_complete'] ?? false;
+    final bool isOnBoardingCompleted = user?.userMetadata?['is_onboarding_complete'] ?? false;
     final destination = state.fullPath;
 
     if (!hasSplashCompleted) {
@@ -90,8 +88,7 @@ GoRouter router(Ref ref) {
     }
 
     if (!isCompletedProfile) {
-      return ProfileCompletionFormRoute(id: user.id, role: user.role as String)
-          .location;
+      return ProfileCompletionFormRoute(id: user.id, role: user.role as String).location;
     }
 
     return null;
@@ -101,13 +98,13 @@ GoRouter router(Ref ref) {
 
   final router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: session == null
-        ? const AuthRoute().location
-        : const HomeRoute().location,
+    initialLocation: session == null ? const AuthRoute().location : const HomeRoute().location,
     debugLogDiagnostics: true,
     routes: $appRoutes,
     redirect: redirect,
-    observers: [routeObserver],
+    observers: [
+      routeObserver
+    ],
   );
 
   ref.listen(
@@ -116,7 +113,10 @@ GoRouter router(Ref ref) {
       if (next is AsyncError) {
         router.go(const AuthRoute().location);
       }
-      if (next case AsyncData(value: final auth)) {
+      if (next
+          case AsyncData(
+            value: final auth
+          )) {
         switch (auth.event) {
           case AuthChangeEvent.initialSession:
             break;
@@ -325,8 +325,7 @@ class AuthVerifyPhoneRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     final extras = state.extra;
-    final Map<String, String>? data =
-        extras is Map<String, String> ? extras : null;
+    final Map<String, String>? data = extras is Map<String, String> ? extras : null;
     final String phoneNumber = data?['phone'] ?? '';
     final String dialCode = data?['dialCode'] ?? '';
     log('AuthVerifyPhoneRoute: phoneNumber: $phoneNumber, dialCode: $dialCode');
@@ -430,8 +429,7 @@ class GeneralSettingsRoute extends GoRouteData {
   const GeneralSettingsRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      const GeneralSettingsView();
+  Widget build(BuildContext context, GoRouterState state) => const GeneralSettingsView();
 }
 
 @TypedGoRoute<OnboardingRoute>(path: '/onboarding/:id')
@@ -457,8 +455,7 @@ class ProfileCompletionFormRoute extends GoRouteData {
   final String role;
 
   @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      ProfileCompletionForm(
+  Widget build(BuildContext context, GoRouterState state) => ProfileCompletionForm(
         userId: id,
         role: role,
       );

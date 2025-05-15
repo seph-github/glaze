@@ -40,10 +40,10 @@ class MomentsUpcomingTabview extends HookConsumerWidget {
         itemBuilder: (context, index) => Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: Shimmer.fromColors(
-            baseColor: Colors.grey[300]!,
+            baseColor: Colors.grey[400]!,
             highlightColor: Colors.grey[100]!,
             child: Container(
-              height: 100.0,
+              height: 180.0,
               margin: const EdgeInsets.symmetric(horizontal: 16.0),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -52,6 +52,7 @@ class MomentsUpcomingTabview extends HookConsumerWidget {
             ),
           ),
         ),
+        physics: const NeverScrollableScrollPhysics(),
       );
     }
 

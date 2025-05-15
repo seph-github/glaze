@@ -7,10 +7,10 @@ import 'package:glaze/core/styles/color_pallete.dart';
 import 'package:glaze/features/challenges/models/challenge/challenge.dart';
 import 'package:glaze/features/moments/providers/moments_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:shimmer/shimmer.dart';
 
 import '../../../gen/fonts.gen.dart';
 import '../../challenges/widgets/challenges_card.dart';
+import '../widgets/challenge_shimmer_widget.dart';
 
 class MomentsLiveTabview extends HookConsumerWidget {
   const MomentsLiveTabview({super.key});
@@ -35,24 +35,7 @@ class MomentsLiveTabview extends HookConsumerWidget {
     );
 
     if (state.isLoading) {
-      return ListView.builder(
-        itemCount: 5,
-        itemBuilder: (context, index) => Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Shimmer.fromColors(
-            baseColor: Colors.grey[300]!,
-            highlightColor: Colors.grey[100]!,
-            child: Container(
-              height: 100.0,
-              margin: const EdgeInsets.symmetric(horizontal: 16.0),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16.0),
-              ),
-            ),
-          ),
-        ),
-      );
+      return const ChallengeShimmerWidget();
     }
 
     return Padding(
