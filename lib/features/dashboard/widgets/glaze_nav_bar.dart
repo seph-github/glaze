@@ -18,9 +18,17 @@ class GlazeNavBar extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ColorFilter colorFilter = ColorFilter.mode(
-      Theme.of(context).colorScheme.primary,
+      Theme.of(context).colorScheme.onSurfaceVariant,
       BlendMode.srcIn,
     );
+
+    Widget navigationIcon({required String iconPath}) {
+      return SvgPicture.asset(
+        iconPath,
+        colorFilter: colorFilter,
+        height: 24,
+      );
+    }
 
     return NavigationBar(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -32,24 +40,20 @@ class GlazeNavBar extends HookConsumerWidget {
       ),
       destinations: [
         NavigationDestination(
-          icon: SvgPicture.asset(
-            Assets.images.svg.homeOutlined.path,
-            colorFilter: colorFilter,
+          icon: navigationIcon(
+            iconPath: Assets.images.svg.homeOutlined.path,
           ),
-          selectedIcon: SvgPicture.asset(
-            Assets.images.svg.homeFillIcon.path,
-            colorFilter: colorFilter,
+          selectedIcon: navigationIcon(
+            iconPath: Assets.images.svg.homeFillIcon.path,
           ),
           label: 'Home',
         ),
         NavigationDestination(
-          icon: SvgPicture.asset(
-            Assets.images.svg.momentsInactiveIcon.path,
-            colorFilter: colorFilter,
+          icon: navigationIcon(
+            iconPath: Assets.images.svg.momentsInactiveIcon.path,
           ),
-          selectedIcon: SvgPicture.asset(
-            Assets.images.svg.momentsFillIcon.path,
-            colorFilter: colorFilter,
+          selectedIcon: navigationIcon(
+            iconPath: Assets.images.svg.momentsFillIcon.path,
           ),
           label: 'Moments',
         ),
@@ -66,24 +70,20 @@ class GlazeNavBar extends HookConsumerWidget {
           label: '',
         ),
         NavigationDestination(
-          icon: SvgPicture.asset(
-            Assets.images.svg.shopOutlined.path,
-            colorFilter: colorFilter,
+          icon: navigationIcon(
+            iconPath: Assets.images.svg.shopOutlined.path,
           ),
-          selectedIcon: SvgPicture.asset(
-            Assets.images.svg.shopFillIcon.path,
-            colorFilter: colorFilter,
+          selectedIcon: navigationIcon(
+            iconPath: Assets.images.svg.shopFillIcon.path,
           ),
           label: 'Shop',
         ),
         NavigationDestination(
-          icon: SvgPicture.asset(
-            Assets.images.svg.profileIcon.path,
-            colorFilter: colorFilter,
+          icon: navigationIcon(
+            iconPath: Assets.images.svg.profileIcon.path,
           ),
-          selectedIcon: SvgPicture.asset(
-            Assets.images.svg.profileFillIcon.path,
-            colorFilter: colorFilter,
+          selectedIcon: navigationIcon(
+            iconPath: Assets.images.svg.profileFillIcon.path,
           ),
           label: 'Profile',
         )

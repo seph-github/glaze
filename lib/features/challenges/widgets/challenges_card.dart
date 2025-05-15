@@ -7,7 +7,6 @@ import 'package:glaze/core/navigation/router.dart';
 import 'package:glaze/features/challenges/models/challenge/challenge.dart';
 import 'package:glaze/features/challenges/widgets/circle_stack.dart';
 import 'package:glaze/gen/fonts.gen.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../components/buttons/primary_button.dart';
 import '../../../gen/assets.gen.dart';
@@ -34,7 +33,6 @@ class ChallengesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final router = GoRouter.of(context);
     final randomColor = lightColors[index % lightColors.length];
 
     return ClipRRect(
@@ -102,13 +100,10 @@ class ChallengesCard extends StatelessWidget {
               const Gap(12),
               PrimaryButton(
                 onPressed: () async {
-                  router.push(
-                    const ChallengeDetailsRoute().location,
-                    extra: {
-                      'challenge': challenge,
-                      'color': int.parse(randomColor.toString()),
-                    },
-                  );
+                  ChallengeDetailsRoute(
+                    challenge,
+                    useColor: randomColor.value,
+                  ).push(context);
                 },
                 label: challenge.type == ChallengeType.live
                     ? 'Leaderboard'
@@ -116,7 +111,6 @@ class ChallengesCard extends StatelessWidget {
                 icon: null,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w800,
-                      // color: Theme.of(context).colorScheme.inverseSurface,
                     ),
                 borderRadius: 16.0,
                 height: 40,

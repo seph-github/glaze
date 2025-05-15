@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:glaze/core/navigation/router.dart';
 import 'package:glaze/features/home/models/video_content/video_content.dart';
-import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 
 class MomentsVideosTabview extends StatelessWidget {
@@ -23,7 +22,6 @@ class MomentsVideosTabview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final GoRouter router = GoRouter.of(context);
     if (videos!.isEmpty) {
       return const Center(
         child: Text('No Videos Found!'),
@@ -42,14 +40,10 @@ class MomentsVideosTabview extends StatelessWidget {
       itemCount: videos?.length ?? 0,
       itemBuilder: (context, index) {
         return GestureDetector(
-          onTap: () {
-            router.push(
-              const VideoPreviewRoute().location,
-              extra: {
-                'videos': videos,
-                'initialIndex': index,
-              },
-            );
+          onTap: () async {
+            await VideoPreviewRoute(videos as List<VideoContent>,
+                    initialIndex: index)
+                .push<void>(context);
           },
           child: CachedNetworkImage(
             imageUrl: videos?[index].thumbnailUrl ?? '',

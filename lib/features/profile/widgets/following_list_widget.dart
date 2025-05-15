@@ -43,11 +43,13 @@ class FollowingListWidget extends HookWidget {
           padding: const EdgeInsets.all(4.0),
           child: ListTile(
             onTap: () => router.push(
-              ViewUserProfileRoute(id: following[index].id).location,
+              ViewUserProfileRoute(null, id: following[index].id).location,
             ),
             leading: CircleAvatar(
               radius: 24,
-              foregroundImage: profileImageUrl != null ? CachedNetworkImageProvider(profileImageUrl) : null,
+              foregroundImage: profileImageUrl != null
+                  ? CachedNetworkImageProvider(profileImageUrl)
+                  : null,
               backgroundColor: ColorPallete.blackPearl,
               child: SizedBox(
                 width: 48,
@@ -84,16 +86,21 @@ class FollowingListWidget extends HookWidget {
     );
   }
 
-  Widget _buildFollowButton({bool isFollowed = true, VoidCallback? onPressed, required String id}) {
+  Widget _buildFollowButton(
+      {bool isFollowed = true, VoidCallback? onPressed, required String id}) {
     return Consumer(builder: (context, ref, _) {
       return ElevatedButton(
         onPressed: () async {
           onPressed?.call();
-          await ref.read(followUserNotifierProvider.notifier).onFollowUser(followerId: AuthServices().currentUser?.id ?? '', followingId: id);
+          await ref.read(followUserNotifierProvider.notifier).onFollowUser(
+              followerId: AuthServices().currentUser?.id ?? '',
+              followingId: id);
         },
         style: ElevatedButton.styleFrom(
           fixedSize: const Size.fromWidth(120),
-          backgroundColor: isFollowed ? ColorPallete.inputFilledColor : ColorPallete.primaryColor,
+          backgroundColor: isFollowed
+              ? ColorPallete.inputFilledColor
+              : ColorPallete.primaryColor,
         ),
         child: Text(
           isFollowed ? 'Unfollow' : 'Follow',

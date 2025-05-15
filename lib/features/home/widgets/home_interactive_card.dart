@@ -92,22 +92,28 @@ class HomeInteractiveCard extends HookConsumerWidget {
                   await controller?.pause();
 
                   if (context.mounted) {
-                    await ViewUserProfileRoute(id: userId, $extra: {
-                      'controller': controller,
-                    }).push<void>(context);
+                    await ViewUserProfileRoute(id: userId, controller)
+                        .push<void>(context);
                   }
                 },
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     CachedNetworkImage(
+                      color: Colors.amber,
                       imageUrl: video.profileImageUrl ?? '',
                       imageBuilder: (context, imageProvider) => CircleAvatar(
                         radius: 15.0,
                         backgroundImage: imageProvider,
                       ),
-                      placeholder: (context, url) =>
-                          SvgPicture.asset(Assets.images.svg.profileIcon.path),
+                      placeholder: (context, url) => CircleAvatar(
+                        radius: 15.0,
+                        backgroundColor: ColorPallete.lightBackgroundColor,
+                        child: Image.asset(
+                          Assets.images.png.profilePlaceholder.path,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                       errorWidget: (context, url, error) =>
                           const Icon(Icons.account_circle_outlined),
                     ),

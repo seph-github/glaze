@@ -412,15 +412,15 @@ class ProfileRoute extends GoRouteData {
 
 @TypedGoRoute<ViewUserProfileRoute>(path: '/view-user-profile/:id')
 class ViewUserProfileRoute extends GoRouteData {
-  const ViewUserProfileRoute({this.$extra, required this.id});
-  final Map<String, dynamic>? $extra;
+  const ViewUserProfileRoute(this.$extra, {required this.id});
+  final VideoPlayerController? $extra;
   final String id;
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return ViewUserProfile(
       id: id,
-      controller: $extra?['controller'] as VideoPlayerController?,
+      controller: $extra,
     );
   }
 }
@@ -488,16 +488,14 @@ class NoViewRoute extends GoRouteData {
 
 @TypedGoRoute<VideoPreviewRoute>(path: '/video-preview')
 class VideoPreviewRoute extends GoRouteData {
-  const VideoPreviewRoute();
+  const VideoPreviewRoute(this.$extra, {required this.initialIndex});
+  final List<VideoContent> $extra;
+  final int initialIndex;
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    final Map<String, dynamic>? extras = state.extra as Map<String, dynamic>?;
-    final List<VideoContent> videos = extras?['videos'];
-    final int initialIndex = extras?['initialIndex'];
-
     return VideoPreviewView(
-      videos: videos,
+      videos: $extra,
       initialIndex: initialIndex,
     );
   }
@@ -562,15 +560,18 @@ class CheckoutRoute extends GoRouteData {
 
 @TypedGoRoute<ChallengeDetailsRoute>(path: '/challenge-details')
 class ChallengeDetailsRoute extends GoRouteData {
-  const ChallengeDetailsRoute();
+  const ChallengeDetailsRoute(
+    this.$extra, {
+    required this.useColor,
+  });
+
+  final Challenge $extra;
+  final int useColor;
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    final extra = state.extra as Map<String, Object?>;
-    final challenge = extra['challenge'] as Challenge;
-    final useColor = extra['color'] as int;
     return ChallengeDetailsView(
-      challenge: challenge,
+      challenge: $extra,
       useColor: Color(useColor),
     );
   }

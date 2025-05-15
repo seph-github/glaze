@@ -49,6 +49,8 @@ class MomentsNotifier extends _$MomentsNotifier {
 
   int offset = 0;
   String? globalKeywords;
+  String? globalFilterBy;
+  int? globalPageLimit;
 
   Future<void> search({
     String? keywords,
@@ -59,11 +61,13 @@ class MomentsNotifier extends _$MomentsNotifier {
 
     try {
       globalKeywords = keywords;
+      globalFilterBy = filterBy;
+      globalPageLimit = pageLimit;
       offset = 0;
       final response = await MomentsServices().search(
-        keywords: keywords,
-        filterBy: filterBy,
-        pageLimit: pageLimit,
+        keywords: globalKeywords,
+        filterBy: globalFilterBy,
+        pageLimit: globalPageLimit,
         pageOffset: offset,
       );
       final hasMoreItems = response.length == 10;
@@ -72,7 +76,8 @@ class MomentsNotifier extends _$MomentsNotifier {
       }
       // state = state.copyWith(isLoading: false);
 
-      state = state.copyWith(isLoading: false, videos: response, hasMoreItems: hasMoreItems);
+      state = state.copyWith(
+          isLoading: false, videos: response, hasMoreItems: hasMoreItems);
     } catch (e) {
       state = state.copyWith(error: Exception(e), isLoading: false);
     }
@@ -90,8 +95,8 @@ class MomentsNotifier extends _$MomentsNotifier {
       if (state.videos.isNotEmpty) {
         final List<VideoContent> response = await MomentsServices().search(
           keywords: globalKeywords,
-          filterBy: filterBy,
-          pageLimit: pageLimit,
+          filterBy: globalFilterBy,
+          pageLimit: globalPageLimit,
           pageOffset: offset,
         );
         final bool hasMoreItems = response.length == 10;
@@ -99,8 +104,12 @@ class MomentsNotifier extends _$MomentsNotifier {
           offset += 10;
         }
 
-        final List<VideoContent> updatedResponse = List<VideoContent>.from(state.videos)..addAll(response);
-        state = state.copyWith(videos: updatedResponse, isPaginating: false, hasMoreItems: hasMoreItems);
+        final List<VideoContent> updatedResponse =
+            List<VideoContent>.from(state.videos)..addAll(response);
+        state = state.copyWith(
+            videos: updatedResponse,
+            isPaginating: false,
+            hasMoreItems: hasMoreItems);
       }
     } catch (e) {
       state = state.copyWith(error: Exception(e), isLoading: false);
@@ -121,8 +130,10 @@ class MomentsNotifier extends _$MomentsNotifier {
     state = state.copyWith(isLoading: true, error: null);
     try {
       final User? user = AuthServices().currentUser;
-      final upcomingChallenges = await MomentsServices().fetchUpcomingChallenges(user!.id);
-      state = state.copyWith(upcomingChallenges: upcomingChallenges, isLoading: false);
+      final upcomingChallenges =
+          await MomentsServices().fetchUpcomingChallenges(user!.id);
+      state = state.copyWith(
+          upcomingChallenges: upcomingChallenges, isLoading: false);
     } catch (e) {
       state = state.copyWith(error: Exception(e), isLoading: false);
     }
@@ -152,7 +163,8 @@ class MomentsNotifier extends _$MomentsNotifier {
 
       const resMessage = 'Success Uploaded Video';
 
-      state = state.copyWith(isLoading: false, response: resMessage, video: response);
+      state = state.copyWith(
+          isLoading: false, response: resMessage, video: response);
     } catch (e) {
       _setError(e);
     }
@@ -167,9 +179,11 @@ class MomentsNotifier extends _$MomentsNotifier {
       final User? user = AuthServices().currentUser;
       // final challengeId = state.challenges[0].id;
       // final videoId = state.videos[0].id;
-      await MomentsServices().submitChallengeEntry(userId: user!.id, challengeId: challengeId, videoId: videoId);
+      await MomentsServices().submitChallengeEntry(
+          userId: user!.id, challengeId: challengeId, videoId: videoId);
 
-      state = state.copyWith(response: 'Success submitting entries', isLoading: false);
+      state = state.copyWith(
+          response: 'Success submitting entries', isLoading: false);
     } catch (e) {
       _setError(e);
     }

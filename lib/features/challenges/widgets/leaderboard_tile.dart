@@ -36,7 +36,7 @@ class LeaderboardTile extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16.0),
       ),
-      // tileColor: colorByRank(int.parse(rank)),
+      tileColor: colorByRank(int.parse(rank)),
       title: Text(
         username,
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -56,8 +56,9 @@ class LeaderboardTile extends StatelessWidget {
         width: 42,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: colorByRank(int.parse(rank)),
-          border: Border.all(color: Theme.of(context).colorScheme.inverseSurface, width: 1),
+          color: Theme.of(context).colorScheme.surface,
+          border: Border.all(
+              color: Theme.of(context).colorScheme.inverseSurface, width: 1),
         ),
         child: Text(
           rank,

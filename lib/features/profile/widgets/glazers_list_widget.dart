@@ -24,11 +24,13 @@ class GlazersListWidget extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: ListTile(
             onTap: () => router.push(
-              ViewUserProfileRoute(id: glazes[index].glazer.id).location,
+              ViewUserProfileRoute(null, id: glazes[index].glazer.id).location,
             ),
             leading: CircleAvatar(
               radius: 24,
-              foregroundImage: profileImageUrl != null ? CachedNetworkImageProvider(profileImageUrl) : null,
+              foregroundImage: profileImageUrl != null
+                  ? CachedNetworkImageProvider(profileImageUrl)
+                  : null,
               backgroundColor: ColorPallete.blackPearl,
               child: SizedBox(
                 width: 48,

@@ -59,7 +59,8 @@ class ChallengeDetailsView extends StatelessWidget {
                           decoration: BoxDecoration(
                             border: Border.all(
                               width: 1 / 2,
-                              color: Theme.of(context).colorScheme.inverseSurface,
+                              color:
+                                  Theme.of(context).colorScheme.inverseSurface,
                             ),
                             borderRadius: BorderRadius.circular(16.0),
                             image: DecorationImage(
@@ -73,7 +74,8 @@ class ChallengeDetailsView extends StatelessWidget {
                       ],
                     ),
                     _buildHeaderSection(context),
-                    if (challenge.rules != null) _buildChallengeRuleSection(context),
+                    if (challenge.rules != null)
+                      _buildChallengeRuleSection(context),
                     const Gap(12.0),
                     _buildLeaderboardSection(context),
                   ],
@@ -150,7 +152,8 @@ class ChallengeDetailsView extends StatelessWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: Theme.of(context).colorScheme.surface,
-          border: Border.all(color: Theme.of(context).colorScheme.inverseSurface, width: 1),
+          border: Border.all(
+              color: Theme.of(context).colorScheme.inverseSurface, width: 1),
         ),
         child: Text(
           orderList ?? '',
@@ -183,7 +186,8 @@ class ChallengeDetailsView extends StatelessWidget {
                   ),
             ),
             GestureDetector(
-              onTap: () async => await const ChallengeLeaderboardRoute().push<void>(context),
+              onTap: () =>
+                  const ChallengeLeaderboardRoute().push<void>(context),
               child: Text(
                 'View All',
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
@@ -306,7 +310,8 @@ class ChallengeDetailsView extends StatelessWidget {
             children: challenge.tags!.map((tag) {
               return Container(
                 height: 24,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 decoration: BoxDecoration(
                   color: useColor.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(16.0),
@@ -332,7 +337,9 @@ class ChallengeDetailsView extends StatelessWidget {
       child: SafeArea(
         child: PrimaryButton(
           label: 'Accept Challenge',
-          onPressed: () async => ChallengeSubmitEntryRoute(challengeId: challenge.id).push<void>(context),
+          onPressed: () async =>
+              ChallengeSubmitEntryRoute(challengeId: challenge.id)
+                  .push<void>(context),
         ),
       ),
     );

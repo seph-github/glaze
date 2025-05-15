@@ -6,7 +6,6 @@ import 'package:gap/gap.dart';
 import 'package:glaze/features/auth/services/auth_services.dart';
 import 'package:glaze/features/profile/provider/profile_provider/profile_provider.dart';
 import 'package:glaze/features/templates/loading_layout.dart';
-import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../components/buttons/primary_button.dart';
@@ -24,7 +23,6 @@ class OnboardingView extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final router = GoRouter.of(context);
     // final Size size = MediaQuery.sizeOf(context);
 
     return Consumer(
@@ -47,17 +45,23 @@ class OnboardingView extends HookWidget {
                   }),
                 )
                 .then(
-                  (_) => router.go(
-                    ProfileCompletionFormRoute(id: user?.id as String, role: user?.userMetadata?['role'] as String).location,
-                  ),
-                );
+              (_) async {
+                if (context.mounted) {
+                  ProfileCompletionFormRoute(
+                          id: user?.id as String,
+                          role: user?.userMetadata?['role'] as String)
+                      .go(context);
+                }
+              },
+            );
           }
           ref.read(onboardingDataNotifierProvider.notifier).next();
         }
 
         return LoadingLayout(
           isLoading: ref.watch(profileNotifierProvider).isLoading,
-          floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerDocked,
           floatingActionButton: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(

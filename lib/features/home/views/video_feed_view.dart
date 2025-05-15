@@ -410,8 +410,9 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
               if (index >= videos.length) return const SizedBox.shrink();
               final video = videos[index];
 
-              if ((index - currentPage.value).abs() > 1)
+              if ((index - currentPage.value).abs() > 1) {
                 return const SizedBox.shrink();
+              }
 
               return FutureBuilder<VideoPlayerController?>(
                 future: getOrCreateController(video),

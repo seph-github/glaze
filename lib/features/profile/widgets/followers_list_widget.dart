@@ -24,7 +24,8 @@ class FollowersListWidget extends HookWidget {
     final router = GoRouter.of(context);
 
     final followerStates = useState<Map<String, bool>>({
-      for (final follower in followers) follower.id: following.any((item) => item.id == follower.id),
+      for (final follower in followers)
+        follower.id: following.any((item) => item.id == follower.id),
     });
 
     void toggleFollow(String id) {
@@ -44,10 +45,12 @@ class FollowersListWidget extends HookWidget {
         return Padding(
           padding: const EdgeInsets.all(4.0),
           child: ListTile(
-            onTap: () => router.push(ViewUserProfileRoute(id: followers[index].id).location),
+            onTap: () => router.push(
+                ViewUserProfileRoute(null, id: followers[index].id).location),
             leading: CircleAvatar(
               radius: 24,
-              foregroundImage: CachedNetworkImageProvider(followers[index].profileImageUrl ?? ''),
+              foregroundImage: CachedNetworkImageProvider(
+                  followers[index].profileImageUrl ?? ''),
             ),
             title: Text(
               '@${followers[index].username}',
@@ -67,13 +70,19 @@ class FollowersListWidget extends HookWidget {
                 return ElevatedButton(
                   onPressed: () {
                     if (!isFollowed) {
-                      ref.read(followUserNotifierProvider.notifier).onFollowUser(followerId: AuthServices().currentUser?.id ?? '', followingId: follower.id);
+                      ref
+                          .read(followUserNotifierProvider.notifier)
+                          .onFollowUser(
+                              followerId: AuthServices().currentUser?.id ?? '',
+                              followingId: follower.id);
                       toggleFollow(follower.id);
                     }
                   },
                   style: ElevatedButton.styleFrom(
                     fixedSize: const Size.fromWidth(120),
-                    backgroundColor: isFollowed ? ColorPallete.inputFilledColor : ColorPallete.primaryColor,
+                    backgroundColor: isFollowed
+                        ? ColorPallete.inputFilledColor
+                        : ColorPallete.primaryColor,
                   ),
                   child: Text(
                     isFollowed ? 'Message' : 'Follow',
