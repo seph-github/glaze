@@ -9,7 +9,8 @@ class DateTimeConverter implements JsonConverter<DateTime?, String?> {
   const DateTimeConverter();
 
   @override
-  DateTime? fromJson(String? json) => json == null ? null : DateTime.parse(json);
+  DateTime? fromJson(String? json) =>
+      json == null ? null : DateTime.parse(json);
 
   @override
   String? toJson(DateTime? object) => object?.toIso8601String();
@@ -24,6 +25,7 @@ class VideoContent with _$VideoContent {
     @JsonKey(name: 'video_url') required String videoUrl,
     @JsonKey(name: 'has_glazed') @Default(false) bool hasGlazed,
     @JsonKey(name: 'thumbnail_url') String? thumbnailUrl,
+    @JsonKey(name: 'profile_image_url') String? profileImageUrl,
     @JsonKey(name: 'title') String? title,
     String? caption,
     String? category,
@@ -32,5 +34,6 @@ class VideoContent with _$VideoContent {
     @JsonKey(name: 'created_at') @DateTimeConverter() DateTime? createdAt,
   }) = _VideoContent;
 
-  factory VideoContent.fromJson(Map<String, dynamic> json) => _$VideoContentFromJson(json);
+  factory VideoContent.fromJson(Map<String, dynamic> json) =>
+      _$VideoContentFromJson(json);
 }

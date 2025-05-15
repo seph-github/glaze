@@ -89,10 +89,11 @@ class ChallengesCard extends StatelessWidget {
                     Flexible(
                       child: Text(
                         getPrizeText(challenge.prize ?? ''),
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontFamily: FontFamily.robotoBold,
-                              fontWeight: FontWeight.w800,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontFamily: FontFamily.robotoBold,
+                                  fontWeight: FontWeight.w800,
+                                ),
                       ),
                     ),
                   ],
@@ -105,11 +106,13 @@ class ChallengesCard extends StatelessWidget {
                     const ChallengeDetailsRoute().location,
                     extra: {
                       'challenge': challenge,
-                      'color': randomColor.toARGB32(),
+                      'color': int.parse(randomColor.toString()),
                     },
                   );
                 },
-                label: challenge.type == ChallengeType.live ? 'Leaderboard' : 'Join the Challenge',
+                label: challenge.type == ChallengeType.live
+                    ? 'Leaderboard'
+                    : 'Join the Challenge',
                 icon: null,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w800,

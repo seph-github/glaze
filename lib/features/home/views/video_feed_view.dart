@@ -32,10 +32,7 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(videoFeedNotifierProvider);
     final appLifecycle = useAppLifecycleState();
-    final Size(
-      :width,
-      :height
-    ) = MediaQuery.sizeOf(context);
+    final Size(:width, :height) = MediaQuery.sizeOf(context);
     final showMoreDonutOptions = useState<bool>(false);
     final userGlazes = useState<List<Glaze>>([]);
 
@@ -50,14 +47,16 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
     final playIconTimer = useRef<Timer?>(null);
 
     final videos = ref.watch(videosProvider);
-    final controllerCreationMap = useState<Map<String, Completer<VideoPlayerController>>>({});
+    final controllerCreationMap =
+        useState<Map<String, Completer<VideoPlayerController>>>({});
 
     void toggleDonutOptions(bool value) {
       showMoreDonutOptions.value = value;
     }
 
     Future<void> pauseAllControllers() async {
-      final controllers = List<VideoPlayerController>.from(controllerCache.value.values);
+      final controllers =
+          List<VideoPlayerController>.from(controllerCache.value.values);
 
       for (final controller in controllers) {
         try {
@@ -100,7 +99,8 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
     }
 
     void enforceCacheLimit() {
-      while (controllerCache.value.length > maxCacheSize && accessOrder.value.isNotEmpty) {
+      while (controllerCache.value.length > maxCacheSize &&
+          accessOrder.value.isNotEmpty) {
         final oldestId = accessOrder.value.removeAt(0);
 
         removeController(oldestId);
@@ -112,7 +112,8 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
       accessOrder.value.add(videoId);
     }
 
-    Future<VideoPlayerController?> getOrCreateController(VideoContent video) async {
+    Future<VideoPlayerController?> getOrCreateController(
+        VideoContent video) async {
       if (controllerCache.value.containsKey(video.id)) {
         touchController(video.id);
         return controllerCache.value[video.id];
@@ -126,7 +127,9 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
       controllerCreationMap.value[video.id] = completer;
 
       try {
-        final videoFile = await ref.watch(videoFeedNotifierProvider.notifier).getCachedVideoFile(video.videoUrl);
+        final videoFile = await ref
+            .watch(videoFeedNotifierProvider.notifier)
+            .getCachedVideoFile(video.videoUrl);
 
         final controller = VideoPlayerController.file(videoFile);
         await controller.initialize();
@@ -152,7 +155,10 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
       final controller = controllerCache.value[videoId];
       final tabIndex = ref.read(dashboardTabControllerProvider);
 
-      if (controller != null && controller.value.isInitialized && !controller.value.isPlaying && tabIndex == 0) {
+      if (controller != null &&
+          controller.value.isInitialized &&
+          !controller.value.isPlaying &&
+          tabIndex == 0) {
         try {
           await controller.play();
           if (controller.value.isPlaying) {}
@@ -194,7 +200,8 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
       final videoId = videos[currentPage.value].id;
       final controller = getController(videoId);
 
-      if (controller != null && (controller.value.hasError || !controller.value.isInitialized)) {
+      if (controller != null &&
+          (controller.value.hasError || !controller.value.isInitialized)) {
         await removeController(videoId);
         await Future.delayed(const Duration(milliseconds: 50));
       }
@@ -226,7 +233,9 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
         }
       }
 
-      final idsToDispose = controllerCache.value.keys.where((id) => !idsToKeep.contains(id)).toList();
+      final idsToDispose = controllerCache.value.keys
+          .where((id) => !idsToKeep.contains(id))
+          .toList();
       for (final id in idsToDispose) {
         await removeController(id);
       }
@@ -270,7 +279,9 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
             try {
               if (state.videos.isNotEmpty) {
                 ref.read(videosProvider.notifier).setVideos(state.videos);
-                await ref.read(glazeNotifierProvider.notifier).fetchUserGlazes();
+                await ref
+                    .read(glazeNotifierProvider.notifier)
+                    .fetchUserGlazes();
                 // WidgetsBinding.instance.addPostFrameCallback((_) async {
                 await initAndPlayVideo(0);
                 // });
@@ -283,9 +294,7 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
 
         return null;
       },
-      [
-        state.videos
-      ],
+      [state.videos],
     );
 
     useEffect(() {
@@ -325,14 +334,14 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
       Future.microtask(handleLifecycleChange);
 
       return null;
-    }, [
-      appLifecycle
-    ]);
+    }, [appLifecycle]);
 
     ref.listen(
       videoFeedNotifierProvider,
       (prev, next) async {
-        if (prev?.videos != next.videos || prev?.isLoading != next.isLoading || prev?.preloadedVideoUrls != next.preloadedVideoUrls) {
+        if (prev?.videos != next.videos ||
+            prev?.isLoading != next.isLoading ||
+            prev?.preloadedVideoUrls != next.preloadedVideoUrls) {
           ref.read(videosProvider.notifier).addVideos(next.videos);
 
           await initAndPlayVideo(0);
@@ -354,7 +363,8 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
           final isActive = next == 0;
 
           final index = currentPage.value;
-          final controller = getController(ref.watch(videosProvider).elementAtOrNull(index)?.id ?? '');
+          final controller = getController(
+              ref.watch(videosProvider).elementAtOrNull(index)?.id ?? '');
 
           if (controller != null && controller.value.isInitialized) {
             if (!isActive) {
@@ -400,7 +410,8 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
               if (index >= videos.length) return const SizedBox.shrink();
               final video = videos[index];
 
-              if ((index - currentPage.value).abs() > 1) return const SizedBox.shrink();
+              if ((index - currentPage.value).abs() > 1)
+                return const SizedBox.shrink();
 
               return FutureBuilder<VideoPlayerController?>(
                 future: getOrCreateController(video),
@@ -421,7 +432,8 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
                           if (controller.value.isPlaying) {
                             await controller.pause();
                             showPlayIcon.value = true;
-                            playIconTimer.value = Timer(const Duration(seconds: 2), () {
+                            playIconTimer.value =
+                                Timer(const Duration(seconds: 2), () {
                               showPlayIcon.value = false;
                             });
                           } else {
@@ -451,7 +463,8 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
                                   color: Colors.black.withValues(alpha: 0.3),
                                 ),
                                 child: Center(
-                                  child: SvgPicture.asset(Assets.images.svg.playIcon.path),
+                                  child: SvgPicture.asset(
+                                      Assets.images.svg.playIcon.path),
                                 ),
                               ),
                           ],
@@ -464,18 +477,25 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
                         child: HomeInteractiveCard(
                           key: PageStorageKey('HomeInteractiveCard_$index'),
                           onGlazeLongPress: () => toggleDonutOptions(true),
-                          controller: getController(videos[currentPage.value].id),
+                          controller:
+                              getController(videos[currentPage.value].id),
                           glazeCount: videos[index].glazesCount ?? 0,
                           isGlazed: videos[index].hasGlazed,
                           onGlazeTap: () async {
                             final isCurrentlyGlazed = video.hasGlazed;
-                            final newGlazeCount = isCurrentlyGlazed ? (video.glazesCount ?? 0) - 1 : (video.glazesCount ?? 0) + 1;
+                            final newGlazeCount = isCurrentlyGlazed
+                                ? (video.glazesCount ?? 0) - 1
+                                : (video.glazesCount ?? 0) + 1;
 
-                            ref.read(videosProvider.notifier).updateVideo(video.id, newGlazeCount, !isCurrentlyGlazed);
+                            ref.read(videosProvider.notifier).updateVideo(
+                                video.id, newGlazeCount, !isCurrentlyGlazed);
 
-                            await ref.read(glazeNotifierProvider.notifier).onGlazed(videoId: video.id);
+                            await ref
+                                .read(glazeNotifierProvider.notifier)
+                                .onGlazed(videoId: video.id);
                           },
-                          onShareTap: () async => await showShareOptions(context),
+                          onShareTap: () async =>
+                              await showShareOptions(context),
                           width: width,
                           height: height,
                           video: videos[index],

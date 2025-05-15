@@ -1,9 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/core/styles/color_pallete.dart';
 import 'package:glaze/features/home/models/video_content/video_content.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:video_player/video_player.dart';
 
@@ -43,8 +43,6 @@ class HomeInteractiveCard extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final router = GoRouter.of(context);
-
     return Container(
       width: width,
       height: 140,
@@ -71,7 +69,7 @@ class HomeInteractiveCard extends HookConsumerWidget {
                   // TODO: Challenges screen
                   // router.push(const ChallengesRoute().location);
                 },
-                width: width / 2,
+                width: width / 2.25,
                 height: 40,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -87,36 +85,54 @@ class HomeInteractiveCard extends HookConsumerWidget {
                   ],
                 ),
               ),
-              const Gap(10),
+              const Gap(8),
+              GestureDetector(
+                onTap: () async {
+                  final userId = video.userId as String;
+                  await controller?.pause();
+
+                  if (context.mounted) {
+                    await ViewUserProfileRoute(id: userId, $extra: {
+                      'controller': controller,
+                    }).push<void>(context);
+                  }
+                },
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    CachedNetworkImage(
+                      imageUrl: video.profileImageUrl ?? '',
+                      imageBuilder: (context, imageProvider) => CircleAvatar(
+                        radius: 15.0,
+                        backgroundImage: imageProvider,
+                      ),
+                      placeholder: (context, url) =>
+                          SvgPicture.asset(Assets.images.svg.profileIcon.path),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.account_circle_outlined),
+                    ),
+                    const Gap(8),
+                    Text(
+                      '@${video.username}',
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+              const Gap(4),
               Text(
                 video.title ?? '',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
               ),
-              GestureDetector(
-                onTap: () async {
-                  final userId = video.userId;
-                  await controller?.pause();
-                  router.push(
-                    ViewUserProfileRoute(id: userId ?? '').location,
-                    extra: {
-                      'controller': controller,
-                    },
-                  );
-                },
-                child: Text(
-                  '@${video.username}',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                ),
-              ),
               Text(
                 video.caption ?? '',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Colors.grey,
                     ),

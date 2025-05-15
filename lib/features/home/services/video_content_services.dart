@@ -16,7 +16,9 @@ class VideoContentServices {
 
       final rawList = response as List<dynamic>;
 
-      final value = rawList.map((video) => VideoContent.fromJson(video as Map<String, dynamic>)).toList();
+      final value = rawList
+          .map((video) => VideoContent.fromJson(video as Map<String, dynamic>))
+          .toList();
 
       value.sort((a, b) => b.createdAt!.compareTo(a.createdAt!));
       return value;
@@ -39,7 +41,9 @@ class VideoContentServices {
 
       final rawList = response as List<dynamic>;
 
-      final value = rawList.map((video) => VideoContent.fromJson(video as Map<String, dynamic>)).toList();
+      final value = rawList
+          .map((video) => VideoContent.fromJson(video as Map<String, dynamic>))
+          .toList();
 
       value.sort((a, b) => b.createdAt!.compareTo(a.createdAt!));
       return value;
