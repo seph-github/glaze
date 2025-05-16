@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
@@ -9,6 +10,7 @@ import 'package:glaze/components/modals/glaze_modals.dart';
 import 'package:glaze/features/camera/provider/content_picker_provider.dart';
 import 'package:glaze/features/category/provider/category_provider.dart';
 import 'package:glaze/features/moments/providers/moments_provider.dart';
+import 'package:glaze/features/moments/providers/upload_moments_provider/upload_moments_form_provider.dart';
 import 'package:glaze/features/templates/loading_layout.dart';
 import 'package:glaze/utils/generate_thumbnail.dart';
 import 'package:go_router/go_router.dart';
@@ -30,27 +32,21 @@ class UploadMomentsCard extends HookConsumerWidget {
   const UploadMomentsCard({
     super.key,
     this.showBackground = true,
+    this.onPressed,
   });
 
   final bool showBackground;
-
-  Future<Duration> _getVideoDuration(File file) async {
-    final controller = VideoPlayerController.file(file);
-
-    try {
-      await controller.initialize();
-      return controller.value.duration;
-    } finally {
-      await controller.dispose();
-    }
-  }
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(momentsNotifierProvider);
+    final categoryState = ref.watch(categoryNotifierProvider);
     final fileState = ref.watch(contentPickerNotifierProvider);
+
+    final formNotifier = ref.read(uploadMomentFormProvider.notifier);
     final router = GoRouter.of(context);
     final formKey = GlobalKey<FormState>();
-    final file = useState<File?>(null);
     final Size(
       :width,
       :height
@@ -77,14 +73,6 @@ class UploadMomentsCard extends HookConsumerWidget {
         fileState.video
       ],
     );
-
-    final titleController = useTextEditingController();
-    final captionController = useTextEditingController();
-    final categoryController = useTextEditingController();
-    final fileController = useTextEditingController();
-
-    final state = ref.watch(momentsNotifierProvider);
-    final categoryState = ref.watch(categoryNotifierProvider);
 
     useEffect(
       () {
@@ -114,11 +102,7 @@ class UploadMomentsCard extends HookConsumerWidget {
             title: 'Success',
             content: next.response ?? '',
             onPressed: () async {
-              titleController.clear();
-              captionController.clear();
-              categoryController.clear();
-              fileController.clear();
-              file.value = null;
+              formNotifier.clearForm();
               ref.invalidate(contentPickerNotifierProvider);
 
               return router.pop();
@@ -132,22 +116,21 @@ class UploadMomentsCard extends HookConsumerWidget {
       contentPickerNotifierProvider,
       (prev, next) {
         if (next.video != null) {
-          file.value = File(next.video!.path);
-          fileController.text = file.value?.path.split('/').last ?? '';
+          ref.read(uploadMomentFormProvider.notifier).setFile(File(next.video!.path));
         }
       },
     );
 
     void onCancelUploadMoment() async {
-      if (titleController.text.isNotEmpty || captionController.text.isNotEmpty || categoryController.text.isNotEmpty || fileController.text.isNotEmpty || file.value != null) {
-        await showUploadMomentCard(context);
+      if (formNotifier.hasChanges) {
+        await _showUploadMomentCard(context);
       } else {
         context.pop();
       }
     }
 
     void onSubmit() async {
-      if (file.value == null) {
+      if (formNotifier.file == null) {
         await showDialog(
           context: context,
           builder: (context) {
@@ -172,13 +155,18 @@ class UploadMomentsCard extends HookConsumerWidget {
       if (formKey.currentState!.validate()) {
         formKey.currentState!.save();
         final thumbnail = await thumbnailFuture;
-        await ref.read(momentsNotifierProvider.notifier).uploadVideoContent(
-              file: file.value ?? File(''),
-              thumbnail: thumbnail,
-              title: titleController.text,
-              caption: captionController.text,
-              category: categoryController.text,
-            );
+        ref.read(uploadMomentFormProvider.notifier).setThumbnail(thumbnail);
+        onPressed?.call();
+        log('form state ${ref.watch(uploadMomentFormProvider)}');
+
+        // TODO:
+        // await ref.read(momentsNotifierProvider.notifier).uploadVideoContent(
+        //       file: file.value ?? File(''),
+        //       thumbnail: thumbnail,
+        //       title: titleController.text,
+        //       caption: captionController.text,
+        //       category: categoryController.text,
+        //     );
       }
     }
 
@@ -235,7 +223,11 @@ class UploadMomentsCard extends HookConsumerWidget {
                             ),
                           ),
                         ),
+                        const Gap(8.0),
                         const Divider(
+                          height: 4,
+                          color: ColorPallete.borderColor,
+                          thickness: 1,
                           indent: 12.0,
                           endIndent: 12.0,
                         ),
@@ -272,7 +264,8 @@ class UploadMomentsCard extends HookConsumerWidget {
                             ),
                             const Gap(16.0),
                             InputField.text(
-                              controller: titleController,
+                              controller: formNotifier.titleController,
+                              onChanged: (_) => formNotifier.syncControllersToState(),
                               hintText: 'Enter video title',
                               helper: Text(
                                 '* up to 50 characters',
@@ -289,7 +282,8 @@ class UploadMomentsCard extends HookConsumerWidget {
                             ),
                             const Gap(10.0),
                             InputField.paragraph(
-                              controller: captionController,
+                              controller: formNotifier.captionController,
+                              onChanged: (_) => formNotifier.syncControllersToState(),
                               maxLines: 5,
                               hintText: 'Write video caption',
                               validator: (value) {
@@ -302,7 +296,8 @@ class UploadMomentsCard extends HookConsumerWidget {
                             const Gap(26.0),
                             InputField(
                               hintText: 'Category',
-                              controller: categoryController,
+                              controller: formNotifier.categoryController,
+                              onChanged: (_) => formNotifier.syncControllersToState(),
                               validator: (value) {
                                 if (value!.isEmpty) {
                                   return 'Please add a category';
@@ -311,27 +306,28 @@ class UploadMomentsCard extends HookConsumerWidget {
                               },
                               readOnly: true,
                               onTap: () async {
-                                await GlazeModal.showCategoryModalPopup(context, categoryState, categoryController);
+                                await GlazeModal.showCategoryModalPopup(context, categoryState, formNotifier.categoryController);
                               },
                             ),
                             if (fileState.video != null) _buildContentThumbnailPreview(thumbnailFuture, ref),
                             const Gap(30.0),
                             FocusButton(
-                              controller: fileController,
+                              controller: formNotifier.fileController,
+                              onChanged: (_) => formNotifier.syncControllersToState(),
                               borderRadius: 16.0,
                               validator: (value) {
-                                if (file.value == null) {
+                                if (formNotifier.file == null) {
                                   return 'Please choose file';
                                 }
 
-                                final fileSize = File(file.value?.path ?? '').lengthSync();
+                                final fileSize = File(formNotifier.file?.path ?? '').lengthSync();
 
                                 if (fileSize > 100 * 1024 * 1024) {
                                   return 'File size must not exceed 100MB';
                                 }
                                 return null;
                               },
-                              onTap: () async => await onImageSource(context, ref),
+                              onTap: () async => await _onImageSource(context, ref),
                               child: Center(
                                 child: Text(
                                   'Choose a Moment',
@@ -393,7 +389,10 @@ class UploadMomentsCard extends HookConsumerWidget {
                     right: 8,
                     top: 8,
                     child: IconButton.filled(
-                      onPressed: () => ref.invalidate(contentPickerNotifierProvider),
+                      onPressed: () {
+                        ref.read(uploadMomentFormProvider.notifier).clearFile();
+                        ref.invalidate(contentPickerNotifierProvider);
+                      },
                       visualDensity: const VisualDensity(horizontal: -3, vertical: -2),
                       focusColor: ColorPallete.primaryColor,
                       color: ColorPallete.primaryColor,
@@ -412,7 +411,7 @@ class UploadMomentsCard extends HookConsumerWidget {
   }
 }
 
-Future<void> onImageSource(BuildContext ctx, WidgetRef ref) async {
+Future<void> _onImageSource(BuildContext ctx, WidgetRef ref) async {
   return await showCupertinoModalPopup(
     context: ctx,
     builder: (ctx) => CupertinoActionSheet(
@@ -466,7 +465,7 @@ Future<void> onImageSource(BuildContext ctx, WidgetRef ref) async {
   );
 }
 
-Future<void> showUploadMomentCard(BuildContext context) async {
+Future<void> _showUploadMomentCard(BuildContext context) async {
   await showDialog(
     context: context,
     builder: (ctx) {
@@ -481,18 +480,31 @@ Future<void> showUploadMomentCard(BuildContext context) async {
             onPressed: () => Navigator.pop(ctx),
             child: const Text('Cancel'),
           ),
-          TextButton(
-            onPressed: () {
-              () {};
-              Navigator.popUntil(
-                context,
-                (route) => route.isFirst,
-              );
-            },
-            child: const Text('Discard'),
-          ),
+          Consumer(builder: (context, ref, _) {
+            return TextButton(
+              onPressed: () {
+                ref.read(uploadMomentFormProvider.notifier).clearForm();
+                Navigator.popUntil(
+                  context,
+                  (route) => route.isFirst,
+                );
+              },
+              child: const Text('Discard'),
+            );
+          }),
         ],
       );
     },
   );
+}
+
+Future<Duration> _getVideoDuration(File file) async {
+  final controller = VideoPlayerController.file(file);
+
+  try {
+    await controller.initialize();
+    return controller.value.duration;
+  } finally {
+    await controller.dispose();
+  }
 }

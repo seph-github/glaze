@@ -1,7 +1,11 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:glaze/features/challenges/services/challenge_services.dart';
+import 'package:glaze/features/home/services/video_content_services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:supabase/supabase.dart';
 
+import '../../auth/services/auth_services.dart';
+import '../../moments/providers/upload_moments_provider/upload_moments_form_provider.dart';
 import '../models/challenge_entry/challenge_entry.dart';
 
 part 'challenge_provider.freezed.dart';
@@ -43,6 +47,31 @@ class ChallengeNotifier extends _$ChallengeNotifier {
       }
 
       state = state.copyWith(isLoading: false, entries: response);
+    } catch (e) {
+      setError(e);
+    }
+  }
+
+  Future<void> submitChallengeEntry({
+    required String challengeId,
+  }) async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final formState = ref.watch(uploadMomentFormProvider);
+
+      final User? user = AuthServices().currentUser;
+      final response = await VideoContentServices().uploadVideoContent(
+        file: formState.file!,
+        userId: user!.id,
+        title: formState.title!,
+        caption: formState.caption!,
+        category: formState.category!,
+        thumbnail: formState.thumbnail!,
+      );
+
+      if (response is Exception) return;
+
+      await _challengeServices.submitChallengeEntry(userId: user.id, challengeId: challengeId, videoId: response.id);
     } catch (e) {
       setError(e);
     }

@@ -41,9 +41,7 @@ class MomentsVideosTabview extends StatelessWidget {
       itemBuilder: (context, index) {
         return GestureDetector(
           onTap: () async {
-            await VideoPreviewRoute(videos as List<VideoContent>,
-                    initialIndex: index)
-                .push<void>(context);
+            await VideoPreviewRoute(videos as List<VideoContent>, initialIndex: index).push<void>(context);
           },
           child: CachedNetworkImage(
             imageUrl: videos?[index].thumbnailUrl ?? '',

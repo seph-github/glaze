@@ -1,10 +1,9 @@
 // ignore_for_file: unused_element
 
-import 'dart:io';
-
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:glaze/features/challenges/models/challenge/challenge.dart';
 import 'package:glaze/features/home/models/video_content/video_content.dart';
+import 'package:glaze/features/moments/providers/upload_moments_provider/upload_moments_form_provider.dart';
 import 'package:glaze/features/moments/services/moments_services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase/supabase.dart';
@@ -76,8 +75,7 @@ class MomentsNotifier extends _$MomentsNotifier {
       }
       // state = state.copyWith(isLoading: false);
 
-      state = state.copyWith(
-          isLoading: false, videos: response, hasMoreItems: hasMoreItems);
+      state = state.copyWith(isLoading: false, videos: response, hasMoreItems: hasMoreItems);
     } catch (e) {
       state = state.copyWith(error: Exception(e), isLoading: false);
     }
@@ -104,12 +102,8 @@ class MomentsNotifier extends _$MomentsNotifier {
           offset += 10;
         }
 
-        final List<VideoContent> updatedResponse =
-            List<VideoContent>.from(state.videos)..addAll(response);
-        state = state.copyWith(
-            videos: updatedResponse,
-            isPaginating: false,
-            hasMoreItems: hasMoreItems);
+        final List<VideoContent> updatedResponse = List<VideoContent>.from(state.videos)..addAll(response);
+        state = state.copyWith(videos: updatedResponse, isPaginating: false, hasMoreItems: hasMoreItems);
       }
     } catch (e) {
       state = state.copyWith(error: Exception(e), isLoading: false);
@@ -130,62 +124,56 @@ class MomentsNotifier extends _$MomentsNotifier {
     state = state.copyWith(isLoading: true, error: null);
     try {
       final User? user = AuthServices().currentUser;
-      final upcomingChallenges =
-          await MomentsServices().fetchUpcomingChallenges(user!.id);
-      state = state.copyWith(
-          upcomingChallenges: upcomingChallenges, isLoading: false);
+      final upcomingChallenges = await MomentsServices().fetchUpcomingChallenges(user!.id);
+      state = state.copyWith(upcomingChallenges: upcomingChallenges, isLoading: false);
     } catch (e) {
       state = state.copyWith(error: Exception(e), isLoading: false);
     }
   }
 
-  Future<void> uploadVideoContent({
-    required File file,
-    required File thumbnail,
-    required String title,
-    required String caption,
-    required String category,
-  }) async {
+  Future<void> uploadVideoContent() async {
     state = state.copyWith(isLoading: true, error: null, response: null);
     try {
+      final formState = ref.watch(uploadMomentFormProvider);
+
       final User? user = AuthServices().currentUser;
 
       final response = await VideoContentServices().uploadVideoContent(
-        file: file,
-        thumbnail: thumbnail,
-        userId: user?.id ?? '',
-        title: title,
-        caption: caption,
-        category: category,
+        file: formState.file!,
+        thumbnail: formState.thumbnail!,
+        userId: user!.id,
+        title: formState.title!,
+        caption: formState.caption!,
+        category: formState.category!,
       );
 
-      await ref.read(profileNotifierProvider.notifier).fetchProfile(user!.id);
+      await ref.read(profileNotifierProvider.notifier).fetchProfile(user.id);
 
       const resMessage = 'Success Uploaded Video';
 
-      state = state.copyWith(
-          isLoading: false, response: resMessage, video: response);
+      state = state.copyWith(isLoading: false, response: resMessage, video: response);
     } catch (e) {
       _setError(e);
     }
   }
 
-  Future<void> submitChallengeEntry({
-    required String challengeId,
-    required String videoId,
-  }) async {
-    state = state.copyWith(isLoading: true, error: null);
-    try {
-      final User? user = AuthServices().currentUser;
-      // final challengeId = state.challenges[0].id;
-      // final videoId = state.videos[0].id;
-      await MomentsServices().submitChallengeEntry(
-          userId: user!.id, challengeId: challengeId, videoId: videoId);
+  // TODO:
+  // Future<void> submitChallengeEntry({
+  //   required String challengeId,
+  //   required String videoId,
+  // }) async {
+  //   state = state.copyWith(isLoading: true, error: null);
+  //   try {
+  //     final User? user = AuthServices().currentUser;
+  //     // final challengeId = state.challenges[0].id;
+  //     // final videoId = state.videos[0].id;
+  //     await MomentsServices().submitChallengeEntry(
+  //         userId: user!.id, challengeId: challengeId, videoId: videoId);
 
-      state = state.copyWith(
-          response: 'Success submitting entries', isLoading: false);
-    } catch (e) {
-      _setError(e);
-    }
-  }
+  //     state = state.copyWith(
+  //         response: 'Success submitting entries', isLoading: false);
+  //   } catch (e) {
+  //     _setError(e);
+  //   }
+  // }
 }

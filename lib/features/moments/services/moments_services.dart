@@ -79,23 +79,4 @@ class MomentsServices {
       rethrow;
     }
   }
-
-  Future<void> submitChallengeEntry({
-    required String userId,
-    required String challengeId,
-    required String videoId,
-  }) async {
-    try {
-      await _supabaseClient.rpc(
-        'submit_challenge_entry',
-        params: {
-          'p_user_id': userId,
-          'p_challenge_id': challengeId,
-          'p_video_id': videoId,
-        },
-      );
-    } catch (e) {
-      rethrow;
-    }
-  }
 }

@@ -12,6 +12,7 @@ class LoadingLayout extends HookWidget {
     this.backgroundColor,
     this.floatingActionButton,
     this.floatingActionButtonLocation,
+    this.bottomSheet,
   });
 
   final Widget? child;
@@ -21,6 +22,7 @@ class LoadingLayout extends HookWidget {
   final Color? backgroundColor;
   final Widget? floatingActionButton;
   final FloatingActionButtonLocation? floatingActionButtonLocation;
+  final Widget? bottomSheet;
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +52,7 @@ class LoadingLayout extends HookWidget {
           ],
         ],
       ),
+      bottomSheet: bottomSheet,
       bottomNavigationBar: bottomNavigationBar,
       floatingActionButton: floatingActionButton,
       floatingActionButtonLocation: floatingActionButtonLocation,

@@ -33,6 +33,7 @@ class LeaderboardTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      dense: true,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16.0),
       ),
@@ -57,8 +58,7 @@ class LeaderboardTile extends StatelessWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: Theme.of(context).colorScheme.surface,
-          border: Border.all(
-              color: Theme.of(context).colorScheme.inverseSurface, width: 1),
+          border: Border.all(color: Theme.of(context).colorScheme.inverseSurface, width: 1),
         ),
         child: Text(
           rank,

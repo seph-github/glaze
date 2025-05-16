@@ -9,6 +9,7 @@ import 'package:glaze/core/navigation/observer/route_observer_provider.dart';
 import 'package:glaze/features/auth/views/auth_forget_password_view.dart';
 import 'package:glaze/features/auth/views/auth_reset_password_view.dart';
 import 'package:glaze/features/challenges/models/challenge/challenge.dart';
+import 'package:glaze/features/challenges/models/challenge_entry/challenge_entry.dart';
 import 'package:glaze/features/challenges/views/challenge_details_view.dart';
 import 'package:glaze/features/challenges/views/challenge_leaderboard_view.dart';
 import 'package:glaze/features/challenges/views/challenge_submit_entry.dart';
@@ -485,15 +486,16 @@ class NoViewRoute extends GoRouteData {
 
 @TypedGoRoute<VideoPreviewRoute>(path: '/video-preview')
 class VideoPreviewRoute extends GoRouteData {
-  const VideoPreviewRoute(this.$extra, {required this.initialIndex});
+  const VideoPreviewRoute(this.$extra, {this.initialIndex});
+
   final List<VideoContent> $extra;
-  final int initialIndex;
+  final int? initialIndex;
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return VideoPreviewView(
       videos: $extra,
-      initialIndex: initialIndex,
+      initialIndex: initialIndex as int,
     );
   }
 }
@@ -559,28 +561,32 @@ class CheckoutRoute extends GoRouteData {
 class ChallengeDetailsRoute extends GoRouteData {
   const ChallengeDetailsRoute(
     this.$extra, {
-    required this.useColor,
+    this.useColor,
   });
 
   final Challenge $extra;
-  final int useColor;
+  final int? useColor;
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return ChallengeDetailsView(
       challenge: $extra,
-      useColor: Color(useColor),
+      useColor: Color(useColor as int),
     );
   }
 }
 
 @TypedGoRoute<ChallengeLeaderboardRoute>(path: '/leaderboard')
 class ChallengeLeaderboardRoute extends GoRouteData {
-  const ChallengeLeaderboardRoute();
+  const ChallengeLeaderboardRoute(this.$extra);
+
+  final List<ChallengeEntry> $extra;
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return const ChallengeLeaderBoardView();
+    return ChallengeLeaderBoardView(
+      entries: $extra,
+    );
   }
 }
 

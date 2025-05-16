@@ -37,8 +37,6 @@ class ChallengeDetailsView extends HookConsumerWidget {
       return null;
     }, []);
 
-    debugPrint('Challenge details page ${ref.watch(challengeNotifierProvider)}');
-
     return LoadingLayout(
       appBar: AppBarWithBackButton(
         actions: [
@@ -48,8 +46,8 @@ class ChallengeDetailsView extends HookConsumerWidget {
           const Gap(12.0),
         ],
       ),
-      floatingActionButton: _buildAcceptChallenge(context),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomSheet: _buildJoinChallenge(context),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       child: SafeArea(
         child: CustomScrollView(
           slivers: [
@@ -201,7 +199,7 @@ class ChallengeDetailsView extends HookConsumerWidget {
                 ),
                 if (state.entries.isNotEmpty)
                   GestureDetector(
-                    onTap: () => const ChallengeLeaderboardRoute().push<void>(context),
+                    onTap: () => ChallengeLeaderboardRoute(state.entries).push<void>(context),
                     child: Text(
                       'View All',
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
@@ -241,40 +239,23 @@ class ChallengeDetailsView extends HookConsumerWidget {
               )
             else
               Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  borderRadius: BorderRadius.circular(24.0),
-                ),
-                child: Column(
-                  children: [
-                    LeaderboardTile(
+                padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 12.0),
+                height: 144,
+                child: ListView.separated(
+                  primary: false,
+                  physics: const NeverScrollableScrollPhysics(),
+                  separatorBuilder: (context, index) {
+                    return const Divider();
+                  },
+                  itemCount: state.entries.length < 5 ? state.entries.length : 5,
+                  itemBuilder: (context, index) {
+                    final rank = index + 1;
+                    return LeaderboardTile(
                       useColor: useColor,
-                      username: 'first',
-                      rank: 1.toString(),
-                    ),
-                    const Divider(
-                      height: 0,
-                      indent: 12,
-                      endIndent: 12,
-                      thickness: 0.5,
-                    ),
-                    LeaderboardTile(
-                      useColor: useColor,
-                      username: 'second',
-                      rank: 2.toString(),
-                    ),
-                    const Divider(
-                      height: 0,
-                      indent: 12,
-                      endIndent: 12,
-                      thickness: 0.5,
-                    ),
-                    LeaderboardTile(
-                      useColor: useColor,
-                      username: 'thirdy',
-                      rank: 3.toString(),
-                    ),
-                  ],
+                      username: '@${state.entries[index].profile.username}',
+                      rank: rank.toString(),
+                    );
+                  },
                 ),
               ),
             const Gap(12.0),
@@ -368,13 +349,12 @@ class ChallengeDetailsView extends HookConsumerWidget {
     );
   }
 
-  Widget _buildAcceptChallenge(BuildContext context) {
-    return Container(
-      color: Theme.of(context).scaffoldBackgroundColor,
-      padding: const EdgeInsets.all(12.0),
-      child: SafeArea(
+  Widget _buildJoinChallenge(BuildContext context) {
+    return SafeArea(
+      child: Container(
+        padding: const EdgeInsets.all(12.0),
         child: PrimaryButton(
-          label: 'Accept Challenge',
+          label: 'Join',
           onPressed: () async => ChallengeSubmitEntryRoute(challengeId: challenge.id).push<void>(context),
         ),
       ),
