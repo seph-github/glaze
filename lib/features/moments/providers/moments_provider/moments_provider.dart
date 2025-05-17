@@ -3,14 +3,14 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:glaze/features/challenges/models/challenge/challenge.dart';
 import 'package:glaze/features/home/models/video_content/video_content.dart';
-import 'package:glaze/features/moments/providers/upload_moments_provider/upload_moments_form_provider.dart';
+import 'package:glaze/features/moments/providers/upload_moments_form_provider/upload_moments_form_provider.dart';
 import 'package:glaze/features/moments/services/moments_services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase/supabase.dart';
 
-import '../../auth/services/auth_services.dart';
-import '../../home/services/video_content_services.dart';
-import '../../profile/provider/profile_provider/profile_provider.dart';
+import '../../../auth/services/auth_services.dart';
+import '../../../home/services/video_content_services.dart';
+import '../../../profile/provider/profile_provider/profile_provider.dart';
 
 part 'moments_provider.freezed.dart';
 part 'moments_provider.g.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:glaze/features/moments/providers/moments_provider.dart';
+import 'package:glaze/features/moments/providers/moments_provider/moments_provider.dart';
 
 import '../../core/styles/color_pallete.dart';
 import '../../data/models/category/category_model.dart';

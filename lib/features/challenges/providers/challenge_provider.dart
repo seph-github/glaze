@@ -5,7 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase/supabase.dart';
 
 import '../../auth/services/auth_services.dart';
-import '../../moments/providers/upload_moments_provider/upload_moments_form_provider.dart';
+import '../../moments/providers/upload_moments_form_provider/upload_moments_form_provider.dart';
 import '../models/challenge_entry/challenge_entry.dart';
 
 part 'challenge_provider.freezed.dart';

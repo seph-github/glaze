@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,7 +25,11 @@ class OnboardingDataNotifier extends _$OnboardingDataNotifier {
   @override
   int build() => 0;
 
-  void next() => state++;
+  void next() {
+    log('before $state');
+    state++;
+    log('state $state');
+  }
 }
 
 class OnboardingProvider {

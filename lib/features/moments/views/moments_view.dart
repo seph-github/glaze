@@ -5,7 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/components/app_bar_with_back_button.dart';
 import 'package:glaze/components/custom_tab_bar.dart';
-import 'package:glaze/features/moments/providers/moments_provider.dart';
+import 'package:glaze/features/moments/providers/moments_provider/moments_provider.dart';
 import 'package:glaze/features/moments/views/moments_upcoming_tabview.dart';
 import 'package:glaze/features/moments/views/moments_videos_tabview.dart';
 import 'package:glaze/features/moments/widgets/search_field.dart';

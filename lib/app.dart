@@ -15,9 +15,7 @@ class App extends ConsumerWidget {
     final theme = ref.watch(settingsThemeProvider);
 
     return MaterialApp.router(
-      // themeMode: ThemeMode.system,
       theme: theme,
-      // darkTheme: darkTheme,
       title: 'Glaze',
       routerConfig: router,
       localizationsDelegates: AppLocalizations.localizationsDelegates,

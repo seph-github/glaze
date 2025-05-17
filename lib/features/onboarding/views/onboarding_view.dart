@@ -23,12 +23,10 @@ class OnboardingView extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final Size size = MediaQuery.sizeOf(context);
-
     return Consumer(
       builder: (context, ref, _) {
         final state = ref.watch(onboardingDataProvider);
-        final index = ref.watch(onboardingDataNotifierProvider);
+        final index = ref.watch(onboardingDataNotifierProvider) + 1;
 
         Future<void> handleContinue({bool? skip = false}) async {
           final User? user = AuthServices().currentUser;
@@ -47,21 +45,18 @@ class OnboardingView extends HookWidget {
                 .then(
               (_) async {
                 if (context.mounted) {
-                  ProfileCompletionFormRoute(
-                          id: user?.id as String,
-                          role: user?.userMetadata?['role'] as String)
-                      .go(context);
+                  ProfileCompletionFormRoute(id: user?.id as String, role: user?.userMetadata?['role'] as String).go(context);
                 }
               },
             );
+          } else {
+            ref.read(onboardingDataNotifierProvider.notifier).next();
           }
-          ref.read(onboardingDataNotifierProvider.notifier).next();
         }
 
         return LoadingLayout(
           isLoading: ref.watch(profileNotifierProvider).isLoading,
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerDocked,
+          floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
           floatingActionButton: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(

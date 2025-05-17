@@ -18,6 +18,8 @@ class PhoneNumberInput extends HookConsumerWidget {
     this.borderRadius,
     this.lightModeColor,
     this.filled = false,
+    this.onChanged,
+    this.onCodeChanged,
   });
 
   final TextEditingController? dialCodeController;
@@ -27,6 +29,8 @@ class PhoneNumberInput extends HookConsumerWidget {
   final double? borderRadius;
   final Color? lightModeColor;
   final bool filled;
+  final void Function(String)? onChanged;
+  final void Function(String)? onCodeChanged;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -50,32 +54,6 @@ class PhoneNumberInput extends HookConsumerWidget {
                 filled: filled,
                 hintText: 'Phone Number',
                 border: const OutlineInputBorder(),
-                // focusedErrorBorder: OutlineInputBorder(
-                //   borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
-                //   borderSide: const BorderSide(
-                //     color: ColorPallete.whiteSmoke,
-                //   ),
-                // ),
-                // focusedBorder: OutlineInputBorder(
-                //   borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
-                //   borderSide: BorderSide(
-                //     color: isLightTheme ? lightModeColor ?? ColorPallete.backgroundColor : ColorPallete.whiteSmoke,
-                //   ),
-                // ),
-                // enabledBorder: OutlineInputBorder(
-                //   borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
-                //   borderSide: BorderSide(
-                //     width: 1 / 4,
-                //     color: isLightTheme ? lightModeColor ?? ColorPallete.backgroundColor : ColorPallete.persianFable,
-                //   ),
-                // ),
-                // errorBorder: OutlineInputBorder(
-                //   borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
-                //   borderSide: const BorderSide(
-                //     width: 1,
-                //     color: ColorPallete.parlourRed,
-                //   ),
-                // ),
                 prefixIcon: Container(
                   alignment: Alignment.center,
                   width: 60,
@@ -126,6 +104,7 @@ class PhoneNumberInput extends HookConsumerWidget {
                       );
                     },
                     onTapOutside: (_) => FocusScope.of(context).unfocus(),
+                    onChanged: onCodeChanged,
                   ),
                 ),
               ),
@@ -134,6 +113,7 @@ class PhoneNumberInput extends HookConsumerWidget {
               readOnly: false,
               validator: validator,
               onTapOutside: (_) => focusNode?.unfocus(),
+              onChanged: onChanged,
             ),
           ],
         );
@@ -182,6 +162,7 @@ class PhoneNumberInput extends HookConsumerWidget {
                       itemExtent: 50,
                       onSelectedItemChanged: (index) {
                         dialCodeController?.text = countryCodes[index].dialCode;
+                        onCodeChanged?.call(countryCodes[index].dialCode);
                       },
                       itemBuilder: (context, index) {
                         return Row(

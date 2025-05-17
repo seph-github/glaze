@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -13,17 +14,18 @@ import 'package:glaze/core/styles/color_pallete.dart';
 import 'package:glaze/data/models/category/category_model.dart';
 import 'package:glaze/data/repository/category/category_repository.dart';
 import 'package:glaze/features/camera/provider/content_picker_provider.dart';
+import 'package:glaze/features/profile/provider/profile_form_provider/profile_form_provider.dart';
 import 'package:glaze/features/profile/provider/profile_provider/profile_provider.dart';
 import 'package:glaze/features/profile/provider/profile_interests_list_provider/profile_interests_list_provider.dart';
 import 'package:glaze/features/templates/loading_layout.dart';
 import 'package:glaze/utils/form_validators.dart';
+import 'package:glaze/utils/throw_error_exception_helper.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../components/buttons/primary_button.dart';
 import '../../../components/dialogs/dialogs.dart';
-import '../../../components/snack_bar/custom_snack_bar.dart';
 import '../../../gen/assets.gen.dart';
 import '../../auth/services/auth_services.dart';
 import '../widgets/interest_choice_chip.dart';
@@ -43,64 +45,29 @@ class ProfileCompletionForm extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(profileNotifierProvider);
-
+    final formNotifier = ref.watch(profileFormNotifierProvider.notifier);
     final formKey = GlobalKey<FormState>();
     final router = GoRouter.of(context);
-
-    final fullnameController = useTextEditingController();
-    final emailController = useTextEditingController();
-    final codeController = useTextEditingController();
-    final phoneController = useTextEditingController();
-    final organizationController = useTextEditingController();
-
     final categories = useState<List<CategoryModel>>([]);
-    final identification = useState<File?>(null);
-    final profileImage = useState<File?>(null);
-    final interestList = ref.watch(profileInterestsNotifierProvider);
 
     ref.listen(
       contentPickerNotifierProvider,
       (prev, next) {
         if (next.image != null) {
-          profileImage.value = File(next.image!.path);
+          formNotifier.setProfileImage(File(next.image!.path));
         }
 
         if (next.identification != null) {
-          identification.value = File(next.identification!.path);
+          formNotifier.setIdentificationFile(File(next.identification!.path));
         }
       },
     );
 
-    useEffect(() {
-      return () {
-        fullnameController.dispose();
-        emailController.dispose();
-        phoneController.dispose();
-        organizationController.dispose();
-        categories.dispose();
-        identification.dispose();
-        profileImage.dispose();
-        codeController.dispose();
-      };
-    }, []);
-
     ref.listen(
       profileNotifierProvider,
       (prev, next) async {
-        if (next.profile != null && next.profile != prev?.profile) {
-          fullnameController.text = next.profile?.fullName ?? '';
-          emailController.text = next.profile?.email ?? '';
-          codeController.text = next.profile?.countryCode ?? '';
-          phoneController.text = next.profile?.phoneNumber ?? '';
-        }
-
         if (next.error != null && next.error != prev?.error) {
-          final errorMessage = next.error.toString();
-
-          CustomSnackBar.showSnackBar(
-            context,
-            content: Text(errorMessage),
-          );
+          throwAuthExceptionError(context, next, useDialog: true);
         }
 
         if (next.response != null && next.response != prev?.response) {
@@ -110,7 +77,7 @@ class ProfileCompletionForm extends HookConsumerWidget {
             content: next.response as String,
             onPressed: () async {
               ref.invalidate(profileInterestsNotifierProvider);
-
+              formNotifier.clearForm();
               router.go(const HomeRoute().location);
             },
           );
@@ -138,16 +105,20 @@ class ProfileCompletionForm extends HookConsumerWidget {
       if (formKey.currentState?.validate() ?? false) {
         formKey.currentState?.save();
 
+        final state = ref.watch(profileFormNotifierProvider);
+
+        log('State form profile $state');
+
         await ref.read(profileNotifierProvider.notifier).updateProfile(
               id: userId,
-              email: emailController.text,
-              fullName: fullnameController.text,
-              countryCode: codeController.text,
-              phoneNumber: phoneController.text,
-              interestList: interestList,
-              organization: organizationController.text,
-              profileImage: profileImage.value,
-              identification: identification.value,
+              email: state.email,
+              fullName: state.fullname,
+              countryCode: state.code,
+              phoneNumber: state.phone,
+              interestList: state.interestList,
+              organization: state.organization,
+              profileImage: state.profileImage,
+              identification: state.identificationImage,
             );
       }
     }
@@ -184,12 +155,14 @@ class ProfileCompletionForm extends HookConsumerWidget {
                             color: ColorPallete.hintTextColor,
                           ),
                     ),
-                  _UserProfileAvatar(
-                    profileImage: profileImage.value,
-                    onPressed: () async {
-                      await ref.read(contentPickerNotifierProvider.notifier).pickImages();
-                    },
-                  ),
+                  Consumer(builder: (context, ref, _) {
+                    return _UserProfileAvatar(
+                      profileImage: ref.watch(profileFormNotifierProvider).profileImage,
+                      onPressed: () async {
+                        await ref.read(contentPickerNotifierProvider.notifier).pickImages();
+                      },
+                    );
+                  }),
                   Text(
                     'Personal Details',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -197,7 +170,8 @@ class ProfileCompletionForm extends HookConsumerWidget {
                         ),
                   ),
                   InputField.text(
-                    controller: fullnameController,
+                    controller: formNotifier.fullnameController,
+                    onChanged: (_) => formNotifier.syncControllerToState(),
                     readOnly: state.profile?.fullName != null,
                     inputIcon: SvgPicture.asset(Assets.images.svg.profileIcon.path),
                     hintText: 'Full name',
@@ -206,7 +180,8 @@ class ProfileCompletionForm extends HookConsumerWidget {
                   ),
                   const Gap(10),
                   InputField.email(
-                    controller: emailController,
+                    controller: formNotifier.emailController,
+                    onChanged: (_) => formNotifier.syncControllerToState(),
                     readOnly: state.profile?.email != null,
                     inputIcon: SvgPicture.asset(Assets.images.svg.emailIcon.path),
                     hintText: 'Email address',
@@ -215,33 +190,44 @@ class ProfileCompletionForm extends HookConsumerWidget {
                   ),
                   const Gap(10),
                   PhoneNumberInput(
-                    dialCodeController: codeController,
-                    phoneController: phoneController,
+                    dialCodeController: formNotifier.codeController,
+                    phoneController: formNotifier.phoneController,
+                    onChanged: (_) => formNotifier.syncControllerToState(),
+                    onCodeChanged: (_) => formNotifier.syncControllerToState(),
                     filled: true,
                     validator: validatePhone,
                   ),
                   const Gap(10),
                   if (role == ProfileType.recruiter.name)
                     InputField.text(
-                      controller: organizationController,
+                      controller: formNotifier.organizationController,
+                      onChanged: (_) => formNotifier.syncControllerToState(),
                       inputIcon: SvgPicture.asset(Assets.images.svg.organizationIcon.path),
                       hintText: 'Organization',
                       filled: true,
                       validator: validateOrganization,
                     ),
                   const Gap(16),
-                  InterestChoiceChip(
-                    categories: categories.value,
-                    selectedInterests: interestList,
-                    onSelected: (value) => ref.read(profileInterestsNotifierProvider.notifier).addToInterestList(value),
-                  ),
+                  Consumer(builder: (context, ref, _) {
+                    return InterestChoiceChip(
+                      categories: categories.value,
+                      selectedInterests: ref.watch(profileFormNotifierProvider).interestList,
+                      onSelected: (value) {
+                        final interests = ref.read(profileInterestsNotifierProvider.notifier).addToInterestList(value);
+                        formNotifier.interestList = interests;
+                        formNotifier.syncControllerToState();
+                      },
+                    );
+                  }),
                   const Gap(16),
                   if (role == ProfileType.recruiter.name)
-                    RecruiterIdentificationCard(
-                      imageFile: identification.value,
-                      onTap: () async => await ref.read(contentPickerNotifierProvider.notifier).pickIdentificationImage(),
-                      onClear: () => identification.value = null,
-                    ),
+                    Consumer(builder: (context, ref, _) {
+                      return RecruiterIdentificationCard(
+                        imageFile: ref.watch(profileFormNotifierProvider).identificationImage,
+                        onTap: () async => await ref.read(contentPickerNotifierProvider.notifier).pickIdentificationImage(),
+                        onClear: () => formNotifier.clearIdenticationImage(),
+                      );
+                    }),
                   PrimaryButton(
                     label: role == ProfileType.recruiter.name ? 'Submit Verification' : 'Save',
                     onPressed: handleSubmit,

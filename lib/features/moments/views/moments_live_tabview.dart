@@ -5,7 +5,7 @@ import 'package:glaze/components/snack_bar/custom_snack_bar.dart';
 import 'package:glaze/config/enum/challenge_type.dart';
 import 'package:glaze/core/styles/color_pallete.dart';
 import 'package:glaze/features/challenges/models/challenge/challenge.dart';
-import 'package:glaze/features/moments/providers/moments_provider.dart';
+import 'package:glaze/features/moments/providers/moments_provider/moments_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../gen/fonts.gen.dart';

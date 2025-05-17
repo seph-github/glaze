@@ -184,38 +184,6 @@ class InputField extends HookWidget {
                     )
                   : null,
               semanticCounterText: 'counter',
-              // focusedErrorBorder: OutlineInputBorder(
-              //   borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
-              //   borderSide: const BorderSide(
-              //     color: ColorPallete.whiteSmoke,
-              //   ),
-              // ),
-              // focusedBorder: OutlineInputBorder(
-              //   borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
-              //   borderSide: BorderSide(
-              //     color: isLightTheme ? lightModeColor ?? ColorPallete.backgroundColor : ColorPallete.whiteSmoke,
-              //   ),
-              // ),
-              // enabledBorder: OutlineInputBorder(
-              //   borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
-              //   borderSide: BorderSide(
-              //     width: 1 / 4,
-              //     color: isLightTheme ? lightModeColor ?? ColorPallete.backgroundColor : ColorPallete.persianFable,
-              //   ),
-              // ),
-              // errorBorder: OutlineInputBorder(
-              //   borderRadius: BorderRadius.circular(borderRadius ?? defaultBorderRadius),
-              //   borderSide: const BorderSide(
-              //     width: 1,
-              //     color: ColorPallete.parlourRed,
-              //   ),
-              // ),
-              // suffixIcon: obscureText
-              //     ? GestureDetector(
-              //         onTap: () => isObscured.value = !isObscured.value,
-              //         child: isObscured.value ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off),
-              //       )
-              //     : null,
               helper: helper,
             ),
             controller: controller,

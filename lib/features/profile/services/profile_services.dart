@@ -194,6 +194,9 @@ class ProfileServices {
             profileEntity.toMap(),
           )
           .eq('id', id);
+    } on AuthApiException catch (e) {
+      log('Error updating profile: ${e.message}');
+      rethrow;
     } on PostgrestException catch (e) {
       log('Error updating profile: ${e.message}');
       rethrow;
