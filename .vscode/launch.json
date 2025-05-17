@@ -11,7 +11,7 @@
       "flutterMode": "debug",
       "program": "lib/main.dart",
       "args": [
-        "--dart-define-from-file=dart-defines/development.json",
+        "--dart-define-from-file=dart-defines/development.json"
       ],
     },
     {

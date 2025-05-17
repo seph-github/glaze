@@ -5,8 +5,9 @@ import 'package:gap/gap.dart';
 import 'package:glaze/components/buttons/primary_button.dart';
 import 'package:glaze/components/inputs/input_field.dart';
 import 'package:glaze/components/snack_bar/custom_snack_bar.dart';
+import 'package:glaze/core/navigation/router.dart';
 import 'package:glaze/core/styles/color_pallete.dart';
-import 'package:glaze/features/auth/providers/auth_provider.dart';
+import 'package:glaze/features/auth/providers/auth_provider/auth_provider.dart';
 import 'package:glaze/features/templates/loading_layout.dart';
 import 'package:glaze/gen/assets.gen.dart';
 import 'package:glaze/utils/form_validators.dart';
@@ -39,7 +40,12 @@ class AuthForgetPasswordView extends HookConsumerWidget {
             context,
             title: 'Email Sent',
             content: 'A password reset email has been sent to the provided address. Kindly review your inbox, including the spam/junk folder, to complete the process.',
-            onPressed: () => context.pop(),
+            onPressed: () async {
+              await router.push(
+                const AuthConfirmTokenRoute().location,
+                extra: emailController.text.trim(),
+              );
+            },
           );
         }
         if (next.error != null) {

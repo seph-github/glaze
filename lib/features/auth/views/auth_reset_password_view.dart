@@ -13,7 +13,7 @@ import '../../../components/inputs/input_field.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../gen/assets.gen.dart';
 import '../../../utils/form_validators.dart';
-import '../providers/auth_provider.dart';
+import '../providers/auth_provider/auth_provider.dart';
 
 class AuthResetPasswordView extends HookConsumerWidget {
   const AuthResetPasswordView({

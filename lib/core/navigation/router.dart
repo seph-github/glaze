@@ -6,6 +6,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glaze/core/navigation/observer/route_observer_provider.dart';
+import 'package:glaze/features/auth/views/auth_confirm_token_view.dart';
 import 'package:glaze/features/auth/views/auth_forget_password_view.dart';
 import 'package:glaze/features/auth/views/auth_reset_password_view.dart';
 import 'package:glaze/features/challenges/models/challenge/challenge.dart';
@@ -29,8 +30,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:video_player/video_player.dart';
 
-import '../../features/auth/providers/auth_provider.dart';
-import '../../features/auth/providers/auth_state_change_provider.dart';
+import '../../features/auth/providers/auth_provider/auth_provider.dart';
+import '../../features/auth/providers/auth_state_change_provider/auth_state_change_provider.dart';
 import '../../features/auth/services/auth_services.dart';
 import '../../features/auth/views/auth_phone_sign_in.dart';
 import '../../features/auth/views/auth_verify_phone.dart';
@@ -67,6 +68,8 @@ GoRouter router(Ref ref) {
     final bool isOnBoardingCompleted = user?.userMetadata?['is_onboarding_complete'] ?? false;
     final destination = state.fullPath;
 
+    // log('User $user, is completed profile: $isCompletedProfile, is onboarding completed: $isOnBoardingCompleted');
+
     if (!hasSplashCompleted) {
       return const SplashRoute().location;
     }
@@ -80,6 +83,10 @@ GoRouter router(Ref ref) {
         return const AuthResetPasswordRoute().location;
       } else if (destination.contains('/auth/verify-phone')) {
         return const AuthVerifyPhoneRoute().location;
+      } else if (destination.contains('/auth/confirm-code')) {
+        final email = state.extra as String;
+        log('router email $email');
+        return const AuthConfirmTokenRoute().location;
       }
       return const AuthRoute().location;
     }
@@ -186,15 +193,6 @@ GoRouter router(Ref ref) {
       routes: [
         TypedGoRoute<ProfileRoute>(
           path: '/profile',
-          // routes: [
-          //   TypedGoRoute<GeneralSettingsRoute>(
-          //     path: 'settings',
-          //     routes: [
-          //       TypedGoRoute<PersonalDetailsRoute>(path: 'personal_details'),
-          //       TypedGoRoute<TermsAndConditionRoute>(path: 'terms_and_conditions'),
-          //     ],
-          // )
-          // ],
         ),
       ],
     ),
@@ -283,7 +281,6 @@ class SplashRoute extends GoRouteData {
   Widget build(BuildContext context, GoRouterState state) => const SplashView();
 }
 
-// @TypedGoRoute<HomeRoute>(path: '/')
 class HomeRoute extends GoRouteData {
   const HomeRoute();
 
@@ -300,6 +297,7 @@ class HomeRoute extends GoRouteData {
     TypedGoRoute<AuthVerifyPhoneRoute>(path: 'verify-phone'),
     TypedGoRoute<AuthForgetPasswordRoute>(path: 'forget-password'),
     TypedGoRoute<AuthResetPasswordRoute>(path: 'reset-password'),
+    TypedGoRoute<AuthConfirmTokenRoute>(path: 'confirm-code'),
   ],
 )
 class AuthRoute extends GoRouteData {
@@ -352,6 +350,16 @@ class AuthForgetPasswordRoute extends GoRouteData {
   }
 }
 
+class AuthConfirmTokenRoute extends GoRouteData {
+  const AuthConfirmTokenRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    final email = state.extra as String;
+    return AuthConfirmTokenView(email: email);
+  }
+}
+
 class AuthResetPasswordRoute extends GoRouteData {
   const AuthResetPasswordRoute();
 
@@ -387,7 +395,6 @@ class ShopRoute extends GoRouteData {
   }
 }
 
-// @TypedGoRoute<MomentsRoute>(path: '/moments')
 class MomentsRoute extends GoRouteData {
   const MomentsRoute();
 
@@ -400,7 +407,6 @@ class MomentsRoute extends GoRouteData {
   }
 }
 
-// @TypedGoRoute<ProfileRoute>(path: '/profile')
 class ProfileRoute extends GoRouteData {
   const ProfileRoute();
 

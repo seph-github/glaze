@@ -26,7 +26,30 @@ class LeaderboardTile extends StatelessWidget {
       case 3:
         return ColorPallete.bronze;
       default:
-        return ColorPallete.inputFilledColor;
+        return ColorPallete.borderColor.withValues(alpha: 0.6);
+    }
+  }
+
+  Widget leadingWidget(BuildContext context, int rank) {
+    switch (rank) {
+      case 1:
+      case 2:
+      case 3:
+        return SvgPicture.asset(
+          Assets.images.svg.trophyIcon.path,
+          height: 24.0,
+          colorFilter: ColorFilter.mode(
+            colorByRank(rank),
+            BlendMode.srcIn,
+          ),
+        );
+      default:
+        return Text(
+          rank.toString(),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+        );
     }
   }
 
@@ -35,9 +58,12 @@ class LeaderboardTile extends StatelessWidget {
     return ListTile(
       dense: true,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.0),
-      ),
-      tileColor: colorByRank(int.parse(rank)),
+          borderRadius: BorderRadius.circular(16.0),
+          side: BorderSide(
+            color: colorByRank(int.parse(rank)),
+            width: 2,
+          )),
+      tileColor: colorByRank(int.parse(rank)).withValues(alpha: 0.7),
       title: Text(
         username,
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -48,7 +74,7 @@ class LeaderboardTile extends StatelessWidget {
         'You need 30 more glaze to rank up.',
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.normal,
-              color: ColorPallete.hintTextColor,
+              color: Colors.white,
             ),
       ),
       leading: Container(
@@ -58,13 +84,14 @@ class LeaderboardTile extends StatelessWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: Theme.of(context).colorScheme.surface,
-          border: Border.all(color: Theme.of(context).colorScheme.inverseSurface, width: 1),
+          border: Border.all(
+            color: colorByRank(int.parse(rank)),
+            width: 1,
+          ),
         ),
-        child: Text(
-          rank,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+        child: leadingWidget(
+          context,
+          int.parse(rank),
         ),
       ),
       trailing: Container(

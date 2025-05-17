@@ -4,7 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:glaze/components/app_bar_with_back_button.dart';
 import 'package:glaze/components/buttons/primary_button.dart';
 import 'package:glaze/components/inputs/phone_number_input.dart';
-import 'package:glaze/features/auth/providers/auth_provider.dart';
+import 'package:glaze/features/auth/providers/auth_provider/auth_provider.dart';
 import 'package:glaze/features/templates/loading_layout.dart';
 import 'package:glaze/utils/form_validators.dart';
 import 'package:go_router/go_router.dart';

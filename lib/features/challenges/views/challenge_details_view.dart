@@ -240,23 +240,36 @@ class ChallengeDetailsView extends HookConsumerWidget {
             else
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 12.0),
-                height: 144,
-                child: ListView.separated(
-                  primary: false,
-                  physics: const NeverScrollableScrollPhysics(),
-                  separatorBuilder: (context, index) {
-                    return const Divider();
-                  },
-                  itemCount: state.entries.length < 5 ? state.entries.length : 5,
-                  itemBuilder: (context, index) {
-                    final rank = index + 1;
-                    return LeaderboardTile(
-                      useColor: useColor,
-                      username: '@${state.entries[index].profile.username}',
-                      rank: rank.toString(),
+                // height: 144,
+                child: Column(
+                  children: List.generate(5, (index) {
+                    final newIndex = index + 1;
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 4.0),
+                      child: LeaderboardTile(
+                        useColor: useColor,
+                        username: '@${state.entries[0].profile.username}',
+                        rank: newIndex.toString(),
+                      ),
                     );
-                  },
+                  }),
                 ),
+                // child: ListView.separated(
+                //   primary: false,
+                //   physics: const NeverScrollableScrollPhysics(),
+                //   separatorBuilder: (context, index) {
+                //     return const Divider();
+                //   },
+                //   itemCount: state.entries.length < 5 ? state.entries.length : 5,
+                //   itemBuilder: (context, index) {
+                //     final rank = index + 1;
+                //     return LeaderboardTile(
+                //       useColor: useColor,
+                //       username: '@${state.entries[index].profile.username}',
+                //       rank: rank.toString(),
+                //     );
+                //   },
+                // ),
               ),
             const Gap(12.0),
           ],
@@ -354,7 +367,7 @@ class ChallengeDetailsView extends HookConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(12.0),
         child: PrimaryButton(
-          label: 'Join',
+          label: 'Join Challenge',
           onPressed: () async => ChallengeSubmitEntryRoute(challengeId: challenge.id).push<void>(context),
         ),
       ),

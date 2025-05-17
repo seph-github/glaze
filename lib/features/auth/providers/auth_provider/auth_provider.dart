@@ -4,7 +4,7 @@ import 'package:glaze/features/profile/provider/user_profile_provider/user_profi
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../config/enum/profile_type.dart';
+import '../../../../config/enum/profile_type.dart';
 
 part 'auth_provider.freezed.dart';
 part 'auth_provider.g.dart';
@@ -154,6 +154,38 @@ class AuthNotifier extends _$AuthNotifier {
       state = state.copyWith(isLoading: false, otpSent: true);
     } catch (error) {
       setPhoneSentError(error as Exception);
+    }
+  }
+
+  Future<void> signInWithGoogle() async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      await AuthServices().signInWithGoogle();
+
+      state = state.copyWith(isLoading: false);
+    } catch (e) {
+      setError(e as Exception);
+    }
+  }
+
+  Future<void> signInWithApple() async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      await AuthServices().signInWithApple();
+
+      state = state.copyWith(isLoading: false);
+    } catch (e) {
+      setError(e as Exception);
+    }
+  }
+
+  Future<void> changeToken(String token) async {
+    state = state.copyWith(isLoading: true, error: null, otpSent: false);
+    try {
+      await AuthServices().changeCodeToSession(token);
+      state = state.copyWith(isLoading: false, otpSent: true);
+    } catch (e) {
+      setError(e as Exception);
     }
   }
 }

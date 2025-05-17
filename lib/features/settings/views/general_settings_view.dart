@@ -13,7 +13,7 @@ import '../../../core/navigation/router.dart';
 import '../../../core/services/secure_storage_services.dart';
 import '../../../gen/assets.gen.dart';
 import '../../../providers/initial_app_use/initial_app_use.dart';
-import '../../auth/providers/auth_provider.dart';
+import '../../auth/providers/auth_provider/auth_provider.dart';
 import '../widgets/settings_content_card.dart';
 
 class GeneralSettingsView extends HookConsumerWidget {

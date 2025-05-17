@@ -73,16 +73,28 @@
 	<dict>
 		<key>CFBundleURLSchemes</key>
 		<array>
-		<string>myapp</string>
+			<string>myapp</string>
 		</array>
 		<key>CFBundleURLName</key>
    		<string>$(appId)</string>
 	</dict>
+	<dict>
+        <key>CFBundleTypeRole</key>
+        <string>Editor</string>
+        <key>CFBundleURLSchemes</key>
+        <array>
+            <string>com.googleusercontent.apps.1069660819613-po4igme85hs4b8omnctesoivi5n2gh8p</string>
+        </array>
+    </dict>
 	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
 		<false/>
 	</dict>
+	<key>com.apple.developer.associated-domains</key>
+    <array>
+        <string>applinks:glaze-admin.netlify.app</string>
+    </array>
 </dict>
 </plist>

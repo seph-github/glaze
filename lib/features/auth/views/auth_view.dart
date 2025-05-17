@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
-import 'package:glaze/features/auth/providers/auth_provider.dart';
+import 'package:glaze/features/auth/providers/auth_provider/auth_provider.dart';
 import 'package:glaze/features/templates/loading_layout.dart';
 import 'package:glaze/utils/form_validators.dart';
 import 'package:glaze/utils/throw_error_exception_helper.dart';
@@ -232,11 +232,43 @@ class AuthView extends HookConsumerWidget {
                     backgroundColor: ColorPallete.primaryColor,
                   ),
                 const Gap(20),
+                PrimaryButton(
+                  icon: SvgPicture.asset(
+                    Assets.images.svg.googleIcon.path,
+                    height: 24.0,
+                  ),
+                  label: 'Sign in with Google',
+                  backgroundColor: Colors.white12,
+                  onPressed: () async {
+                    await ref.read(authNotifierProvider.notifier).signInWithGoogle();
+                  },
+                ),
+                const Gap(20),
+                PrimaryButton(
+                  icon: SvgPicture.asset(
+                    Assets.images.svg.appleIcon.path,
+                    height: 24.0,
+                    colorFilter: const ColorFilter.mode(
+                      Colors.white,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                  label: 'Sign in with Apple',
+                  backgroundColor: Colors.white12,
+                  onPressed: () async {
+                    await ref.read(authNotifierProvider.notifier).signInWithApple();
+                  },
+                ),
                 if (!hasCompletedInitialAppUse.value)
-                  PrimaryButton(
-                    onPressed: () => onAnonymousSignin(ref),
-                    label: 'Continue Anonymously',
-                    backgroundColor: Colors.white12,
+                  Column(
+                    children: [
+                      const Gap(20),
+                      PrimaryButton(
+                        onPressed: () => onAnonymousSignin(ref),
+                        label: 'Continue Anonymously',
+                        backgroundColor: Colors.white12,
+                      ),
+                    ],
                   ),
                 const Gap(20),
                 if (!isLogin.value)
