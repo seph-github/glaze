@@ -38,6 +38,15 @@ class AuthServices {
     }
   }
 
+  Map<String, dynamic> rawUserMetaData({String? username, ProfileType? profileType}) {
+    return {
+      'username': username,
+      'role': profileType?.value,
+      'is_onboarding_complete': false,
+      'is_profile_complete': false,
+    };
+  }
+
   Future<AuthResponse> signUp({
     String? email,
     String? phone,
@@ -50,12 +59,7 @@ class AuthServices {
         email: email,
         phone: phone,
         password: password,
-        data: {
-          'username': username,
-          'role': profileType?.value,
-          'is_onboarding_complete': false,
-          'is_profile_complete': false,
-        },
+        data: rawUserMetaData(profileType: profileType!),
         channel: OtpChannel.sms,
       );
 
@@ -73,6 +77,9 @@ class AuthServices {
     try {
       await _supabase.auth.signInWithOtp(
         phone: phone,
+        data: rawUserMetaData(
+          profileType: ProfileType.user,
+        ),
       );
     } on AuthApiException catch (_) {
       rethrow;
@@ -103,9 +110,9 @@ class AuthServices {
 
   Future<AuthResponse> anonymousSignin() async {
     try {
-      final AuthResponse authResponse = await _supabase.auth.signInAnonymously(data: {
-        'role': ProfileType.user.value,
-      });
+      final AuthResponse authResponse = await _supabase.auth.signInAnonymously(
+        data: rawUserMetaData(profileType: ProfileType.user),
+      );
 
       return authResponse;
     } on AuthApiException catch (_) {
@@ -187,7 +194,7 @@ class AuthServices {
 
       if (googleUser == null) {
         return throw Exception(
-          PlatformException(message: 'Sign in cancelled', code: '500'),
+          PlatformException(message: 'Sign in cancelled', code: '1000'),
         );
       }
 
@@ -200,10 +207,19 @@ class AuthServices {
       if (idToken == null) {
         throw 'No ID Token found.';
       }
-      return await _supabase.auth.signInWithIdToken(
+
+      return await _supabase.auth
+          .signInWithIdToken(
         provider: OAuthProvider.google,
         idToken: idToken,
         accessToken: accessToken,
+      )
+          .whenComplete(
+        () async {
+          await _supabase.auth.updateUser(
+            UserAttributes(data: rawUserMetaData(profileType: ProfileType.user)),
+          );
+        },
       );
     } catch (e) {
       log('google sign in error $e');
@@ -212,24 +228,36 @@ class AuthServices {
   }
 
   Future<AuthResponse> signInWithApple() async {
-    final rawNonce = _supabase.auth.generateRawNonce();
-    final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
-    final credential = await SignInWithApple.getAppleIDCredential(
-      scopes: [
-        AppleIDAuthorizationScopes.email,
-        AppleIDAuthorizationScopes.fullName,
-      ],
-      nonce: hashedNonce,
-    );
-    final idToken = credential.identityToken;
-    if (idToken == null) {
-      throw const AuthException('Could not find ID Token from generated credential.');
+    try {
+      final rawNonce = _supabase.auth.generateRawNonce();
+      final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: hashedNonce,
+      );
+      final idToken = credential.identityToken;
+      if (idToken == null) {
+        throw const AuthException('Could not find ID Token from generated credential.');
+      }
+      return _supabase.auth.signInWithIdToken(
+        provider: OAuthProvider.apple,
+        idToken: idToken,
+        nonce: rawNonce,
+        // )
+        //     .whenComplete(
+        //   () async {
+        //     await _supabase.auth.updateUser(
+        //       UserAttributes(data: rawUserMetaData(profileType: ProfileType.user), nonce: hashedNonce),
+        //     );
+        //   },
+      );
+    } catch (e) {
+      log('Apple sign in error $e');
+      rethrow;
     }
-    return _supabase.auth.signInWithIdToken(
-      provider: OAuthProvider.apple,
-      idToken: idToken,
-      nonce: rawNonce,
-    );
   }
 
   Future<void> changeCodeToSession(String token) async {
