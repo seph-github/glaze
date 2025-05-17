@@ -208,19 +208,48 @@ class AuthServices {
         throw 'No ID Token found.';
       }
 
-      return await _supabase.auth
+      final response = await _supabase.auth
           .signInWithIdToken(
         provider: OAuthProvider.google,
         idToken: idToken,
         accessToken: accessToken,
       )
-          .whenComplete(
-        () async {
+          .then((value) async {
+        if (!value.user!.userMetadata!.containsKey('is_onboarding_complete')) {
+          log('has no is onboarding');
+          await _supabase.auth.updateUser(
+            UserAttributes(data: {
+              'is_onboarding_complete': false
+            }),
+          );
+        }
+        if (!value.user!.userMetadata!.containsKey('is_profile_complete')) {
+          log('has no  profile complete');
+          await _supabase.auth.updateUser(
+            UserAttributes(data: {
+              'is_profile_complete': false
+            }),
+          );
+        }
+        if (!value.user!.userMetadata!.containsKey('role')) {
+          log('has no is role');
+          await _supabase.auth.updateUser(
+            UserAttributes(data: {
+              'role': ProfileType.user.value
+            }),
+          );
+        }
+        if (!value.user!.userMetadata!.containsKey('is_onboarding_complete') && !value.user!.userMetadata!.containsKey('is_profile_complete') && !value.user!.userMetadata!.containsKey('role')) {
+          log('has nothing');
           await _supabase.auth.updateUser(
             UserAttributes(data: rawUserMetaData(profileType: ProfileType.user)),
           );
-        },
-      );
+        }
+      });
+
+      log('google sign in response ${response.user}');
+
+      return response;
     } catch (e) {
       log('google sign in error $e');
       rethrow;
@@ -242,18 +271,48 @@ class AuthServices {
       if (idToken == null) {
         throw const AuthException('Could not find ID Token from generated credential.');
       }
-      return _supabase.auth.signInWithIdToken(
+      final response = await _supabase.auth
+          .signInWithIdToken(
         provider: OAuthProvider.apple,
         idToken: idToken,
         nonce: rawNonce,
-        // )
-        //     .whenComplete(
-        //   () async {
-        //     await _supabase.auth.updateUser(
-        //       UserAttributes(data: rawUserMetaData(profileType: ProfileType.user), nonce: hashedNonce),
-        //     );
-        //   },
-      );
+      )
+          .then((value) async {
+        if (!value.user!.userMetadata!.containsKey('is_onboarding_complete')) {
+          log('has no is onboarding');
+          await _supabase.auth.updateUser(
+            UserAttributes(data: {
+              'is_onboarding_complete': false
+            }),
+          );
+        }
+        if (!value.user!.userMetadata!.containsKey('is_profile_complete')) {
+          log('has no  profile complete');
+          await _supabase.auth.updateUser(
+            UserAttributes(data: {
+              'is_profile_complete': false
+            }),
+          );
+        }
+        if (!value.user!.userMetadata!.containsKey('role')) {
+          log('has no is role');
+          await _supabase.auth.updateUser(
+            UserAttributes(data: {
+              'role': ProfileType.user.value
+            }),
+          );
+        }
+        if (!value.user!.userMetadata!.containsKey('is_onboarding_complete') && !value.user!.userMetadata!.containsKey('is_profile_complete') && !value.user!.userMetadata!.containsKey('role')) {
+          log('has nothing');
+          await _supabase.auth.updateUser(
+            UserAttributes(data: rawUserMetaData(profileType: ProfileType.user)),
+          );
+        }
+      });
+
+      log('Apple sign in response ${response.user}');
+
+      return response;
     } catch (e) {
       log('Apple sign in error $e');
       rethrow;

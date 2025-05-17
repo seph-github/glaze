@@ -68,7 +68,7 @@ GoRouter router(Ref ref) {
     final bool isOnBoardingCompleted = user?.userMetadata?['is_onboarding_complete'] ?? false;
     final destination = state.fullPath;
 
-    // log('User $user, is completed profile: $isCompletedProfile, is onboarding completed: $isOnBoardingCompleted');
+    log('User $user, is completed profile: $isCompletedProfile, is onboarding completed: $isOnBoardingCompleted');
 
     if (!hasSplashCompleted) {
       return const SplashRoute().location;

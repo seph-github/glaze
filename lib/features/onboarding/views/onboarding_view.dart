@@ -26,7 +26,7 @@ class OnboardingView extends HookWidget {
     return Consumer(
       builder: (context, ref, _) {
         final state = ref.watch(onboardingDataProvider);
-        final index = ref.watch(onboardingDataNotifierProvider) + 1;
+        final index = ref.watch(onboardingDataNotifierProvider);
 
         Future<void> handleContinue({bool? skip = false}) async {
           final User? user = AuthServices().currentUser;
