@@ -4,12 +4,15 @@ import 'dart:math' hide log;
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart';
+import 'package:glaze/features/profile/models/profile/profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../../config/enum/profile_type.dart';
+
+part 'auth_services_extension.dart';
 
 class AuthServices {
   final SupabaseClient _supabase = Supabase.instance.client;
@@ -210,44 +213,11 @@ class AuthServices {
 
       final response = await _supabase.auth
           .signInWithIdToken(
-        provider: OAuthProvider.google,
-        idToken: idToken,
-        accessToken: accessToken,
-      )
-          .then((value) async {
-        if (!value.user!.userMetadata!.containsKey('is_onboarding_complete')) {
-          log('has no is onboarding');
-          await _supabase.auth.updateUser(
-            UserAttributes(data: {
-              'is_onboarding_complete': false
-            }),
-          );
-        }
-        if (!value.user!.userMetadata!.containsKey('is_profile_complete')) {
-          log('has no  profile complete');
-          await _supabase.auth.updateUser(
-            UserAttributes(data: {
-              'is_profile_complete': false
-            }),
-          );
-        }
-        if (!value.user!.userMetadata!.containsKey('role')) {
-          log('has no is role');
-          await _supabase.auth.updateUser(
-            UserAttributes(data: {
-              'role': ProfileType.user.value
-            }),
-          );
-        }
-        if (!value.user!.userMetadata!.containsKey('is_onboarding_complete') && !value.user!.userMetadata!.containsKey('is_profile_complete') && !value.user!.userMetadata!.containsKey('role')) {
-          log('has nothing');
-          await _supabase.auth.updateUser(
-            UserAttributes(data: rawUserMetaData(profileType: ProfileType.user)),
-          );
-        }
-      });
-
-      log('google sign in response ${response.user}');
+            provider: OAuthProvider.google,
+            idToken: idToken,
+            accessToken: accessToken,
+          )
+          .then((value) async => _checkUserProfile(value));
 
       return response;
     } catch (e) {
@@ -273,44 +243,11 @@ class AuthServices {
       }
       final response = await _supabase.auth
           .signInWithIdToken(
-        provider: OAuthProvider.apple,
-        idToken: idToken,
-        nonce: rawNonce,
-      )
-          .then((value) async {
-        if (!value.user!.userMetadata!.containsKey('is_onboarding_complete')) {
-          log('has no is onboarding');
-          await _supabase.auth.updateUser(
-            UserAttributes(data: {
-              'is_onboarding_complete': false
-            }),
-          );
-        }
-        if (!value.user!.userMetadata!.containsKey('is_profile_complete')) {
-          log('has no  profile complete');
-          await _supabase.auth.updateUser(
-            UserAttributes(data: {
-              'is_profile_complete': false
-            }),
-          );
-        }
-        if (!value.user!.userMetadata!.containsKey('role')) {
-          log('has no is role');
-          await _supabase.auth.updateUser(
-            UserAttributes(data: {
-              'role': ProfileType.user.value
-            }),
-          );
-        }
-        if (!value.user!.userMetadata!.containsKey('is_onboarding_complete') && !value.user!.userMetadata!.containsKey('is_profile_complete') && !value.user!.userMetadata!.containsKey('role')) {
-          log('has nothing');
-          await _supabase.auth.updateUser(
-            UserAttributes(data: rawUserMetaData(profileType: ProfileType.user)),
-          );
-        }
-      });
-
-      log('Apple sign in response ${response.user}');
+            provider: OAuthProvider.apple,
+            idToken: idToken,
+            nonce: rawNonce,
+          )
+          .then((value) async => _checkUserProfile(value));
 
       return response;
     } catch (e) {
