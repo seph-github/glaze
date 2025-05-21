@@ -6,8 +6,10 @@ environment:
   sdk: ^3.5.2
 description: A new Flutter project.
 dependencies:
+  audioplayers: ^6.4.0
   cached_network_image: ^3.4.1
   camera: ^0.11.1
+  camerawesome: ^2.4.0
   carousel_slider: ^5.0.0
   connectivity_plus: ^6.1.4
   crypto: ^3.0.6
@@ -29,11 +31,13 @@ dependencies:
   gap: ^3.0.1
   glass_kit: ^4.0.1
   go_router: ^14.8.1
+  google_places_autocomplete_text_field: ^1.1.0
   google_sign_in: ^6.3.0
   hooks_riverpod: ^2.6.1
   image_picker: ^1.1.2
   intl: any
   json_annotation: ^4.9.0
+  just_audio: ^0.10.3
   lottie: ^3.3.1
   lucide_icons: ^0.257.0
   lucide_icons_flutter: ^2.0.6
@@ -77,6 +81,7 @@ flutter:
     - assets/images/gif/
     - assets/lotties/
     - assets/others/
+    - assets/audios/
   fonts:
     - family: Hit and Run
       fonts:

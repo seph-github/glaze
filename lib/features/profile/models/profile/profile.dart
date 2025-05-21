@@ -1,6 +1,7 @@
 // ignore_for_file: invalid_annotation_target
 
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:glaze/features/profile/models/feature/feature.dart';
 
 import '../../../home/models/video_content/video_content.dart';
 
@@ -34,6 +35,7 @@ class Profile with _$Profile {
     @Default([]) List<Interact> followers,
     @Default([]) List<Interact> following,
     @Default([]) List<Glaze> glazes,
+    @Default([]) List<Feature>? userFeatures,
   }) = _Profile;
 
   factory Profile.fromJson(Map<String, dynamic> json) => _$ProfileFromJson(json);

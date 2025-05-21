@@ -15,6 +15,10 @@ abstract class UploadMomentFormState with _$UploadMomentFormState {
     @Default(null) String? filePath,
     @Default(null) File? file,
     @Default(null) File? thumbnail,
+    @Default(null) String? location,
+    @Default([]) List<String>? tags,
+    @Default(null) String? latitude,
+    @Default(null) String? longitude,
   }) = _UploadMomentFormState;
 
   const UploadMomentFormState._();
@@ -26,6 +30,9 @@ class UploadMomentForm extends _$UploadMomentForm {
   late final captionController = TextEditingController();
   late final categoryController = TextEditingController();
   late final fileController = TextEditingController();
+  late final locationController = TextEditingController();
+  late final tagsController = TextEditingController();
+  List<String>? tags;
   File? file;
   File? thumbnail;
 
@@ -36,6 +43,8 @@ class UploadMomentForm extends _$UploadMomentForm {
       caption: '',
       category: '',
       filePath: '',
+      location: '',
+      tags: [],
     );
   }
 
@@ -45,8 +54,10 @@ class UploadMomentForm extends _$UploadMomentForm {
       caption: captionController.text.trim(),
       category: categoryController.text.trim(),
       filePath: fileController.text.trim(),
+      location: locationController.text.trim(),
       file: file,
       thumbnail: thumbnail,
+      tags: tags,
     );
   }
 
@@ -55,8 +66,11 @@ class UploadMomentForm extends _$UploadMomentForm {
     captionController.clear();
     categoryController.clear();
     fileController.clear();
+    locationController.clear();
     file = null;
     thumbnail = null;
+    tags = null;
+    tagsController.dispose();
     syncControllersToState();
   }
 
@@ -78,11 +92,18 @@ class UploadMomentForm extends _$UploadMomentForm {
     syncControllersToState();
   }
 
+  void setTags() {
+    tags = tagsController.text.trim().split(',').map((tag) => tag.trim()).where((tag) => tag.isNotEmpty).toList();
+
+    syncControllersToState();
+  }
+
   void onDispose() {
     titleController.dispose();
     captionController.dispose();
     categoryController.dispose();
     fileController.dispose();
+    locationController.dispose();
   }
 
   bool get hasChanges {

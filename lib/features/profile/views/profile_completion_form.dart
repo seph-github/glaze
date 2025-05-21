@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -76,7 +75,7 @@ class ProfileCompletionForm extends HookConsumerWidget {
             title: 'Success',
             content: next.response as String,
             onPressed: () async {
-              ref.invalidate(profileInterestsNotifierProvider);
+              ref.invalidate(profileInterestsListNotifierProvider);
               formNotifier.clearForm();
               router.go(const HomeRoute().location);
             },
@@ -106,8 +105,6 @@ class ProfileCompletionForm extends HookConsumerWidget {
         formKey.currentState?.save();
 
         final state = ref.watch(profileFormNotifierProvider);
-
-        log('State form profile $state');
 
         await ref.read(profileNotifierProvider.notifier).updateProfile(
               id: userId,
@@ -213,8 +210,11 @@ class ProfileCompletionForm extends HookConsumerWidget {
                       categories: categories.value,
                       selectedInterests: ref.watch(profileFormNotifierProvider).interestList,
                       onSelected: (value) {
-                        final interests = ref.read(profileInterestsNotifierProvider.notifier).addToInterestList(value);
+                        ref.read(profileInterestsListNotifierProvider.notifier).addToInterestList(value);
+                        final interests = ref.watch(profileInterestsListNotifierProvider);
+
                         formNotifier.interestList = interests;
+
                         formNotifier.syncControllerToState();
                       },
                     );

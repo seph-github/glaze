@@ -92,8 +92,7 @@ class HomeInteractiveCard extends HookConsumerWidget {
                   await controller?.pause();
 
                   if (context.mounted) {
-                    await ViewUserProfileRoute(id: userId, controller)
-                        .push<void>(context);
+                    await ViewUserProfileRoute(id: userId, $extra: controller).push<void>(context);
                   }
                 },
                 child: Row(
@@ -114,8 +113,7 @@ class HomeInteractiveCard extends HookConsumerWidget {
                           fit: BoxFit.cover,
                         ),
                       ),
-                      errorWidget: (context, url, error) =>
-                          const Icon(Icons.account_circle_outlined),
+                      errorWidget: (context, url, error) => const Icon(Icons.account_circle_outlined),
                     ),
                     const Gap(8),
                     Text(

@@ -9,6 +9,8 @@ import 'package:glaze/core/navigation/observer/route_observer_provider.dart';
 import 'package:glaze/features/auth/views/auth_confirm_token_view.dart';
 import 'package:glaze/features/auth/views/auth_forget_password_view.dart';
 import 'package:glaze/features/auth/views/auth_reset_password_view.dart';
+import 'package:glaze/features/camera/view/camera_content_form.dart';
+import 'package:glaze/features/camera/view/camera_view.dart';
 import 'package:glaze/features/challenges/models/challenge/challenge.dart';
 import 'package:glaze/features/challenges/models/challenge_entry/challenge_entry.dart';
 import 'package:glaze/features/challenges/views/challenge_details_view.dart';
@@ -35,6 +37,7 @@ import '../../features/auth/providers/auth_state_change_provider/auth_state_chan
 import '../../features/auth/services/auth_services.dart';
 import '../../features/auth/views/auth_phone_sign_in.dart';
 import '../../features/auth/views/auth_verify_phone.dart';
+import '../../features/camera/view/camera_video_preview_view.dart';
 import '../../features/home/models/video_content/video_content.dart';
 import '../../features/home/views/video_feed_view.dart';
 import '../../features/moments/views/moments_view.dart';
@@ -67,8 +70,6 @@ GoRouter router(Ref ref) {
     final bool isCompletedProfile = user?.userMetadata?['is_profile_complete'] ?? false;
     final bool isOnBoardingCompleted = user?.userMetadata?['is_onboarding_complete'] ?? false;
     final destination = state.fullPath;
-
-    log('User $user, is completed profile: $isCompletedProfile, is onboarding completed: $isOnBoardingCompleted');
 
     if (!hasSplashCompleted) {
       return const SplashRoute().location;
@@ -418,7 +419,7 @@ class ProfileRoute extends GoRouteData {
 
 @TypedGoRoute<ViewUserProfileRoute>(path: '/view-user-profile/:id')
 class ViewUserProfileRoute extends GoRouteData {
-  const ViewUserProfileRoute(this.$extra, {required this.id});
+  const ViewUserProfileRoute({this.$extra, required this.id});
   final VideoPlayerController? $extra;
   final String id;
 
@@ -607,5 +608,44 @@ class ChallengeSubmitEntryRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return ChallengeSubmitEntry(challengeId: challengeId);
+  }
+}
+
+@TypedGoRoute<CameraRoute>(
+  path: '/camera-view',
+  routes: [
+    TypedGoRoute<CameraVideoPreviewRoute>(path: 'video-preview'),
+    TypedGoRoute<CameraContentFormRoute>(path: 'content-form')
+  ],
+)
+class CameraRoute extends GoRouteData {
+  const CameraRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const CameraView();
+  }
+}
+
+// @TypedGoRoute<CameraRoute>(path: '/camera-view')
+class CameraVideoPreviewRoute extends GoRouteData {
+  const CameraVideoPreviewRoute(this.filePath);
+
+  final String filePath;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return CameraVideoPreviewView(
+      filePath: filePath,
+    );
+  }
+}
+
+class CameraContentFormRoute extends GoRouteData {
+  const CameraContentFormRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const CameraContentForm();
   }
 }

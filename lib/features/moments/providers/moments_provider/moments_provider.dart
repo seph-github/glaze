@@ -139,12 +139,13 @@ class MomentsNotifier extends _$MomentsNotifier {
       final User? user = AuthServices().currentUser;
 
       final response = await VideoContentServices().uploadVideoContent(
-        file: formState.file!,
-        thumbnail: formState.thumbnail!,
+        form: formState,
+        // file: formState.file!,
+        // thumbnail: formState.thumbnail!,
         userId: user!.id,
-        title: formState.title!,
-        caption: formState.caption!,
-        category: formState.category!,
+        // title: formState.title!,
+        // caption: formState.caption!,
+        // category: formState.category!,
       );
 
       await ref.read(profileNotifierProvider.notifier).fetchProfile(user.id);

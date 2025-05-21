@@ -22,7 +22,7 @@ class GlazeModal {
         return StatefulBuilder(
           builder: (context, setState) => Consumer(
             builder: (context, ref, child) {
-              final selectedInterests = ref.watch(profileInterestsNotifierProvider);
+              final selectedInterests = ref.watch(profileInterestsListNotifierProvider);
 
               return ListView.builder(
                 shrinkWrap: true,
@@ -40,7 +40,7 @@ class GlazeModal {
                     selected: isSelected,
                     selectedTileColor: ColorPallete.inputFilledColor,
                     onChanged: (value) {
-                      ref.read(profileInterestsNotifierProvider.notifier).addToInterestList(interestName);
+                      ref.read(profileInterestsListNotifierProvider.notifier).addToInterestList(interestName);
                       setState(() {});
                     },
                   );
@@ -155,6 +155,60 @@ class GlazeModal {
                     ),
                   ),
                 ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  static Future<void> showCustomModalPopup(BuildContext context, Widget? child) async {
+    return showModalBottomSheet(
+      backgroundColor: Colors.transparent,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(16.0),
+          topRight: Radius.circular(16.0),
+        ),
+      ),
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) {
+        final size = MediaQuery.of(ctx).size;
+
+        return SafeArea(
+          child: DraggableScrollableSheet(
+            initialChildSize: 0.9,
+            maxChildSize: 1,
+            minChildSize: 0.4,
+            builder: (context, controller) => Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
+                ),
+              ),
+              child: SizedBox(
+                height: size.height - kToolbarHeight,
+                width: double.infinity,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(height: 12),
+                    Container(
+                      width: 40,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.inverseSurface,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    if (child != null) child,
+                  ],
+                ),
               ),
             ),
           ),

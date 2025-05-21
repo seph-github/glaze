@@ -39,7 +39,7 @@ class SearchField extends StatelessWidget {
                     fit: BoxFit.scaleDown,
                     colorFilter: ColorFilter.mode(theme.colorScheme.onSurface.withValues(alpha: 0.6), BlendMode.srcIn),
                   ),
-                  suffix: controller?.text != null
+                  suffix: controller != null
                       ? GestureDetector(
                           onTap: () {
                             controller?.clear();

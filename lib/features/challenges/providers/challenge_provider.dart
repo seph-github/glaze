@@ -61,12 +61,13 @@ class ChallengeNotifier extends _$ChallengeNotifier {
 
       final User? user = AuthServices().currentUser;
       final response = await VideoContentServices().uploadVideoContent(
-        file: formState.file!,
+        form: formState,
+        // file: formState.file!,
         userId: user!.id,
-        title: formState.title!,
-        caption: formState.caption!,
-        category: formState.category!,
-        thumbnail: formState.thumbnail!,
+        // title: formState.title!,
+        // caption: formState.caption!,
+        // category: formState.category!,
+        // thumbnail: formState.thumbnail!,
       );
 
       if (response is Exception) return;

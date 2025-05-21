@@ -114,7 +114,7 @@ class ProfileEditForm extends HookConsumerWidget {
             content: 'Your Profile Has Been Updated',
             onPressed: () async {
               ref.invalidate(imageState);
-              ref.invalidate(profileInterestsNotifierProvider);
+              ref.invalidate(profileInterestsListNotifierProvider);
 
               router.pop();
             },
@@ -156,7 +156,7 @@ class ProfileEditForm extends HookConsumerWidget {
         onBackButtonPressed: () {
           formKey.currentState?.reset();
           ref.invalidate(imageState);
-          ref.invalidate(profileInterestsNotifierProvider);
+          ref.invalidate(profileInterestsListNotifierProvider);
           router.pop();
         },
         title: const Text('Edit Profile'),
@@ -310,7 +310,7 @@ class ProfileEditForm extends HookConsumerWidget {
                   categories: categories.value,
                   selectedInterests: updatedSelectedInterests.value,
                   onSelected: (value) {
-                    updatedSelectedInterests.value = ref.read(profileInterestsNotifierProvider.notifier).updateInterestsList(updatedSelectedInterests.value, value);
+                    updatedSelectedInterests.value = ref.read(profileInterestsListNotifierProvider.notifier).updateInterestsList(updatedSelectedInterests.value, value);
                     checkForChanges();
                   },
                 ),

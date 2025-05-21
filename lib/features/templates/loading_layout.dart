@@ -29,7 +29,7 @@ class LoadingLayout extends HookWidget {
     return Scaffold(
       backgroundColor: backgroundColor ?? Theme.of(context).scaffoldBackgroundColor,
       appBar: appBar,
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [

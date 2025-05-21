@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:glaze/features/auth/services/auth_services.dart';
 import 'package:glaze/features/home/entity/video_content_entity.dart';
 import 'package:glaze/features/home/models/video_content/video_content.dart';
+import 'package:glaze/features/moments/providers/upload_moments_form_provider/upload_moments_form_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/services/storage_services.dart';
@@ -16,9 +17,7 @@ class VideoContentServices {
 
       final rawList = response as List<dynamic>;
 
-      final value = rawList
-          .map((video) => VideoContent.fromJson(video as Map<String, dynamic>))
-          .toList();
+      final value = rawList.map((video) => VideoContent.fromJson(video as Map<String, dynamic>)).toList();
 
       value.sort((a, b) => b.createdAt!.compareTo(a.createdAt!));
       return value;
@@ -41,9 +40,7 @@ class VideoContentServices {
 
       final rawList = response as List<dynamic>;
 
-      final value = rawList
-          .map((video) => VideoContent.fromJson(video as Map<String, dynamic>))
-          .toList();
+      final value = rawList.map((video) => VideoContent.fromJson(video as Map<String, dynamic>)).toList();
 
       value.sort((a, b) => b.createdAt!.compareTo(a.createdAt!));
       return value;
@@ -53,35 +50,35 @@ class VideoContentServices {
   }
 
   Future<VideoContent> uploadVideoContent({
-    required File file,
+    required UploadMomentFormState form,
     required String userId,
-    required String title,
-    required String caption,
-    required String category,
-    required File thumbnail,
   }) async {
     try {
       final videoUrl = await StorageServices().upload(
         id: userId,
         bucketName: 'videos',
-        file: file,
-        fileName: title,
+        file: form.file as File,
+        fileName: form.title as String,
       );
 
       final thumbnailUrl = await StorageServices().upload(
         id: userId,
         bucketName: 'thumbnails',
-        file: thumbnail,
-        fileName: title,
+        file: form.thumbnail as File,
+        fileName: form.title as String,
       );
 
       final entity = VideoContentEntity(
         userId: userId,
-        title: title,
-        caption: caption,
-        category: category,
+        title: form.title as String,
+        caption: form.caption as String,
+        category: form.category as String,
         videoUrl: videoUrl,
         thumbnailUrl: thumbnailUrl,
+        location: form.location,
+        latitude: form.latitude,
+        longitude: form.longitude,
+        tags: form.tags,
       );
 
       final response = await _supabaseClient

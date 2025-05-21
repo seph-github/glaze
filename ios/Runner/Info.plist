@@ -1,100 +1,104 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>$(DEVELOPMENT_LANGUAGE)</string>
-	<key>CFBundleDisplayName</key>
-	<string>$(appName)</string>
-	<key>CFBundleExecutable</key>
-	<string>$(EXECUTABLE_NAME)</string>
-	<key>CFBundleIdentifier</key>
-	<string>$(appId)</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleName</key>
-	<string>$(appName)</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleShortVersionString</key>
-	<string>$(FLUTTER_BUILD_NAME)</string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
-	<key>CFBundleVersion</key>
-	<string>$(FLUTTER_BUILD_NUMBER)</string>
-	<key>FLTEnableImpeller</key>
-	<true/>
-	<key>FLTEnableWideGamut</key>
-	<true/>
-	<key>FLTUseFlutterMetalLayer</key>
-	<true/>
-	<key>LSRequiresIPhoneOS</key>
-	<true/>
-	<key>LSSupportsOpeningDocumentsInPlace</key>
-	<true/>
-	<key>NSAppTransportSecurity</key>
 	<dict>
-		<key>NSAllowsArbitraryLoads</key>
+		<key>CADisableMinimumFrameDurationOnPhone</key>
 		<true/>
-	</dict>
-	<key>NSCameraUsageDescription</key>
-	<string>We need access to your camera to let you capture photos and videos directly within the app.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>We use your microphone for audio recording while capturing videos.</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>We need permission to save captured videos and photos to your photo library.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>We need access to your photo library so you can select and upload media from your device.</string>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
-	<key>UIFileSharingEnabled</key>
-	<true/>
-	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen.storyboard</string>
-	<key>UIMainStoryboardFile</key>
-	<string>Main</string>
-	<key>UISupportedInterfaceOrientations</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-	</array>
-	<key>UISupportedInterfaceOrientations~ipad</key>
-	<array>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-	</array>
-	<key>FlutterDeepLinkingEnabled</key>
-	<true/>
-	<key>CFBundleURLTypes</key>
-	<array>
-	<dict>
-		<key>CFBundleURLSchemes</key>
+		<key>CFBundleDevelopmentRegion</key>
+		<string>$(DEVELOPMENT_LANGUAGE)</string>
+		<key>CFBundleDisplayName</key>
+		<string>$(appName)</string>
+		<key>CFBundleExecutable</key>
+		<string>$(EXECUTABLE_NAME)</string>
+		<key>CFBundleIdentifier</key>
+		<string>$(appId)</string>
+		<key>CFBundleInfoDictionaryVersion</key>
+		<string>6.0</string>
+		<key>CFBundleName</key>
+		<string>$(appName)</string>
+		<key>CFBundlePackageType</key>
+		<string>APPL</string>
+		<key>CFBundleShortVersionString</key>
+		<string>$(FLUTTER_BUILD_NAME)</string>
+		<key>CFBundleSignature</key>
+		<string>????</string>
+		<key>CFBundleVersion</key>
+		<string>$(FLUTTER_BUILD_NUMBER)</string>
+		<key>FLTEnableImpeller</key>
+		<true/>
+		<key>FLTEnableWideGamut</key>
+		<true/>
+		<key>FLTUseFlutterMetalLayer</key>
+		<true/>
+		<key>LSRequiresIPhoneOS</key>
+		<true/>
+		<key>LSSupportsOpeningDocumentsInPlace</key>
+		<true/>
+		<key>NSAppTransportSecurity</key>
+		<dict>
+			<key>NSAllowsArbitraryLoads</key>
+			<true/>
+		</dict>
+		<key>NSCameraUsageDescription</key>
+		<string>We need access to your camera to let you capture photos and videos directly within the app.</string>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>We use your microphone for audio recording while capturing videos.</string>
+		<key>NSPhotoLibraryAddUsageDescription</key>
+		<string>We need permission to save captured videos and photos to your photo library.</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>We need access to your photo library so you can select and upload media from your device.</string>
+		<key>UIApplicationSupportsIndirectInputEvents</key>
+		<true/>
+		<key>UIFileSharingEnabled</key>
+		<true/>
+		<key>UILaunchStoryboardName</key>
+		<string>LaunchScreen.storyboard</string>
+		<key>UIMainStoryboardFile</key>
+		<string>Main</string>
+		<key>UISupportedInterfaceOrientations</key>
 		<array>
-			<string>myapp</string>
+			<string>UIInterfaceOrientationPortrait</string>
 		</array>
-		<key>CFBundleURLName</key>
-   		<string>$(appId)</string>
+		<key>UISupportedInterfaceOrientations~ipad</key>
+		<array>
+			<string>UIInterfaceOrientationLandscapeLeft</string>
+			<string>UIInterfaceOrientationLandscapeRight</string>
+			<string>UIInterfaceOrientationPortrait</string>
+			<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		</array>
+		<key>FlutterDeepLinkingEnabled</key>
+		<true/>
+		<key>CFBundleURLTypes</key>
+		<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>myapp</string>
+			</array>
+			<key>CFBundleURLName</key>
+			<string>$(appId)</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.1069660819613-po4igme85hs4b8omnctesoivi5n2gh8p</string>
+			</array>
+		</dict>
+		</array>
+		<key>UIApplicationSceneManifest</key>
+		<dict>
+			<key>UIApplicationSupportsMultipleScenes</key>
+			<false/>
+		</dict>
+		<key>com.apple.developer.associated-domains</key>
+		<array>
+			<string>applinks:glaze-admin.netlify.app</string>
+		</array>
+		<key>UIBackgroundModes</key>
+		<array>
+		<string>audio</string>
+		</array>
 	</dict>
-	<dict>
-        <key>CFBundleTypeRole</key>
-        <string>Editor</string>
-        <key>CFBundleURLSchemes</key>
-        <array>
-            <string>com.googleusercontent.apps.1069660819613-po4igme85hs4b8omnctesoivi5n2gh8p</string>
-        </array>
-    </dict>
-	</array>
-	<key>UIApplicationSceneManifest</key>
-	<dict>
-		<key>UIApplicationSupportsMultipleScenes</key>
-		<false/>
-	</dict>
-	<key>com.apple.developer.associated-domains</key>
-    <array>
-        <string>applinks:glaze-admin.netlify.app</string>
-    </array>
-</dict>
 </plist>

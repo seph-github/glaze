@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -41,6 +42,8 @@ class VideoFeedNotifier extends _$VideoFeedNotifier {
   int offset = 0;
 
   Future<void> loadVideos() async {
+    log('calling loadVideos');
+    offset = 0;
     state = state.copyWith(isLoading: true);
     try {
       final videos = await _videoServices.loadVideos(offset);
@@ -59,6 +62,7 @@ class VideoFeedNotifier extends _$VideoFeedNotifier {
   }
 
   Future<void> refreshVideos() async {
+    log('calling refreshVideos');
     offset = 0;
     state = state.copyWith(isLoading: true, error: null);
 
@@ -88,6 +92,7 @@ class VideoFeedNotifier extends _$VideoFeedNotifier {
   }
 
   Future<void> loadMoreVideos() async {
+    log('calling loadMoreVideos');
     if (state.isPaginating || !state.hasMoreVideos) return;
     state = state.copyWith(isPaginating: true);
 

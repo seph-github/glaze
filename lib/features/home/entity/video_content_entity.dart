@@ -8,6 +8,10 @@ class VideoContentEntity {
   final int? glazesCount;
   final String? status;
   final DateTime? createdAt;
+  final String? location;
+  final String? latitude;
+  final String? longitude;
+  final List<String>? tags;
 
   VideoContentEntity({
     required this.userId,
@@ -19,6 +23,10 @@ class VideoContentEntity {
     this.glazesCount,
     this.status,
     this.createdAt,
+    this.location,
+    this.latitude,
+    this.longitude,
+    this.tags,
   });
 
   Map<String, dynamic> toMap() {
@@ -32,6 +40,10 @@ class VideoContentEntity {
       'glazes_count': glazesCount,
       'status': status,
       'created_at': createdAt?.toIso8601String(),
+      'location': location,
+      'latitude': latitude,
+      'longitude': longitude,
+      'tags': tags,
     }..removeWhere((key, value) => value == null);
   }
 }
