@@ -27,7 +27,8 @@ class LoadingLayout extends HookWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor ?? Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor:
+          backgroundColor ?? Theme.of(context).scaffoldBackgroundColor,
       appBar: appBar,
       resizeToAvoidBottomInset: true,
       extendBodyBehindAppBar: true,

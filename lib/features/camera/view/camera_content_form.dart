@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +6,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/components/app_bar_with_back_button.dart';
-import 'package:glaze/components/buttons/focus_button.dart';
 import 'package:glaze/components/modals/glaze_modals.dart';
 import 'package:glaze/features/camera/provider/content_picker_provider.dart';
 import 'package:glaze/features/category/provider/category_provider.dart';
@@ -26,10 +24,10 @@ import 'dart:io';
 import '../../../components/buttons/primary_button.dart';
 import '../../../components/dialogs/dialogs.dart';
 import '../../../components/inputs/input_field.dart';
-import '../../../components/morphism_widget.dart';
 import '../../../components/snack_bar/custom_snack_bar.dart';
 import '../../../core/styles/color_pallete.dart';
 import '../../../gen/assets.gen.dart';
+import '../../../utils/check_video_duration.dart';
 
 const googleApiKey = String.fromEnvironment('googleApiKey', defaultValue: '');
 
@@ -45,21 +43,19 @@ class CameraContentForm extends HookConsumerWidget {
     final formNotifier = ref.read(uploadMomentFormProvider.notifier);
     final router = GoRouter.of(context);
     final formKey = GlobalKey<FormState>();
-    final Size(
-      :width,
-      :height
-    ) = MediaQuery.sizeOf(context);
+    // final Size(:width, :height) = MediaQuery.sizeOf(context);
 
     final thumbnailFuture = useMemoized(
       () async {
         final videoFile = File(fileState.video?.path ?? '');
-        final duration = await _getVideoDuration(videoFile);
+        final duration = await getVideoDuration(videoFile);
 
         if (duration.inSeconds > 15 && context.mounted) {
           await Dialogs.createContentDialog(
             context,
             title: 'Error',
-            content: 'Your video exceeds the maximum allowed duration. Please subscribe or purchase a plan to upload longer videos.',
+            content:
+                'Your video exceeds the maximum allowed duration. Please subscribe or purchase a plan to upload longer videos.',
             onPressed: () => context.pop(),
           );
           throw Exception('Video too long! Max 15 seconds allowed.');
@@ -67,9 +63,7 @@ class CameraContentForm extends HookConsumerWidget {
           return await getVideoThumbnail(File(fileState.video?.path ?? ''));
         }
       },
-      [
-        fileState.video
-      ],
+      [fileState.video],
     );
 
     useEffect(
@@ -114,7 +108,9 @@ class CameraContentForm extends HookConsumerWidget {
       contentPickerNotifierProvider,
       (prev, next) {
         if (next.video != null) {
-          ref.read(uploadMomentFormProvider.notifier).setFile(File(next.video!.path));
+          ref
+              .read(uploadMomentFormProvider.notifier)
+              .setFile(File(next.video!.path));
         }
       },
     );
@@ -135,7 +131,8 @@ class CameraContentForm extends HookConsumerWidget {
             return AlertDialog.adaptive(
               title: const Text('Error'),
               content: const Center(
-                child: Text('The moment is empty please choose a video from gallery or camera.'),
+                child: Text(
+                    'The moment is empty please choose a video from gallery or camera.'),
               ),
               actions: [
                 CupertinoActionSheetAction(
@@ -246,17 +243,24 @@ class CameraContentForm extends HookConsumerWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 12.0),
                           child: GooglePlacesAutoCompleteTextFormField(
                             googleAPIKey: googleApiKey,
-                            textEditingController: formNotifier.locationController,
-                            onPlaceDetailsWithCoordinatesReceived: (prediction) {
+                            textEditingController:
+                                formNotifier.locationController,
+                            onPlaceDetailsWithCoordinatesReceived:
+                                (prediction) {
                               // this method will return latlng with place detail
                               log("Coordinates: (${prediction.lat},${prediction.lng})");
                             },
                             onSuggestionClicked: (prediction) {
-                              formNotifier.locationController.text = prediction.description as String;
-                              formNotifier.locationController.selection = TextSelection.fromPosition(TextPosition(offset: prediction.description!.length));
+                              formNotifier.locationController.text =
+                                  prediction.description as String;
+                              formNotifier.locationController.selection =
+                                  TextSelection.fromPosition(TextPosition(
+                                      offset: prediction.description!.length));
                             },
-                            onChanged: (_) => formNotifier.syncControllersToState(),
-                            onTapOutside: (_) => FocusScope.of(context).unfocus(),
+                            onChanged: (_) =>
+                                formNotifier.syncControllersToState(),
+                            onTapOutside: (_) =>
+                                FocusScope.of(context).unfocus(),
                           ),
                         ),
                       ],
@@ -297,10 +301,12 @@ class CameraContentForm extends HookConsumerWidget {
                 },
                 readOnly: true,
                 onTap: () async {
-                  await GlazeModal.showCategoryModalPopup(context, categoryState, formNotifier.categoryController);
+                  await GlazeModal.showCategoryModalPopup(
+                      context, categoryState, formNotifier.categoryController);
                 },
               ),
-              if (fileState.video != null) _buildContentThumbnailPreview(thumbnailFuture, ref),
+              // if (fileState.video != null)
+              //   _buildContentThumbnailPreview(thumbnailFuture, ref),
               const Gap(60.0),
               PrimaryButton(
                 label: 'Upload Moment',
@@ -315,7 +321,8 @@ class CameraContentForm extends HookConsumerWidget {
     );
   }
 
-  Widget _buildContentThumbnailPreview(Future<File> thumbnailFuture, WidgetRef ref) {
+  Widget _buildContentThumbnailPreview(
+      Future<File> thumbnailFuture, WidgetRef ref) {
     return Column(
       children: [
         const Gap(26.0),
@@ -353,7 +360,8 @@ class CameraContentForm extends HookConsumerWidget {
                         ref.read(uploadMomentFormProvider.notifier).clearFile();
                         ref.invalidate(contentPickerNotifierProvider);
                       },
-                      visualDensity: const VisualDensity(horizontal: -3, vertical: -2),
+                      visualDensity:
+                          const VisualDensity(horizontal: -3, vertical: -2),
                       focusColor: ColorPallete.primaryColor,
                       color: ColorPallete.primaryColor,
                       icon: SvgPicture.asset(Assets.images.svg.closeIcon.path),
@@ -456,15 +464,4 @@ Future<void> _showUploadMomentCard(BuildContext context) async {
       );
     },
   );
-}
-
-Future<Duration> _getVideoDuration(File file) async {
-  final controller = VideoPlayerController.file(file);
-
-  try {
-    await controller.initialize();
-    return controller.value.duration;
-  } finally {
-    await controller.dispose();
-  }
 }
