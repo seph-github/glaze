@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -32,9 +31,8 @@ class _CameraVideoPreviewViewState extends State<CameraVideoPreviewView> {
 
   Future<void> _initializeVideo() async {
     await _controller.initialize();
-    _controller.setLooping(false);
+    _controller.setLooping(true);
     await _controller.play();
-    log('Video size: ${_controller.value.size}');
   }
 
   @override
@@ -56,26 +54,19 @@ class _CameraVideoPreviewViewState extends State<CameraVideoPreviewView> {
                   Expanded(
                     child: LayoutBuilder(
                       builder: (context, constraints) {
-                        final screenRatio =
-                            constraints.maxHeight / constraints.maxWidth;
-                        final previewRatio = _controller.value.size.width /
-                            _controller.value.size.height;
+                        final screenRatio = constraints.maxHeight / constraints.maxWidth;
+                        final previewRatio = _controller.value.size.width / _controller.value.size.height;
 
                         return OverflowBox(
-                          maxHeight: screenRatio > previewRatio
-                              ? constraints.maxHeight
-                              : constraints.maxWidth / previewRatio,
-                          maxWidth: screenRatio > previewRatio
-                              ? constraints.maxHeight * previewRatio
-                              : constraints.maxWidth,
+                          maxHeight: screenRatio > previewRatio ? constraints.maxHeight : constraints.maxWidth / previewRatio,
+                          maxWidth: screenRatio > previewRatio ? constraints.maxHeight * previewRatio : constraints.maxWidth,
                           child: VideoPlayer(_controller),
                         );
                       },
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12.0, vertical: 8.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
                     height: 100.0,
                     width: double.infinity,
                     child: Row(
@@ -92,10 +83,7 @@ class _CameraVideoPreviewViewState extends State<CameraVideoPreviewView> {
                           },
                           style: TextButton.styleFrom(
                             foregroundColor: Colors.blue,
-                            textStyle: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(
+                            textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.w800,
                                 ),
                           ),
@@ -106,26 +94,18 @@ class _CameraVideoPreviewViewState extends State<CameraVideoPreviewView> {
                             onPressed: () async {
                               await _controller.pause();
 
-                              ref
-                                  .read(uploadMomentFormProvider.notifier)
-                                  .setFile(
+                              ref.read(uploadMomentFormProvider.notifier).setFile(
                                     File(widget.filePath),
                                   );
-                              ref
-                                  .read(uploadMomentFormProvider.notifier)
-                                  .syncControllersToState();
+                              ref.read(uploadMomentFormProvider.notifier).syncControllersToState();
 
                               if (context.mounted) {
-                                await const CameraContentFormRoute()
-                                    .push<void>(context);
+                                await const CameraContentFormRoute().push<void>(context);
                               }
                             },
                             style: TextButton.styleFrom(
                               foregroundColor: Colors.blue,
-                              textStyle: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.copyWith(
+                              textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
                                     fontWeight: FontWeight.w800,
                                   ),
                             ),

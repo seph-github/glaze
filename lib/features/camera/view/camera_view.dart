@@ -44,14 +44,14 @@ class _CameraViewState extends State<CameraView> with WidgetsBindingObserver, Ti
     super.initState();
     _audioPlayer = AudioPlayer();
     _audioPlayer.setAsset(Assets.audios.on);
-    _audioPlayer.setVolume(30);
+    _audioPlayer.setVolume(10);
     _initCamerasAndStart(CameraLensDirection.back);
   }
 
   Future<void> _initCamerasAndStart(CameraLensDirection lens) async {
     try {
       _cameras = await availableCameras();
-      // log('available camers $_cameras');
+
       await _initializeCamera(lens);
     } catch (e) {
       _showCameraException(CameraException('init_error', e.toString()));
@@ -137,12 +137,13 @@ class _CameraViewState extends State<CameraView> with WidgetsBindingObserver, Ti
     }
 
     try {
-      _audioPlayer.play();
-      await HapticFeedback.lightImpact();
-      await _controller.startVideoRecording();
-      setState(() {
-        isRecording = true;
-        countdown = 15;
+      _audioPlayer.play().whenComplete(() async {
+        await HapticFeedback.lightImpact();
+        await _controller.startVideoRecording();
+        setState(() {
+          isRecording = true;
+          countdown = 15;
+        });
       });
 
       _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {

@@ -8,6 +8,8 @@ import 'package:glaze/core/navigation/router.dart';
 import 'package:glaze/features/camera/provider/camera_upload_content_provider/camera_upload_content_provider.dart';
 import 'package:glaze/features/camera/provider/content_picker_provider/content_picker_provider.dart';
 import 'package:glaze/features/category/provider/category_provider.dart';
+import 'package:glaze/features/dashboard/providers/dashboard_tab_controller_provider.dart';
+import 'package:glaze/features/home/provider/video_feed_provider/video_feed_provider.dart';
 import 'package:glaze/features/moments/providers/upload_moments_form_provider/upload_moments_form_provider.dart';
 import 'package:glaze/features/templates/loading_layout.dart';
 import 'package:go_router/go_router.dart';
@@ -64,7 +66,9 @@ class CameraContentFormView extends HookConsumerWidget {
             onPressed: () {
               formNotifier.clearForm();
               ref.invalidate(contentPickerNotifierProvider);
-
+              ref.read(dashboardTabControllerProvider.notifier).setTab(0);
+              final refresh = ref.refresh<VideoFeedState>(videoFeedNotifierProvider);
+              print(refresh);
               const HomeRoute().go(context);
             },
           );
