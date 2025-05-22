@@ -65,10 +65,11 @@ class CameraContentFormView extends HookConsumerWidget {
             content: next.responseMessage ?? '',
             onPressed: () {
               formNotifier.clearForm();
+              formNotifier.onDispose();
               ref.invalidate(contentPickerNotifierProvider);
               ref.read(dashboardTabControllerProvider.notifier).setTab(0);
               final refresh = ref.refresh<VideoFeedState>(videoFeedNotifierProvider);
-              print(refresh);
+              debugPrint('refresh video feed $refresh');
               const HomeRoute().go(context);
             },
           );
@@ -211,6 +212,7 @@ class CameraContentFormView extends HookConsumerWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 12.0),
                           child: GooglePlacesAutoCompleteTextFormField(
                             autofocus: true,
+                            maxHeight: 400,
                             googleAPIKey: googleApiKey,
                             textEditingController: formNotifier.locationController,
                             onPlaceDetailsWithCoordinatesReceived: (prediction) {
