@@ -12,7 +12,7 @@ import 'package:glaze/core/navigation/router.dart';
 import 'package:glaze/core/styles/color_pallete.dart';
 import 'package:glaze/data/models/category/category_model.dart';
 import 'package:glaze/data/repository/category/category_repository.dart';
-import 'package:glaze/features/camera/provider/content_picker_provider.dart';
+import 'package:glaze/features/camera/provider/content_picker_provider/content_picker_provider.dart';
 import 'package:glaze/features/profile/provider/profile_form_provider/profile_form_provider.dart';
 import 'package:glaze/features/profile/provider/profile_provider/profile_provider.dart';
 import 'package:glaze/features/profile/provider/profile_interests_list_provider/profile_interests_list_provider.dart';

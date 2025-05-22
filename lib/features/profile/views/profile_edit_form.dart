@@ -8,7 +8,7 @@ import 'package:glaze/components/app_bar_with_back_button.dart';
 import 'package:glaze/components/buttons/primary_button.dart';
 import 'package:glaze/config/enum/profile_type.dart';
 import 'package:glaze/features/auth/services/auth_services.dart';
-import 'package:glaze/features/camera/provider/content_picker_provider.dart';
+import 'package:glaze/features/camera/provider/content_picker_provider/content_picker_provider.dart';
 import 'package:glaze/features/profile/provider/profile_provider/profile_provider.dart';
 import 'package:glaze/features/profile/widgets/interest_choice_chip.dart';
 import 'package:glaze/features/templates/loading_layout.dart';

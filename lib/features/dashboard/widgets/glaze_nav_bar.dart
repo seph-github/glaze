@@ -59,9 +59,9 @@ class GlazeNavBar extends HookConsumerWidget {
         ),
         NavigationDestination(
           icon: Container(
-            width: 50.0,
-            height: 50.0,
-            margin: const EdgeInsets.only(top: 30),
+            width: 65.0,
+            height: 65.0,
+            margin: const EdgeInsets.only(top: 12),
             child: SvgPicture.asset(
               Assets.images.svg.addIcon.path,
               colorFilter: colorFilter,

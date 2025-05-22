@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../utils/generate_thumbnail.dart';
+
 part 'upload_moments_form_provider.g.dart';
 part 'upload_moments_form_provider.freezed.dart';
 
@@ -32,6 +34,8 @@ class UploadMomentForm extends _$UploadMomentForm {
   late final fileController = TextEditingController();
   late final locationController = TextEditingController();
   late final tagsController = TextEditingController();
+  late final latitudeController = TextEditingController();
+  late final longitudeController = TextEditingController();
   List<String>? tags;
   File? file;
   File? thumbnail;
@@ -45,6 +49,8 @@ class UploadMomentForm extends _$UploadMomentForm {
       filePath: '',
       location: '',
       tags: [],
+      latitude: '',
+      longitude: '',
     );
   }
 
@@ -58,6 +64,8 @@ class UploadMomentForm extends _$UploadMomentForm {
       file: file,
       thumbnail: thumbnail,
       tags: tags,
+      latitude: latitudeController.text.trim(),
+      longitude: longitudeController.text.trim(),
     );
   }
 
@@ -70,7 +78,9 @@ class UploadMomentForm extends _$UploadMomentForm {
     file = null;
     thumbnail = null;
     tags = null;
-    tagsController.dispose();
+    tagsController.clear();
+    latitudeController.clear();
+    longitudeController.clear;
     syncControllersToState();
   }
 
@@ -81,14 +91,14 @@ class UploadMomentForm extends _$UploadMomentForm {
     syncControllersToState();
   }
 
-  void setFile(File? newFile) {
+  void setFile(File? newFile) async {
     file = newFile;
     fileController.text = newFile!.path.split('/').last;
-    syncControllersToState();
-  }
 
-  void setThumbnail(File? newThumbnail) {
-    thumbnail = newThumbnail;
+    if (file != null) {
+      thumbnail = await getVideoThumbnail(file!);
+    }
+
     syncControllersToState();
   }
 
@@ -104,6 +114,9 @@ class UploadMomentForm extends _$UploadMomentForm {
     categoryController.dispose();
     fileController.dispose();
     locationController.dispose();
+    latitudeController.dispose();
+    longitudeController.dispose();
+    tagsController.dispose();
   }
 
   bool get hasChanges {

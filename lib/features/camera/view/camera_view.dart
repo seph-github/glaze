@@ -1,7 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
@@ -18,7 +17,7 @@ import 'package:just_audio/just_audio.dart';
 
 import '../../../components/dialogs/dialogs.dart';
 import '../../../utils/check_video_duration.dart';
-import '../provider/content_picker_provider.dart';
+import '../provider/content_picker_provider/content_picker_provider.dart';
 
 class CameraView extends StatefulWidget {
   const CameraView({super.key});
@@ -27,8 +26,7 @@ class CameraView extends StatefulWidget {
   State<CameraView> createState() => _CameraViewState();
 }
 
-class _CameraViewState extends State<CameraView>
-    with WidgetsBindingObserver, TickerProviderStateMixin {
+class _CameraViewState extends State<CameraView> with WidgetsBindingObserver, TickerProviderStateMixin {
   late CameraController _controller;
   Future<void>? _initializeControllerFuture;
   late List<CameraDescription> _cameras;
@@ -69,20 +67,16 @@ class _CameraViewState extends State<CameraView>
     } catch (_) {}
 
     final selectedCamera = _cameras.firstWhere(
-      (camera) =>
-          camera.lensDirection == lens &&
-          (lens == CameraLensDirection.front || camera.name.contains('0')),
+      (camera) => camera.lensDirection == lens && (lens == CameraLensDirection.front || camera.name.contains('0')),
       orElse: () => _cameras.first,
     );
 
     final newController = CameraController(
       selectedCamera,
-      ResolutionPreset.high,
+      ResolutionPreset.veryHigh,
       enableAudio: true,
       fps: 60,
     );
-
-    // if (_controller.value.isRecordingVideo) return;
 
     _initializeControllerFuture = newController.initialize();
     await _initializeControllerFuture;
@@ -90,15 +84,11 @@ class _CameraViewState extends State<CameraView>
 
     if (!mounted) return;
 
-    // if (_controller.value.isRecordingVideo) return;
-
     setState(() {
       _controller = newController;
       isRearCamera = lens == CameraLensDirection.back;
       isFlashOn = false;
     });
-
-    log('Selected camera: ${_controller.description.name}');
   }
 
   Future<void> onFlashToggle() async {
@@ -106,8 +96,7 @@ class _CameraViewState extends State<CameraView>
 
     try {
       // Check if the current camera supports flash
-      final hasFlash =
-          _controller.description.lensDirection == CameraLensDirection.back;
+      final hasFlash = _controller.description.lensDirection == CameraLensDirection.back;
 
       if (!hasFlash) {
         if (mounted) {
@@ -143,8 +132,7 @@ class _CameraViewState extends State<CameraView>
   }
 
   Future<void> _startVideoRecording() async {
-    if (!_controller.value.isInitialized ||
-        _controller.value.isRecordingVideo) {
+    if (!_controller.value.isInitialized || _controller.value.isRecordingVideo) {
       return;
     }
 
@@ -218,7 +206,6 @@ class _CameraViewState extends State<CameraView>
 
   void _showCameraException(CameraException e) {
     _logError(e.code, e.description);
-    // CustomSnackBar.showSnackBar(context, content: Text('Error: ${e.code}\n${e.description}'));
   }
 
   void _logError(String code, String? message) {
@@ -248,15 +235,20 @@ class _CameraViewState extends State<CameraView>
                   ),
             ),
             const Gap(12.0),
-            GestureDetector(
-              onTap: () async => await onFlashToggle(),
-              child: Icon(
-                isFlashOn ? Icons.flash_on_rounded : Icons.flash_off_rounded,
-                color: Colors.white,
-                size: 24.0,
+            if (isRearCamera)
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () async => await onFlashToggle(),
+                    child: Icon(
+                      isFlashOn ? Icons.flash_on_rounded : Icons.flash_off_rounded,
+                      color: Colors.white,
+                      size: 24.0,
+                    ),
+                  ),
+                  const Gap(12.0),
+                ],
               ),
-            ),
-            const Gap(12.0),
           ],
         ),
         body: FutureBuilder(
@@ -266,16 +258,10 @@ class _CameraViewState extends State<CameraView>
               return _CameraPreviewWidget(
                 countdown: countdown,
                 controller: _controller,
-                onRecordingPressed: _controller.value.isInitialized &&
-                        !_controller.value.isRecordingVideo
-                    ? _onVideoRecordButtonPressed
-                    : _onStopButtonPressed,
-                onRotateCameraPressed: _controller.value.isInitialized &&
-                        !_controller.value.isRecordingVideo
+                onRecordingPressed: _controller.value.isInitialized && !_controller.value.isRecordingVideo ? _onVideoRecordButtonPressed : _onStopButtonPressed,
+                onRotateCameraPressed: _controller.value.isInitialized && !_controller.value.isRecordingVideo
                     ? () async {
-                        final newLens = isRearCamera
-                            ? CameraLensDirection.front
-                            : CameraLensDirection.back;
+                        final newLens = isRearCamera ? CameraLensDirection.front : CameraLensDirection.back;
                         await _initializeCamera(newLens);
                       }
                     : null,
@@ -316,22 +302,22 @@ class _CameraPreviewWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final Size(:width, :height) = MediaQuery.sizeOf(context);
+    final Size(
+      :width,
+      :height
+    ) = MediaQuery.sizeOf(context);
 
     ref.listen(
       contentPickerNotifierProvider,
       (prev, next) async {
         if (next.video != null && prev?.video != next.video) {
-          log('listened to video: ${next.video!.path}');
-
           final duration = await getVideoDuration(File(next.video?.path ?? ''));
 
           if (duration.inSeconds > 15 && context.mounted) {
             await Dialogs.createContentDialog(
               context,
               title: 'Error',
-              content:
-                  'Your video exceeds the maximum allowed duration. Please subscribe or purchase a plan to upload longer videos.',
+              content: 'Your video exceeds the maximum allowed duration. Please subscribe or purchase a plan to upload longer videos.',
               onPressed: () => context.pop(),
             );
             throw Exception('Video too long! Max 15 seconds allowed.');
@@ -344,27 +330,11 @@ class _CameraPreviewWidget extends ConsumerWidget {
 
     return SafeArea(
       bottom: false,
-      child: Column(
+      child: Stack(
         children: [
-          Expanded(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final screenRatio =
-                    constraints.maxHeight / constraints.maxWidth;
-                final previewRatio = _controller.value.previewSize!.height /
-                    _controller.value.previewSize!.width;
-
-                return OverflowBox(
-                  maxHeight: screenRatio > previewRatio
-                      ? constraints.maxHeight
-                      : constraints.maxWidth / previewRatio,
-                  maxWidth: screenRatio > previewRatio
-                      ? constraints.maxHeight * previewRatio
-                      : constraints.maxWidth,
-                  child: CameraPreview(_controller),
-                );
-              },
-            ),
+          AspectRatio(
+            aspectRatio: _controller.value.previewSize!.height / _controller.value.previewSize!.width,
+            child: CameraPreview(_controller),
           ),
           Align(
             alignment: Alignment.bottomCenter,
@@ -372,16 +342,13 @@ class _CameraPreviewWidget extends ConsumerWidget {
               height: 120,
               width: width,
               color: Colors.black.withValues(alpha: 0.75),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   GestureDetector(
                     onTap: () async {
-                      await ref
-                          .read(contentPickerNotifierProvider.notifier)
-                          .pickVideos();
+                      await ref.read(contentPickerNotifierProvider.notifier).pickVideos();
                     },
                     child: Padding(
                       padding: const EdgeInsets.only(top: 16.0),

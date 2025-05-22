@@ -18,6 +18,7 @@ class InputField extends HookWidget {
     this.helper,
     this.filled = false,
     this.onTap,
+    this.onEditingComplete,
     this.lightModeColor,
     TextEditingController? controller,
   })  : controller = controller ?? TextEditingController(text: initialValue),
@@ -37,6 +38,7 @@ class InputField extends HookWidget {
     this.helper,
     this.filled = false,
     this.onTap,
+    this.onEditingComplete,
     TextEditingController? controller,
     this.readOnly = false,
     this.lightModeColor,
@@ -61,6 +63,7 @@ class InputField extends HookWidget {
     TextEditingController? controller,
     this.readOnly = false,
     this.lightModeColor,
+    this.onEditingComplete,
   })  : obscureText = false,
         controller = controller ?? TextEditingController(text: initialValue),
         keyboardType = TextInputType.phone,
@@ -82,6 +85,7 @@ class InputField extends HookWidget {
     this.filled = false,
     this.onTap,
     this.lightModeColor,
+    this.onEditingComplete,
   })  : obscureText = true,
         controller = controller ?? TextEditingController(text: initialValue),
         keyboardType = TextInputType.text,
@@ -102,6 +106,7 @@ class InputField extends HookWidget {
     this.helper,
     this.filled = false,
     this.onTap,
+    this.onEditingComplete,
     TextEditingController? controller,
     this.lightModeColor,
   })  : controller = controller ?? TextEditingController(text: initialValue),
@@ -125,6 +130,7 @@ class InputField extends HookWidget {
     this.filled = false,
     this.onTap,
     this.lightModeColor,
+    this.onEditingComplete,
     TextEditingController? controller,
   })  : controller = controller ?? TextEditingController(text: initialValue),
         _inputAction = TextInputAction.next,
@@ -148,6 +154,7 @@ class InputField extends HookWidget {
   final Widget? inputIcon;
   final bool filled;
   final Color? lightModeColor;
+  final void Function()? onEditingComplete;
 
   @override
   Widget build(BuildContext context) {
@@ -196,6 +203,7 @@ class InputField extends HookWidget {
             },
             onTapOutside: (_) => FocusScope.of(context).unfocus(),
             onChanged: onChanged,
+            onEditingComplete: onEditingComplete,
             onTap: onTap,
           ),
         ],

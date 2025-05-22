@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:glaze/features/auth/services/auth_services.dart';
 import 'package:glaze/features/home/entity/video_content_entity.dart';
 import 'package:glaze/features/home/models/video_content/video_content.dart';
@@ -57,15 +55,15 @@ class VideoContentServices {
       final videoUrl = await StorageServices().upload(
         id: userId,
         bucketName: 'videos',
-        file: form.file as File,
-        fileName: form.title as String,
+        file: form.file!,
+        fileName: form.title!,
       );
 
       final thumbnailUrl = await StorageServices().upload(
         id: userId,
         bucketName: 'thumbnails',
-        file: form.thumbnail as File,
-        fileName: form.title as String,
+        file: form.thumbnail!,
+        fileName: form.title!,
       );
 
       final entity = VideoContentEntity(

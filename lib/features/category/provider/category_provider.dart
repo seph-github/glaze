@@ -17,7 +17,7 @@ abstract class CategoryState with _$CategoryState {
   const CategoryState._();
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class CategoryNotifier extends _$CategoryNotifier {
   @override
   CategoryState build() {

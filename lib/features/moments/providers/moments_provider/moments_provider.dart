@@ -2,6 +2,7 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:glaze/features/challenges/models/challenge/challenge.dart';
+import 'package:glaze/features/challenges/services/challenge_services.dart';
 import 'package:glaze/features/home/models/video_content/video_content.dart';
 import 'package:glaze/features/moments/providers/upload_moments_form_provider/upload_moments_form_provider.dart';
 import 'package:glaze/features/moments/services/moments_services.dart';
@@ -131,7 +132,7 @@ class MomentsNotifier extends _$MomentsNotifier {
     }
   }
 
-  Future<void> uploadVideoContent() async {
+  Future<void> uploadVideoContent({String? challengeId}) async {
     state = state.copyWith(isLoading: true, error: null, response: null);
     try {
       final formState = ref.watch(uploadMomentFormProvider);
@@ -140,13 +141,12 @@ class MomentsNotifier extends _$MomentsNotifier {
 
       final response = await VideoContentServices().uploadVideoContent(
         form: formState,
-        // file: formState.file!,
-        // thumbnail: formState.thumbnail!,
         userId: user!.id,
-        // title: formState.title!,
-        // caption: formState.caption!,
-        // category: formState.category!,
       );
+
+      if (challengeId != null) {
+        await ChallengeServices().submitChallengeEntry(userId: user.id, challengeId: challengeId, videoId: response.id);
+      }
 
       await ref.read(profileNotifierProvider.notifier).fetchProfile(user.id);
 

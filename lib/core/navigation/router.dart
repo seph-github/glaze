@@ -9,7 +9,7 @@ import 'package:glaze/core/navigation/observer/route_observer_provider.dart';
 import 'package:glaze/features/auth/views/auth_confirm_token_view.dart';
 import 'package:glaze/features/auth/views/auth_forget_password_view.dart';
 import 'package:glaze/features/auth/views/auth_reset_password_view.dart';
-import 'package:glaze/features/camera/view/camera_content_form.dart';
+import 'package:glaze/features/camera/view/camera_content_form_view.dart';
 import 'package:glaze/features/camera/view/camera_view.dart';
 import 'package:glaze/features/challenges/models/challenge/challenge.dart';
 import 'package:glaze/features/challenges/models/challenge_entry/challenge_entry.dart';
@@ -646,6 +646,6 @@ class CameraContentFormRoute extends GoRouteData {
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return const CameraContentForm();
+    return const CameraContentFormView();
   }
 }

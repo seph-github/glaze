@@ -7,7 +7,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/components/modals/glaze_modals.dart';
-import 'package:glaze/features/camera/provider/content_picker_provider.dart';
+import 'package:glaze/features/camera/provider/content_picker_provider/content_picker_provider.dart';
 import 'package:glaze/features/category/provider/category_provider.dart';
 import 'package:glaze/features/moments/providers/moments_provider/moments_provider.dart';
 import 'package:glaze/features/moments/providers/upload_moments_form_provider/upload_moments_form_provider.dart';
@@ -154,8 +154,7 @@ class UploadMomentsCard extends HookConsumerWidget {
 
       if (formKey.currentState!.validate()) {
         formKey.currentState!.save();
-        final thumbnail = await thumbnailFuture;
-        ref.read(uploadMomentFormProvider.notifier).setThumbnail(thumbnail);
+
         onPressed?.call();
         log('form state ${ref.watch(uploadMomentFormProvider)}');
 
