@@ -6,7 +6,7 @@ import 'package:supabase/supabase.dart';
 import '../../../challenges/services/challenge_services.dart';
 import '../../../home/models/video_content/video_content.dart';
 import '../../../home/services/video_content_services.dart';
-import '../../../moments/providers/upload_moments_form_provider/upload_moments_form_provider.dart';
+import '../upload_moments_form_provider/upload_moments_form_provider.dart';
 import '../../../profile/provider/profile_provider/profile_provider.dart';
 
 part 'camera_upload_content_provider.freezed.dart';

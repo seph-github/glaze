@@ -1,7 +1,7 @@
 import 'package:glaze/features/auth/services/auth_services.dart';
 import 'package:glaze/features/home/entity/video_content_entity.dart';
 import 'package:glaze/features/home/models/video_content/video_content.dart';
-import 'package:glaze/features/moments/providers/upload_moments_form_provider/upload_moments_form_provider.dart';
+import 'package:glaze/features/camera/provider/upload_moments_form_provider/upload_moments_form_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/services/storage_services.dart';

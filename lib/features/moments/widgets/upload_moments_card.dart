@@ -10,7 +10,7 @@ import 'package:glaze/components/modals/glaze_modals.dart';
 import 'package:glaze/features/camera/provider/content_picker_provider/content_picker_provider.dart';
 import 'package:glaze/features/category/provider/category_provider.dart';
 import 'package:glaze/features/moments/providers/moments_provider/moments_provider.dart';
-import 'package:glaze/features/moments/providers/upload_moments_form_provider/upload_moments_form_provider.dart';
+import 'package:glaze/features/camera/provider/upload_moments_form_provider/upload_moments_form_provider.dart';
 import 'package:glaze/features/templates/loading_layout.dart';
 import 'package:glaze/utils/generate_thumbnail.dart';
 import 'package:go_router/go_router.dart';

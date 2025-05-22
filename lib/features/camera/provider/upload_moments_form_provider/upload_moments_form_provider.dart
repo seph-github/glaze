@@ -11,6 +11,7 @@ part 'upload_moments_form_provider.freezed.dart';
 @freezed
 abstract class UploadMomentFormState with _$UploadMomentFormState {
   const factory UploadMomentFormState({
+    @Default(null) String? challengeId,
     @Default(null) String? title,
     @Default(null) String? caption,
     @Default(null) String? category,
@@ -39,10 +40,12 @@ class UploadMomentForm extends _$UploadMomentForm {
   List<String>? tags;
   File? file;
   File? thumbnail;
+  String? challengeId;
 
   @override
   UploadMomentFormState build() {
     return const UploadMomentFormState(
+      challengeId: '',
       title: '',
       caption: '',
       category: '',
@@ -51,6 +54,8 @@ class UploadMomentForm extends _$UploadMomentForm {
       tags: [],
       latitude: '',
       longitude: '',
+      file: null,
+      thumbnail: null,
     );
   }
 
@@ -66,6 +71,7 @@ class UploadMomentForm extends _$UploadMomentForm {
       tags: tags,
       latitude: latitudeController.text.trim(),
       longitude: longitudeController.text.trim(),
+      challengeId: challengeId,
     );
   }
 
@@ -81,6 +87,7 @@ class UploadMomentForm extends _$UploadMomentForm {
     tagsController.clear();
     latitudeController.clear();
     longitudeController.clear;
+    challengeId = null;
     syncControllersToState();
   }
 
@@ -88,6 +95,11 @@ class UploadMomentForm extends _$UploadMomentForm {
     file = null;
     thumbnail = null;
     fileController.clear();
+    syncControllersToState();
+  }
+
+  void setChallengeId(String id) {
+    challengeId = id;
     syncControllersToState();
   }
 

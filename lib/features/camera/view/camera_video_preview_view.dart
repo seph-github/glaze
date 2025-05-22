@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glaze/components/app_bar_with_back_button.dart';
 import 'package:glaze/core/navigation/router.dart';
-import 'package:glaze/features/moments/providers/upload_moments_form_provider/upload_moments_form_provider.dart';
+import 'package:glaze/features/camera/provider/upload_moments_form_provider/upload_moments_form_provider.dart';
 import 'package:glaze/features/templates/loading_layout.dart';
 import 'package:go_router/go_router.dart';
 import 'package:video_player/video_player.dart';

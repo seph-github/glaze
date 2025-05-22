@@ -11,6 +11,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/components/app_bar_with_back_button.dart';
 import 'package:glaze/core/navigation/router.dart';
+import 'package:glaze/features/camera/provider/upload_moments_form_provider/upload_moments_form_provider.dart';
+import 'package:glaze/features/dashboard/providers/dashboard_tab_controller_provider.dart';
 import 'package:glaze/gen/assets.gen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:just_audio/just_audio.dart';
@@ -225,61 +227,68 @@ class _CameraViewState extends State<CameraView> with WidgetsBindingObserver, Ti
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      child: Scaffold(
-        appBar: AppBarWithBackButton(
-          backgroundColor: Colors.black.withValues(alpha: 0.75),
-          actions: [
-            Text(
-              '15s',
-              style: TextTheme.of(context).titleMedium?.copyWith(
-                    color: Colors.white,
-                  ),
-            ),
-            const Gap(12.0),
-            if (isRearCamera)
-              Row(
-                children: [
-                  GestureDetector(
-                    onTap: () async => await onFlashToggle(),
-                    child: Icon(
-                      isFlashOn ? Icons.flash_on_rounded : Icons.flash_off_rounded,
+      child: Consumer(builder: (context, ref, _) {
+        return Scaffold(
+          appBar: AppBarWithBackButton(
+            onBackButtonPressed: () {
+              ref.read(uploadMomentFormProvider.notifier).clearForm();
+              ref.read(dashboardTabControllerProvider.notifier).goBackToLastTab();
+              context.pop();
+            },
+            backgroundColor: Colors.black.withValues(alpha: 0.75),
+            actions: [
+              Text(
+                '15s',
+                style: TextTheme.of(context).titleMedium?.copyWith(
                       color: Colors.white,
-                      size: 24.0,
                     ),
-                  ),
-                  const Gap(12.0),
-                ],
               ),
-          ],
-        ),
-        body: FutureBuilder(
-          future: _initializeControllerFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              return _CameraPreviewWidget(
-                countdown: countdown,
-                controller: _controller,
-                onRecordingPressed: _controller.value.isInitialized && !_controller.value.isRecordingVideo ? _onVideoRecordButtonPressed : _onStopButtonPressed,
-                onRotateCameraPressed: _controller.value.isInitialized && !_controller.value.isRecordingVideo
-                    ? () async {
-                        final newLens = isRearCamera ? CameraLensDirection.front : CameraLensDirection.back;
-                        await _initializeCamera(newLens);
-                      }
-                    : null,
-                isRecording: isRecording,
-              );
-            } else if (snapshot.hasError) {
-              return Center(
-                child: Text('Camera error: ${snapshot.error}'),
-              );
-            } else {
-              return const Center(
-                child: SizedBox.shrink(),
-              );
-            }
-          },
-        ),
-      ),
+              const Gap(12.0),
+              if (isRearCamera)
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () async => await onFlashToggle(),
+                      child: Icon(
+                        isFlashOn ? Icons.flash_on_rounded : Icons.flash_off_rounded,
+                        color: Colors.white,
+                        size: 24.0,
+                      ),
+                    ),
+                    const Gap(12.0),
+                  ],
+                ),
+            ],
+          ),
+          body: FutureBuilder(
+            future: _initializeControllerFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                return _CameraPreviewWidget(
+                  countdown: countdown,
+                  controller: _controller,
+                  onRecordingPressed: _controller.value.isInitialized && !_controller.value.isRecordingVideo ? _onVideoRecordButtonPressed : _onStopButtonPressed,
+                  onRotateCameraPressed: _controller.value.isInitialized && !_controller.value.isRecordingVideo
+                      ? () async {
+                          final newLens = isRearCamera ? CameraLensDirection.front : CameraLensDirection.back;
+                          await _initializeCamera(newLens);
+                        }
+                      : null,
+                  isRecording: isRecording,
+                );
+              } else if (snapshot.hasError) {
+                return Center(
+                  child: Text('Camera error: ${snapshot.error}'),
+                );
+              } else {
+                return const Center(
+                  child: SizedBox.shrink(),
+                );
+              }
+            },
+          ),
+        );
+      }),
     );
   }
 }

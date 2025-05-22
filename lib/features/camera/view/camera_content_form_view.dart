@@ -10,7 +10,7 @@ import 'package:glaze/features/camera/provider/content_picker_provider/content_p
 import 'package:glaze/features/category/provider/category_provider.dart';
 import 'package:glaze/features/dashboard/providers/dashboard_tab_controller_provider.dart';
 import 'package:glaze/features/home/provider/video_feed_provider/video_feed_provider.dart';
-import 'package:glaze/features/moments/providers/upload_moments_form_provider/upload_moments_form_provider.dart';
+import 'package:glaze/features/camera/provider/upload_moments_form_provider/upload_moments_form_provider.dart';
 import 'package:glaze/features/templates/loading_layout.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_places_autocomplete_text_field/google_places_autocomplete_text_field.dart';

@@ -5,12 +5,14 @@ import 'package:gap/gap.dart';
 import 'package:glaze/components/app_bar_with_back_button.dart';
 import 'package:glaze/components/buttons/primary_button.dart';
 import 'package:glaze/core/styles/color_pallete.dart';
+import 'package:glaze/features/camera/provider/upload_moments_form_provider/upload_moments_form_provider.dart';
 import 'package:glaze/features/challenges/models/challenge/challenge.dart';
 import 'package:glaze/features/challenges/providers/challenge_provider.dart';
 import 'package:glaze/features/templates/loading_layout.dart';
 import 'package:glaze/gen/assets.gen.dart';
 import 'package:glaze/utils/app_timer.dart';
 import 'package:glaze/utils/string_formatter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -39,6 +41,10 @@ class ChallengeDetailsView extends HookConsumerWidget {
 
     return LoadingLayout(
       appBar: AppBarWithBackButton(
+        onBackButtonPressed: () {
+          ref.read(uploadMomentFormProvider.notifier).clearForm();
+          context.pop();
+        },
         actions: [
           AppTimer(
             endDate: DateTime.now(),
@@ -363,13 +369,23 @@ class ChallengeDetailsView extends HookConsumerWidget {
   }
 
   Widget _buildJoinChallenge(BuildContext context) {
-    return SafeArea(
-      child: Container(
-        padding: const EdgeInsets.all(12.0),
-        child: PrimaryButton(
-          label: 'Join Challenge',
-          onPressed: () async => ChallengeSubmitEntryRoute(challengeId: challenge.id).push<void>(context),
-        ),
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        12.0,
+        12.0,
+        12.0,
+        MediaQuery.paddingOf(context).bottom,
+      ),
+      child: Consumer(
+        builder: (context, ref, _) {
+          return PrimaryButton(
+            label: 'Join Challenge',
+            onPressed: () async {
+              ref.read(uploadMomentFormProvider.notifier).setChallengeId(challenge.id);
+              await const CameraRoute().push<void>(context);
+            },
+          );
+        },
       ),
     );
   }

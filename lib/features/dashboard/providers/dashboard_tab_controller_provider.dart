@@ -17,4 +17,10 @@ class DashboardTabController extends _$DashboardTabController {
       state = index;
     } else {}
   }
+
+  void goBackToLastTab() {
+    final previous = _lastTab;
+    _lastTab = state;
+    state = previous;
+  }
 }

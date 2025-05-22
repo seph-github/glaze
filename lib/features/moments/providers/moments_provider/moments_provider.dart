@@ -4,7 +4,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:glaze/features/challenges/models/challenge/challenge.dart';
 import 'package:glaze/features/challenges/services/challenge_services.dart';
 import 'package:glaze/features/home/models/video_content/video_content.dart';
-import 'package:glaze/features/moments/providers/upload_moments_form_provider/upload_moments_form_provider.dart';
+import 'package:glaze/features/camera/provider/upload_moments_form_provider/upload_moments_form_provider.dart';
 import 'package:glaze/features/moments/services/moments_services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase/supabase.dart';
