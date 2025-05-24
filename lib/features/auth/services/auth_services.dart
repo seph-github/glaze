@@ -26,10 +26,14 @@ class AuthServices {
     required String password,
   }) async {
     try {
-      final AuthResponse authResponse = await _supabase.auth.signInWithPassword(
-        email: email,
-        password: password,
-      );
+      final AuthResponse authResponse = await _supabase.auth
+          .signInWithPassword(
+            email: email,
+            password: password,
+          )
+          .then(
+            (user) async => await _checkUserFeature(user),
+          );
 
       return authResponse;
     } on AuthApiException catch (_) {
@@ -271,36 +275,4 @@ class AuthServices {
   }
 
 // Function to generate a random code verifier
-
-  String generateCodeVerifier() {
-    final random = Random.secure();
-
-    const length = 128;
-// Length of the code verifier
-
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
-
-    return List.generate(length, (index) => chars[random.nextInt(chars.length)]).join();
-  }
-
-  String createCodeChallenge(String codeVerifier) {
-    final bytes = utf8.encode(codeVerifier);
-
-    final digest = sha256.convert(bytes);
-
-    return base64Url.encode(digest.bytes).replaceAll('=', '');
-// Remove padding
-  }
-
-  Future<void> storeCodeVerifier() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-
-// Generate code verifier
-
-    final codeVerifier = generateCodeVerifier();
-
-// Store in local storage
-
-    await prefs.setString('supabase.auth.token-code-verifier', codeVerifier);
-  }
 }

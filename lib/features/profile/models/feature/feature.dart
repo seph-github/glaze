@@ -1,5 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../../../../config/enum/feature_type.dart';
+
 part 'feature.freezed.dart';
 part 'feature.g.dart';
 
@@ -9,7 +11,7 @@ class Feature with _$Feature {
     required String id,
     required String name,
     @JsonKey(name: 'feature_key') required String featureKey,
-    required String type,
+    @Default(FeatureType.free) FeatureType type,
   }) = _Feature;
 
   factory Feature.fromJson(Map<String, dynamic> json) => _$FeatureFromJson(json);

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:glaze/core/storage/local/feature_preferences.dart';
 import 'package:glaze/features/home/provider/video_feed_provider/video_feed_provider.dart';
 import 'package:glaze/features/home/services/video_content_services.dart';
 import 'package:glaze/features/profile/services/profile_services.dart';
@@ -48,8 +49,16 @@ class ProfileNotifier extends _$ProfileNotifier {
       if (profile == null) {
         state = state.copyWith(
           isLoading: false,
-          error: Exception('No profile'),
+          error: Exception('No profile found!'),
         );
+      }
+
+      final featurePref = await ref.read(featurePreferencesProvider.future);
+
+      if (profile?.userFeatures != null) {
+        for (final feature in profile!.userFeatures) {
+          featurePref.set(feature.featureKey, feature.name);
+        }
       }
 
       state = state.copyWith(

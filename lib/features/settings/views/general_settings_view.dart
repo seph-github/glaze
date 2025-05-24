@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:glaze/components/app_bar_with_back_button.dart';
+import 'package:glaze/core/storage/local/feature_preferences.dart';
 import 'package:glaze/core/styles/theme.dart';
 import 'package:glaze/features/settings/providers/settings_theme_provider.dart';
 import 'package:glaze/features/settings/widgets/settings_menu_tile.dart';
@@ -119,6 +120,22 @@ class GeneralSettingsView extends HookConsumerWidget {
                   },
                 ),
                 SettingsMenuTile(
+                  onTap: () async => await const UserFeaturesRoute().push<void>(context),
+                  label: 'Features',
+                  icon: SvgPicture.asset(
+                    Assets.images.svg.plusIcon.path,
+                    colorFilter: colorFilter,
+                  ),
+                  trailing: const Icon(
+                    Icons.chevron_right_rounded,
+                    size: 24.0,
+                  ),
+                  value: lightmode.value,
+                  onChanged: (value) {
+                    lightmode.value = value;
+                  },
+                ),
+                SettingsMenuTile(
                   label: 'Shop',
                   icon: Icon(
                     Icons.shopping_bag_outlined,
@@ -192,7 +209,8 @@ class GeneralSettingsView extends HookConsumerWidget {
                     onTap: () async {
                       if (context.canPop()) {
                         await SecureCache.clear('user_profile');
-
+                        final featurePrefs = await ref.read(featurePreferencesProvider.future);
+                        await featurePrefs.clearAll();
                         await ref.read(initialAppUseProvider).setInitialAppUseComplete(true).then(
                           (_) async {
                             await ref.read(authNotifierProvider.notifier).signOut();

@@ -119,7 +119,7 @@ class AuthView extends HookConsumerWidget {
             ),
             hintText: toggleItems.value[0],
             controller: emailController,
-            validator: validateEmail,
+            // validator: validateEmail,
           ),
           const Gap(16),
           InputField.password(

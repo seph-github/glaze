@@ -35,7 +35,7 @@ class Profile with _$Profile {
     @Default([]) List<Interact> followers,
     @Default([]) List<Interact> following,
     @Default([]) List<Glaze> glazes,
-    @Default([]) List<Feature>? userFeatures,
+    @JsonKey(name: 'user_features') @Default([]) List<Feature> userFeatures,
   }) = _Profile;
 
   factory Profile.fromJson(Map<String, dynamic> json) => _$ProfileFromJson(json);

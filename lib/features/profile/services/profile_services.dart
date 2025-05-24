@@ -27,7 +27,10 @@ class ProfileServices {
 
       final raw = response as List<dynamic>;
 
-      return Profile.fromJson(raw.first);
+      final profile = Profile.fromJson(raw.first);
+      log('user profile from services features ${profile.userFeatures}');
+
+      return profile;
     } on PostgrestException catch (e) {
       log('Error fetching user profile: ${e.message}');
       rethrow;

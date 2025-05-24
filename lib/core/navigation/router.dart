@@ -20,6 +20,7 @@ import 'package:glaze/features/dashboard/views/dashboard_view.dart';
 import 'package:glaze/features/profile/views/profile_edit_form.dart';
 import 'package:glaze/features/profile/views/profile_interactive_view.dart';
 import 'package:glaze/features/settings/views/terms_and_condition_view.dart';
+import 'package:glaze/features/settings/views/user_feature_view.dart';
 import 'package:glaze/features/shop/models/shop_product/shop_product.dart';
 import 'package:glaze/features/shop/views/checkout_view.dart';
 import 'package:glaze/features/shop/views/shop_view.dart';
@@ -548,6 +549,16 @@ class TermsAndConditionRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const TermsAndConditionsPage();
+  }
+}
+
+@TypedGoRoute<UserFeaturesRoute>(path: '/user-features')
+class UserFeaturesRoute extends GoRouteData {
+  const UserFeaturesRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const UserFeatureView();
   }
 }
 
