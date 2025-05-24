@@ -1,22 +1,19 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:glaze/components/app_bar_with_back_button.dart';
 import 'package:glaze/features/home/models/video_content/video_content.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:lottie/lottie.dart';
 import 'package:preload_page_view/preload_page_view.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../core/styles/color_pallete.dart';
 import '../../../gen/assets.gen.dart';
-import '../../../utils/video_feed_sharing_popup.dart';
-import '../../home/provider/glaze_provider/glaze_provider.dart';
 import '../../home/provider/video_feed_provider/video_feed_provider.dart';
-import '../../home/widgets/home_interactive_card.dart';
+import '../../home/widgets/video_player_component.dart';
 import '../../templates/loading_layout.dart';
 import '../providers/video_preview_provider/videos_preview_provider.dart';
 
@@ -36,13 +33,8 @@ class VideoPreviewView extends HookConsumerWidget with WidgetsBindingObserver {
     final appLifecycle = useAppLifecycleState();
     final isAppActive = useState<bool>(true);
 
-    final Size(
-      :width,
-      :height
-    ) = MediaQuery.sizeOf(context);
-
     const int maxCacheSize = 3;
-    final showPlayerIcon = useState<bool>(false);
+
     final pageController = useMemoized(() {
       return PreloadPageController(initialPage: initialIndex);
     }, [
@@ -55,7 +47,6 @@ class VideoPreviewView extends HookConsumerWidget with WidgetsBindingObserver {
     final accessOrder = useState<List<String>>([]);
     final controllerCreationMap = useState<Map<String, Completer<VideoPlayerController>>>({});
     final currentPage = useState<int>(initialIndex);
-    final showPlayIcon = useState<bool>(true);
 
     Future<void> pauseAllControllers() async {
       final controllers = List<VideoPlayerController>.from(controllerCache.value.values);
@@ -64,7 +55,7 @@ class VideoPreviewView extends HookConsumerWidget with WidgetsBindingObserver {
         try {
           if (controller.value.isInitialized && controller.value.isPlaying) {
             await controller.pause();
-            showPlayIcon.value = true;
+
             await controller.seekTo(Duration.zero);
           }
         } catch (_) {}
@@ -72,9 +63,7 @@ class VideoPreviewView extends HookConsumerWidget with WidgetsBindingObserver {
     }
 
     Future<void> removeController(String videoId) async {
-      if (disposingControllers.value.contains(videoId)) {
-        return;
-      }
+      if (disposingControllers.value.contains(videoId)) return;
 
       disposingControllers.value.add(videoId);
 
@@ -87,10 +76,11 @@ class VideoPreviewView extends HookConsumerWidget with WidgetsBindingObserver {
           try {
             if (controller.value.isInitialized) {
               await controller.pause();
-              showPlayIcon.value = true;
+
+              await controller.seekTo(Duration.zero);
             }
 
-            await controller.dispose();
+            // await controller.dispose();
           } catch (_) {}
         }
       } catch (_) {
@@ -126,7 +116,7 @@ class VideoPreviewView extends HookConsumerWidget with WidgetsBindingObserver {
       controllerCreationMap.value[video.id] = completer;
 
       try {
-        final videoFile = await ref.read(videoFeedNotifierProvider.notifier).getCachedVideoFile(video.videoUrl);
+        final videoFile = await ref.watch(videoFeedNotifierProvider.notifier).getCachedVideoFile(video.videoUrl);
 
         final controller = VideoPlayerController.file(videoFile);
         await controller.initialize();
@@ -154,10 +144,10 @@ class VideoPreviewView extends HookConsumerWidget with WidgetsBindingObserver {
       if (controller != null && controller.value.isInitialized && !controller.value.isPlaying) {
         try {
           await controller.play();
-          if (controller.value.isPlaying) {
-            showPlayIcon.value = false;
-          }
-        } catch (_) {}
+          if (controller.value.isPlaying) {}
+        } catch (e) {
+          log('Play controller error: $e');
+        }
       }
     }
 
@@ -261,12 +251,19 @@ class VideoPreviewView extends HookConsumerWidget with WidgetsBindingObserver {
 
     useEffect(() {
       WidgetsBinding.instance.addObserver(this);
-      Future.microtask(() async {
-        ref.read(videosPreviewProvider.notifier).setVideos(this.videos);
-        WidgetsBinding.instance.addPostFrameCallback((_) async {
-          await initAndPlayVideo(initialIndex);
-        });
-      });
+      Future.microtask(
+        () async {
+          try {
+            WidgetsBinding.instance.addPostFrameCallback((_) async {
+              ref.read(videosPreviewProvider.notifier).setVideos(this.videos);
+
+              await initAndPlayVideo(initialIndex);
+            });
+          } catch (e) {
+            log('UseEffect catch error: $e');
+          }
+        },
+      );
       return;
     }, [
       this.videos,
@@ -318,17 +315,15 @@ class VideoPreviewView extends HookConsumerWidget with WidgetsBindingObserver {
     ]);
 
     return SafeArea(
+      top: false,
       child: LoadingLayout(
         backgroundColor: ColorPallete.lightBackgroundColor,
         appBar: AppBarWithBackButton(
-          backgroundColor: ColorPallete.lightBackgroundColor,
+          backgroundColor: Colors.transparent,
           onBackButtonPressed: () async {
             router.pop();
           },
         ),
-        // bottomNavigationBar: SizedBox.fromSize(
-        //   size: const Size.fromHeight(kBottomNavigationBarHeight * 2),
-        // ),
         child: RepaintBoundary(
           child: PreloadPageView.builder(
             scrollDirection: Axis.vertical,
@@ -336,12 +331,12 @@ class VideoPreviewView extends HookConsumerWidget with WidgetsBindingObserver {
             physics: const AlwaysScrollableScrollPhysics(),
             itemCount: videos.length,
             itemBuilder: (context, index) {
-              if (index < 0 || index >= videos.length) return const SizedBox.shrink();
-
-              if ((index - currentPage.value).abs() > 1) return const SizedBox.shrink();
-
+              if (index >= videos.length) return const SizedBox.shrink();
               final video = videos[index];
 
+              if ((index - currentPage.value).abs() > 1) {
+                return const SizedBox.shrink();
+              }
               return FutureBuilder<VideoPlayerController?>(
                 future: getOrCreateController(video),
                 builder: (context, snapshot) {
@@ -350,79 +345,19 @@ class VideoPreviewView extends HookConsumerWidget with WidgetsBindingObserver {
                       child: SizedBox(
                         height: 100,
                         width: 100,
-                        child: Lottie.asset(
-                          Assets.lotties.donutLoading.path,
+                        child: Image.asset(
+                          Assets.images.gif.donutLoading.path,
                         ),
                       ),
                     );
                   }
                   final controller = snapshot.data!;
-                  return Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: () async {
-                          if (!(index == currentPage.value)) {
-                            return;
-                          } else if (controller.value.isPlaying) {
-                            await controller.pause();
-                            showPlayerIcon.value = true;
-                          } else {
-                            await controller.play();
-                            showPlayerIcon.value = false;
-                          }
-                        },
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            if (controller.value.size.height > 640)
-                              VideoPlayer(controller)
-                            else
-                              AspectRatio(
-                                aspectRatio: controller.value.aspectRatio,
-                                child: VideoPlayer(controller),
-                              ),
-                            if (showPlayerIcon.value)
-                              Container(
-                                width: 50,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.black.withValues(alpha: 0.3),
-                                ),
-                                child: Center(
-                                  child: SvgPicture.asset(Assets.images.svg.playIcon.path),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        child: SafeArea(
-                          child: HomeInteractiveCard(
-                            key: PageStorageKey('HomeInteractiveCard_$index'),
-                            video: video,
-                            width: width,
-                            height: height,
-                            controller: getController(video.id),
-                            glazeCount: videos[index].glazesCount ?? 0,
-                            isGlazed: videos[index].hasGlazed,
-                            onGlazeTap: () async {
-                              final isCurrentlyGlazed = video.hasGlazed;
-                              final newGlazeCount = isCurrentlyGlazed ? (video.glazesCount ?? 0) - 1 : (video.glazesCount ?? 0) + 1;
+                  final video = videos[index];
 
-                              ref.read(videosPreviewProvider.notifier).updateVideo(video.id, newGlazeCount, !isCurrentlyGlazed);
-
-                              await ref.read(glazeNotifierProvider.notifier).onGlazed(videoId: video.id);
-                            },
-                            onShareTap: () async => await showShareOptions(context),
-                          ),
-                        ),
-                      )
-                    ],
+                  return VideoPlayerComponent(
+                    controller: controller,
+                    video: video,
+                    currentActiveVideoId: videos[currentPage.value].id,
                   );
                 },
               );

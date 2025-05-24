@@ -98,23 +98,7 @@ class HomeInteractiveCard extends HookConsumerWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    CachedNetworkImage(
-                      color: Colors.amber,
-                      imageUrl: video.profileImageUrl ?? '',
-                      imageBuilder: (context, imageProvider) => CircleAvatar(
-                        radius: 15.0,
-                        backgroundImage: imageProvider,
-                      ),
-                      placeholder: (context, url) => CircleAvatar(
-                        radius: 15.0,
-                        backgroundColor: ColorPallete.lightBackgroundColor,
-                        child: Image.asset(
-                          Assets.images.png.profilePlaceholder.path,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      errorWidget: (context, url, error) => const Icon(Icons.account_circle_outlined),
-                    ),
+                    _buildProfileImage(video.profileImageUrl),
                     const Gap(8),
                     Text(
                       '@${video.username}',
@@ -176,6 +160,36 @@ class HomeInteractiveCard extends HookConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildProfileImage(String? imageUrl) {
+    return CachedNetworkImage(
+      imageUrl: video.profileImageUrl ?? '',
+      imageBuilder: (context, imageProvider) {
+        return CircleAvatar(
+          radius: 15.0,
+          backgroundImage: imageProvider,
+        );
+      },
+      placeholder: (context, url) => CircleAvatar(
+        radius: 15.0,
+        backgroundColor: ColorPallete.lightBackgroundColor,
+        child: Image.asset(
+          Assets.images.png.profilePlaceholder.path,
+          fit: BoxFit.cover,
+        ),
+      ),
+      errorWidget: (context, url, error) {
+        return CircleAvatar(
+          radius: 15.0,
+          backgroundColor: ColorPallete.lightBackgroundColor,
+          child: Image.asset(
+            Assets.images.png.profilePlaceholder.path,
+            fit: BoxFit.cover,
+          ),
+        );
+      },
     );
   }
 }

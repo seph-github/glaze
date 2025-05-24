@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -117,7 +116,6 @@ class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer> with Single
   bool showIcon = false;
 
   void _startHideTimer() {
-    log('called timer');
     timer?.cancel();
     timer = Timer(
       const Duration(milliseconds: 1500),

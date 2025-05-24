@@ -402,10 +402,11 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
                   }
 
                   final controller = snapshot.data!;
+                  final video = videos[index];
 
                   return VideoPlayerComponent(
                     controller: controller,
-                    video: videos[index],
+                    video: video,
                     currentActiveVideoId: videos[currentPage.value].id,
                   );
                 },

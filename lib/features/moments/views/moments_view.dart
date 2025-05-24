@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -70,15 +72,33 @@ class MomentsView extends HookConsumerWidget {
     ];
 
     useEffect(() {
-      scrollController.addListener(() {
-        if (scrollController.offset > 50.0) {
+      void onScroll() {
+        final maxScroll = scrollController.position.maxScrollExtent;
+        final currentScroll = scrollController.position.pixels;
+        const threshold = 100; // Load more when 200px from bottom
+
+        if (maxScroll - currentScroll <= threshold) {
+          log('Almost at bottom - loading more');
           Future.microtask(
             () async => await ref.read(momentsNotifierProvider.notifier).loadMoreSearch(),
           );
+          // ref.read(momentsNotifierProvider.notifier).loadMoreSearch();
         }
-      });
-      return;
-    }, []);
+      }
+
+      scrollController.addListener(onScroll);
+      // scrollController.addListener(() {
+      //   log('scroll controller offset ${scrollController.position}');
+      //   if (scrollController.position.maxScrollExtent > 50.0) {
+      //     Future.microtask(
+      //       () async => await ref.read(momentsNotifierProvider.notifier).loadMoreSearch(),
+      //     );
+      //   }
+      // });
+      return () => scrollController.removeListener(onScroll);
+    }, [
+      scrollController
+    ]);
 
     return LoadingLayout(
       isLoading: state.isLoading,
@@ -120,14 +140,23 @@ class MomentsView extends HookConsumerWidget {
                 ),
             ];
           },
-          body: CustomTabBar(
-            length: tabs.length,
-            controller: tabController,
-            tabs: tabs,
-            tabViews: tabViews,
-            onTap: (value) {
-              currentIndex.value = value;
+          body: NotificationListener<ScrollNotification>(
+            onNotification: (scrollNotification) {
+              // Additional scroll detection for more precise control
+              if (scrollNotification is ScrollEndNotification && scrollNotification.metrics.pixels >= scrollNotification.metrics.maxScrollExtent - 100) {
+                ref.read(momentsNotifierProvider.notifier).loadMoreSearch();
+              }
+              return false;
             },
+            child: CustomTabBar(
+              length: tabs.length,
+              controller: tabController,
+              tabs: tabs,
+              tabViews: tabViews,
+              onTap: (value) {
+                currentIndex.value = value;
+              },
+            ),
           ),
         ),
       ),

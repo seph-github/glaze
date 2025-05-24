@@ -1,17 +1,9 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:gap/gap.dart';
 import 'package:glaze/features/moments/views/moments_videos_tabview.dart';
-import 'package:glaze/features/profile/provider/profile_provider/profile_provider.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-import '../../../components/dialogs/dialogs.dart';
-import '../../../gen/assets.gen.dart';
 import '../../home/models/video_content/video_content.dart';
 
 class ProfileMomentsCard extends ConsumerWidget {
@@ -44,158 +36,9 @@ class ProfileMomentsCard extends ConsumerWidget {
                 child: Text('No videos'),
               ),
             )
-          else if (isCurrentUser)
-            ListView.builder(
-              padding: EdgeInsets.zero,
-              primary: false,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: videos?.length,
-              scrollDirection: Axis.vertical,
-              itemBuilder: (context, index) {
-                return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                  clipBehavior: Clip.hardEdge,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(
-                        children: [
-                          Container(
-                            clipBehavior: Clip.hardEdge,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(4.0),
-                            ),
-                            height: 150,
-                            child: AspectRatio(
-                              aspectRatio: 9 / 16,
-                              child: CachedNetworkImage(
-                                imageUrl: videos?[index].thumbnailUrl ?? '',
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Gap(8),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Text(
-                                videos?[index].title ?? 'Video Title',
-                                style: Theme.of(context).textTheme.headlineSmall,
-                              ),
-                              Row(
-                                children: [
-                                  const Icon(
-                                    LucideIcons.atSign,
-                                    size: 12,
-                                  ),
-                                  Text(' ${videos?[index].category ?? ''}'),
-                                  const Gap(10),
-                                  SvgPicture.asset(
-                                    Assets.images.svg.glazeDonutsIcon.path,
-                                    height: 12,
-                                  ),
-                                  Text(' ${videos?[index].glazesCount ?? 0}'),
-                                ],
-                              ),
-                              const Gap(4.0),
-                              Text(
-                                videos?[index].caption ?? 'Video Caption',
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const Gap(16),
-                      Column(
-                        children: [
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: IconButton(
-                              onPressed: () async {
-                                showCupertinoModalPopup<void>(
-                                  context: context,
-                                  builder: (BuildContext context) => CupertinoActionSheet(
-                                    title: const Text('Options'),
-                                    actions: <CupertinoActionSheetAction>[
-                                      CupertinoActionSheetAction(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: Text(
-                                          'Edit',
-                                          style: Theme.of(context).textTheme.titleLarge,
-                                        ),
-                                      ),
-                                      CupertinoActionSheetAction(
-                                        onPressed: () async {
-                                          await Dialogs.dualActionContentDialog(
-                                            context,
-                                            title: 'Confirm Video Deletion',
-                                            content: 'This action is permanent and cannot be undone. Deleting the video will remove it from your profile and erase all associated data. Are you sure you want to proceed?',
-                                            onCancel: () => Navigator.of(context).popUntil(
-                                              (route) => route.isFirst,
-                                            ),
-                                            onConfirm: () async {
-                                              if (context.canPop()) {
-                                                Navigator.of(context).popUntil(
-                                                  (route) => route.isFirst,
-                                                );
-                                              }
-                                              await ref.read(profileNotifierProvider.notifier).deleteVideoById(videos![index].id);
-                                            },
-                                          );
-                                        },
-                                        isDestructiveAction: true,
-                                        child: Text(
-                                          'Delete',
-                                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                                color: Colors.red,
-                                              ),
-                                        ),
-                                      ),
-                                    ],
-                                    cancelButton: CupertinoActionSheetAction(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      isDefaultAction: true,
-                                      child: Text(
-                                        'Cancel',
-                                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                              color: Colors.blue,
-                                            ),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                              icon: Icon(
-                                Icons.more_horiz,
-                                color: Theme.of(context).colorScheme.inverseSurface,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              },
-            )
           else
             MomentsVideosTabview(
+              isCurrentUser: isCurrentUser,
               videos: videos,
               primary: false,
               shrinkWrap: true,
