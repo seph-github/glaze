@@ -6,16 +6,15 @@ import 'package:glaze/components/app_bar_with_back_button.dart';
 import 'package:glaze/components/modals/glaze_modals.dart';
 import 'package:glaze/core/navigation/router.dart';
 import 'package:glaze/features/camera/provider/camera_upload_content_provider/camera_upload_content_provider.dart';
-import 'package:glaze/features/camera/provider/content_picker_provider/content_picker_provider.dart';
 import 'package:glaze/features/category/provider/category_provider.dart';
 import 'package:glaze/features/dashboard/providers/dashboard_tab_controller_provider.dart';
 import 'package:glaze/features/home/provider/video_feed_provider/video_feed_provider.dart';
 import 'package:glaze/features/camera/provider/upload_moments_form_provider/upload_moments_form_provider.dart';
+import 'package:glaze/features/home/provider/videos_provider/videos_provider.dart';
 import 'package:glaze/features/templates/loading_layout.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_places_autocomplete_text_field/google_places_autocomplete_text_field.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'dart:io';
 
 import '../../../components/buttons/primary_button.dart';
 import '../../../components/dialogs/dialogs.dart';
@@ -65,23 +64,13 @@ class CameraContentFormView extends HookConsumerWidget {
             content: next.responseMessage ?? '',
             onPressed: () {
               formNotifier.clearForm();
-              formNotifier.onDispose();
-              ref.invalidate(contentPickerNotifierProvider);
-              ref.read(dashboardTabControllerProvider.notifier).setTab(0);
-              final refresh = ref.refresh<VideoFeedState>(videoFeedNotifierProvider);
-              debugPrint('refresh video feed $refresh');
+
+              ref.invalidate(videosProvider);
+              ref.invalidate(videoFeedNotifierProvider);
+              ref.invalidate(dashboardTabControllerProvider);
               const HomeRoute().go(context);
             },
           );
-        }
-      },
-    );
-
-    ref.listen(
-      contentPickerNotifierProvider,
-      (prev, next) {
-        if (next.video != null) {
-          ref.read(uploadMomentFormProvider.notifier).setFile(File(next.video!.path));
         }
       },
     );
@@ -118,7 +107,11 @@ class CameraContentFormView extends HookConsumerWidget {
 
     return LoadingLayout(
       isLoading: state.isLoading || categoryState.isLoading,
-      appBar: const AppBarWithBackButton(),
+      appBar: AppBarWithBackButton(
+        onBackButtonPressed: () {
+          context.pop();
+        },
+      ),
       child: Form(
         key: formKey,
         child: Padding(

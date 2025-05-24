@@ -142,10 +142,11 @@ class _CameraViewState extends State<CameraView> with WidgetsBindingObserver, Ti
       _audioPlayer.play().whenComplete(() async {
         await HapticFeedback.lightImpact();
         await _controller.startVideoRecording();
-        setState(() {
-          isRecording = true;
-          countdown = 15;
-        });
+      });
+
+      setState(() {
+        isRecording = true;
+        countdown = 15;
       });
 
       _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {

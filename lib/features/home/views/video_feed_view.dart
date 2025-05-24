@@ -19,7 +19,7 @@ import '../../dashboard/providers/dashboard_tab_controller_provider.dart';
 
 import '../models/video_content/video_content.dart';
 import '../provider/glaze_provider/glaze_provider.dart';
-import 'video_player_view.dart';
+import '../widgets/video_player_component.dart';
 
 class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
   const VideoFeedView({
@@ -403,9 +403,10 @@ class VideoFeedView extends HookConsumerWidget with WidgetsBindingObserver {
 
                   final controller = snapshot.data!;
 
-                  return VideoPlayerView(
+                  return VideoPlayerComponent(
                     controller: controller,
                     video: videos[index],
+                    currentActiveVideoId: videos[currentPage.value].id,
                   );
                 },
               );

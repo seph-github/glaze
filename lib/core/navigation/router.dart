@@ -611,13 +611,7 @@ class ChallengeSubmitEntryRoute extends GoRouteData {
   }
 }
 
-@TypedGoRoute<CameraRoute>(
-  path: '/camera-view',
-  routes: [
-    TypedGoRoute<CameraVideoPreviewRoute>(path: 'video-preview'),
-    TypedGoRoute<CameraContentFormRoute>(path: 'content-form')
-  ],
-)
+@TypedGoRoute<CameraRoute>(path: '/camera-view')
 class CameraRoute extends GoRouteData {
   const CameraRoute();
 
@@ -627,7 +621,7 @@ class CameraRoute extends GoRouteData {
   }
 }
 
-// @TypedGoRoute<CameraRoute>(path: '/camera-view')
+@TypedGoRoute<CameraVideoPreviewRoute>(path: '/camera-preview')
 class CameraVideoPreviewRoute extends GoRouteData {
   const CameraVideoPreviewRoute(this.filePath);
 
@@ -641,6 +635,7 @@ class CameraVideoPreviewRoute extends GoRouteData {
   }
 }
 
+@TypedGoRoute<CameraContentFormRoute>(path: '/content-form')
 class CameraContentFormRoute extends GoRouteData {
   const CameraContentFormRoute();
 
